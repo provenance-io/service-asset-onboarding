@@ -1,0 +1,6 @@
+style:
+    ReturnCount:
+        active: false
+    MagicNumber:
+        active: false
+

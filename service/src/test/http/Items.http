@@ -1,0 +1,7 @@
+### List all sales leads by status
+
+GET http://localhost:8080/service-asset-onboarding/secure/api/v1/items
+Content-Type: application/json
+x-uuid: deadbeef-face-479b-860c-facefaceface
+x-roles:  {"service-asset-onboarding":["ROLE_SUPER_USER"]}
+x-org: FIGURE
