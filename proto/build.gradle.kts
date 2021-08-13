@@ -13,7 +13,6 @@ dependencies {
     listOf(
         Dependencies.Protobuf.Java,
         Dependencies.Protobuf.JavaUtil,
-        Dependencies.Figure.StreamData
     ).forEach { dep ->
         dep.implementation(this)
     }
