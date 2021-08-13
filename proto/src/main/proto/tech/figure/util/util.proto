@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package tech.figure.util;
+
+option go_package = "github.com/FigureTechnologies/figure-tech-proto-go/pkg/common";
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+
+// Java: Use LocalDate. Date stored as ISO8601 string. EX: "2020-05-22". For OffsetDateTime, use proto Timestamp
+message Date {
+  string value = 1;
+}
+
+// Java: Use Joda Money, BigMoney, or BigDecimal
+message Money {
+  string amount = 1;   // Required
+  string currency = 2; // Required
+}
+
+// Java: Use BigDecimal
+message Decimal {
+  string value = 1;
+}
+
+// UUID stored as a string
+message UUID {
+  string value = 1;
+}
+
+message Bytes {
+  bytes value = 1;
+}
+
+// Audit
+message AuditFields {
+  google.protobuf.Timestamp created_date = 1;
+  string created_by = 2;
+  google.protobuf.Timestamp updated_date = 3;
+  string updated_by = 4;
+  int32 version = 5;
+  string message = 6;
+}
