@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package tech.figure.asset.loan;
+
+import "tech/figure/util/util.proto";
+import "google/protobuf/timestamp.proto";
+import "tech/figure/finance/financial_account.proto";
+
+
+message Consent {
+  string consent_type = 1; // see ConsentExpectedType in ExpectedEnumValues.kt
+  OptStatus opt_status = 2;
+  string credit_union = 3;
+}
+
+enum OptStatus {
+  OPT_STATUS_UNKNOWN = 0;
+  IN = 1;
+  OUT = 2;
+}

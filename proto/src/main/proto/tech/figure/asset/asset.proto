@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package tech.figure.asset;
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+import "tech/figure/util/util.proto";
+
+message Asset {
+  tech.figure.util.UUID uuid = 1 ;
+  string asset_type = 2;  // user-defined type
+  string asset_name = 3;  // user-defined name
+
+  map<string, Data> payload = 4;
+
+  tech.figure.util.AuditFields audit_fields = 999;
+}
+
+message Data {
+  string mime_type = 1;
+  tech.figure.util.Bytes data = 2;
+}

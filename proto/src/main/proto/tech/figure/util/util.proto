@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package tech.figure.util;
 
-option go_package = "github.com/FigureTechnologies/figure-tech-proto-go/pkg/common";
-
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -34,10 +32,16 @@ message Bytes {
 
 // Audit
 message AuditFields {
-  google.protobuf.Timestamp created_date = 1;
+  google.protobuf.Timestamp created_timestamp = 1;
   string created_by = 2;
-  google.protobuf.Timestamp updated_date = 3;
+  google.protobuf.Timestamp updated_timestamp = 3;
   string updated_by = 4;
   int32 version = 5;
   string message = 6;
 }
+
+message Note {
+  string note = 1 ;
+  tech.figure.util.AuditFields audit_fields = 99;
+}
+

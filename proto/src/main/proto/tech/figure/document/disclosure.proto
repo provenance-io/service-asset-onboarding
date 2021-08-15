@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package tech.figure.document;
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/timestamp.proto";
+import "tech/figure/document/document.proto";
+import "tech/figure/util/options.proto";
+import "tech/figure/util/util.proto";
+
+message Disclosure {
+  tech.figure.util.UUID uuid = 1;
+
+  tech.figure.document.Document signed_document = 10;
+  tech.figure.document.Document unsigned_document = 11;
+  ElectronicSignature electronic_signature = 12;
+  map<string, string> substitution_data = 13;
+  string disclosure_type = 14;
+
+  string signed_doc_checksum = 24;
+  string signed_doc_checksum_algorithm = 25;
+  bool signature_required = 26;
+
+  tech.figure.util.AuditFields audit_fields = 99;
+}
+
+message ElectronicSignature {
+  tech.figure.util.UUID uuid = 1;
+  string checksum = 5;
+  string checksum_algorithm = 6;
+  repeated Data data = 7;
+
+  tech.figure.util.UUID identity_uuid = 8;
+  tech.figure.util.UUID application_uuid = 9;
+  tech.figure.util.UUID document_uuid = 10;
+
+  tech.figure.util.AuditFields audit_fields = 99;
+
+  message Data {
+    tech.figure.util.UUID identity_uuid = 1;
+    Notary notary = 5;
+    string email = 6 [(tech.figure.util.pii) = true];
+    string ip = 7;
+    string user_agent = 8;
+    Location location = 9;
+    string two_factor_signing_token = 10;
+    google.protobuf.Timestamp two_factor_timestamp = 11;
+    google.protobuf.Timestamp signing_timestamp = 12;
+    tech.figure.util.Name name = 13;
+    repeated Witness witnesses = 14;
+  }
+
+  message Location {
+    tech.figure.util.Decimal latitude = 1;
+    tech.figure.util.Decimal longitude = 2;
+  }
+
+  message Notary {
+    tech.figure.util.UUID identity_uuid = 1;
+    tech.figure.util.Name name = 2;
+    string commission_id = 3;
+    google.protobuf.Timestamp commission_expiration = 4;
+    bool resident = 5;
+  }
+
+  message Witness {
+    tech.figure.util.UUID identity_uuid = 1;
+    tech.figure.util.Name name = 2;
+  }
+}
