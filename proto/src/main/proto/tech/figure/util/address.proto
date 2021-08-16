@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package tech.figure.util;
 
-import "google/protobuf/descriptor.proto";
+//import "google/protobuf/descriptor.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
 

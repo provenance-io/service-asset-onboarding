@@ -51,6 +51,6 @@ message FinancialAccount {
   // Provenance marker location
   string marker_address = 30;
 
-  AuditFields audit_fields = 999;
+  tech.figure.util.AuditFields audit_fields = 999;
 }
 

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package tech.figure.person;
+
+
+import "tech/figure/util/options.proto";
+import "tech/figure/util/util.proto";
+
+
+message Name {
+  tech.figure.util.UUID uuid = 1;
+  string first_name = 2 [(tech.figure.util.pii) = true];
+  string last_name = 3 [(tech.figure.util.pii) = true];
+  string middle_name = 4 [(tech.figure.util.pii) = true];
+  string prefix = 5 [(tech.figure.util.pii) = true];
+  string suffix = 6 [(tech.figure.util.pii) = true];
+  tech.figure.util.AuditFields audit_fields = 99;
+}
