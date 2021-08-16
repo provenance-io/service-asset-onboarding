@@ -10,6 +10,8 @@ package tech.figure.asset.loan;
 //  repeated studentloan.StudentLoanDetail student_loan_details = 140;
 //
 //}
+// SLR had this in Party (Person)
+//   repeated studentloan.Education educations = 22;
 //
 //message Heloc {
 //  tech.figure.util.Money credit_limit_amount = 245; // HELOC/MERLOC: if present, indicates asset credit limit. if absent, Loan.amount should be used instead

@@ -9,7 +9,19 @@ _AKA: Lessons we have learned the hard way_
 - Proto Options all defined in the `options.proto` file and not in individual messages/files. Option field numbers
 should be globally unique
 
+- Why we represent UUID as string: https://newbedev.com/how-do-i-represent-a-uuid-in-a-protobuf-message
+
 ## Loans
 
 - Only info common to all loans goes into the loan proto. For specific loan types, establish separate facts in the scope 
 for that particular loan type
+
+
+
+
+
+to consider:
+
+- package structure
+- file organization
+- message names

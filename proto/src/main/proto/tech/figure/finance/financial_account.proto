@@ -9,10 +9,8 @@ import "google/protobuf/descriptor.proto";
 
 message FinancialAccount {
 
-  tech.figure.util.UUID uuid = 1;
-  tech.figure.util.UUID plaid_account_report_uuid = 2;
-  tech.figure.util.UUID owner_uuid = 3;                  // UUID of the borrower or owner of the account
-  string plaid_account_id = 4;
+  tech.figure.util.UUID id = 1;
+  tech.figure.util.UUID owner_id = 3;  // UUID of the borrower or owner of the account
 
   string account_number = 10 [(tech.figure.util.pii) = true];
   string routing_number = 11 [(tech.figure.util.pii) = true];
@@ -34,12 +32,13 @@ message FinancialAccount {
 
   bool is_ach_account = 18;
 
+  // TODO we should restructure into a oneof
 
   // wire specific info
   tech.figure.util.Address account_address = 20 [(tech.figure.util.pii) = true];
   string wire_instructions = 21 [(tech.figure.util.pii) = true];
 
-  //additional info for SWIFT bank accounts
+  // additional info for SWIFT bank accounts
   string swift_id = 23 [(tech.figure.util.pii) = true]; //SWIFT bank account id
   tech.figure.util.Address swift_bank_address = 24 [(tech.figure.util.pii) = true];
 
@@ -48,6 +47,7 @@ message FinancialAccount {
 
   repeated string verification_messages = 27; // verification messages to give more context to the status, set by 3rd party or manual verification processes
 
+  // TODO should we keep this? seems to be used by servicing for Figure Pay bank credit loans
   // Provenance marker location
   string marker_address = 30;
 

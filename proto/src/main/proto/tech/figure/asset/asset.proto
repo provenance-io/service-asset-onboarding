@@ -3,18 +3,12 @@ syntax = "proto3";
 package tech.figure.asset;
 
 import "tech/figure/util/util.proto";
+import "google/protobuf/any.proto";
 
 message Asset {
-  tech.figure.util.UUID uuid = 1 ;
-  string asset_type = 2;  // user-defined type
-  string asset_name = 3;  // user-defined name
+  tech.figure.util.UUID id = 1 ;
+  string type = 2;  // user-defined type
+  string name = 3;  // user-defined name
 
-  map<string, Data> payload = 4;
-
-  tech.figure.util.AuditFields audit_fields = 999;
-}
-
-message Data {
-  string mime_type = 1;
-  tech.figure.util.Bytes data = 2;
+  map<string, google.protobuf.Any> payload = 4;
 }

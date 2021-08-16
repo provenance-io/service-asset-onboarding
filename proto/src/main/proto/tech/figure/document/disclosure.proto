@@ -7,9 +7,10 @@ import "google/protobuf/timestamp.proto";
 import "tech/figure/document/document.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
+import "tech/figure/person/person.proto";
 
 message Disclosure {
-  tech.figure.util.UUID uuid = 1;
+  tech.figure.util.UUID id = 1;
 
   tech.figure.document.Document signed_document = 10;
   tech.figure.document.Document unsigned_document = 11;
@@ -25,19 +26,19 @@ message Disclosure {
 }
 
 message ElectronicSignature {
-  tech.figure.util.UUID uuid = 1;
+  tech.figure.util.UUID id = 1;
   string checksum = 5;
   string checksum_algorithm = 6;
   repeated Data data = 7;
 
-  tech.figure.util.UUID identity_uuid = 8;
-  tech.figure.util.UUID application_uuid = 9;
-  tech.figure.util.UUID document_uuid = 10;
+  tech.figure.util.UUID identity_id = 8;
+  tech.figure.util.UUID application_id = 9;
+  tech.figure.util.UUID document_id = 10;
 
   tech.figure.util.AuditFields audit_fields = 99;
 
   message Data {
-    tech.figure.util.UUID identity_uuid = 1;
+    tech.figure.util.UUID identity_id = 1;
     Notary notary = 5;
     string email = 6 [(tech.figure.util.pii) = true];
     string ip = 7;
@@ -46,7 +47,7 @@ message ElectronicSignature {
     string two_factor_signing_token = 10;
     google.protobuf.Timestamp two_factor_timestamp = 11;
     google.protobuf.Timestamp signing_timestamp = 12;
-    tech.figure.util.Name name = 13;
+    tech.figure.person.Name name = 13;
     repeated Witness witnesses = 14;
   }
 
@@ -56,15 +57,15 @@ message ElectronicSignature {
   }
 
   message Notary {
-    tech.figure.util.UUID identity_uuid = 1;
-    tech.figure.util.Name name = 2;
+    tech.figure.util.UUID identity_id = 1;
+    tech.figure.person.Name name = 2;
     string commission_id = 3;
     google.protobuf.Timestamp commission_expiration = 4;
     bool resident = 5;
   }
 
   message Witness {
-    tech.figure.util.UUID identity_uuid = 1;
-    tech.figure.util.Name name = 2;
+    tech.figure.util.UUID identity_id = 1;
+    tech.figure.person.Name name = 2;
   }
 }
