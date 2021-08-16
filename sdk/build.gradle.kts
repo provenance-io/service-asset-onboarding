@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":proto"))
+
     listOf(
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
