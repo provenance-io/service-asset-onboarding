@@ -25,6 +25,7 @@ object Versions {
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.2.1"
     const val Reactor = "3.4.6"
+    const val JunitJupiter = "5.2.0"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -174,6 +175,11 @@ object Dependencies {
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", "1.8.0.1")
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", "3.0.1")
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker:1.7.1")
+
+    object Jupiter {
+        val JupiterApi = DependencySpec("org.junit.jupiter:junit-jupiter-api", Versions.JunitJupiter)
+        val JupiterEngine = DependencySpec("org.junit.jupiter:junit-jupiter-engine", Versions.JunitJupiter)
+    }
 }
 
 data class PluginSpec(
@@ -229,6 +235,19 @@ data class DependencySpec(
         val spec = this
         with(handler) {
             "testImplementation".invoke(spec.toDependencyNotation()) {
+                isChanging = spec.isChanging
+                spec.exclude.forEach { excludeDependencyNotation ->
+                    val (group, module) = excludeDependencyNotation.split(":", limit = 2)
+                    this.exclude(group = group, module = module)
+                }
+            }
+        }
+    }
+
+    fun testRuntimeOnly(handler: DependencyHandlerScope) {
+        val spec = this
+        with(handler) {
+            "testRuntimeOnly".invoke(spec.toDependencyNotation()) {
                 isChanging = spec.isChanging
                 spec.exclude.forEach { excludeDependencyNotation ->
                     val (group, module) = excludeDependencyNotation.split(":", limit = 2)

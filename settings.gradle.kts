@@ -17,5 +17,6 @@ pluginManagement {
 
 include(
     "proto",
+    "sdk",
     "service"
 )

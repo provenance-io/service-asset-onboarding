@@ -17,6 +17,7 @@ dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
 
     implementation(project(":proto"))
+    implementation(project(":sdk"))
 
     listOf(
         Dependencies.Kotlin.AllOpen,
