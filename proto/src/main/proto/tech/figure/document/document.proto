@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax                                                       = "proto3";
 
 package tech.figure.document;
 
@@ -6,46 +6,45 @@ import "google/protobuf/timestamp.proto";
 import "tech/figure/util/util.proto";
 
 message Document {
-  tech.figure.util.UUID id = 1;
+  tech.figure.util.UUID id                                   = 1;
 
-  string uri = 10;
-  string sha512_hash = 11;
-  string name = 12;
-  string document_type = 13; // see DocumentExpectedType in ExpectedEnumValues.kt
-  string extension = 14;
-  string context = 15;
-  string description = 16;
-  string md5_sum = 17;
+  string uri                                                 = 10;
+  string sha512_hash                                         = 11;
+  string name                                                = 12;
+  string document_type                                       = 13;       // see DocumentExpectedType
+  string extension                                           = 14;
+  string context                                             = 15;
+  string description                                         = 16;
+  string md5_sum                                             = 17;
 
-  repeated DataAuthority data_authorities = 18;
+  repeated DataAuthority data_authorities                    = 18;
   message DataAuthority {
-    tech.figure.util.UUID id = 1;
-    string public_key = 2;
-    string data_key = 3;
-    string nonce = 4;
+    tech.figure.util.UUID id                                 = 1;
+    string public_key                                        = 2;
+    string data_key                                          = 3;
+    string nonce                                             = 4;
   }
 
-  bool has_signature = 19;
+  bool has_signature                                         = 19;
 
-  repeated Tag tags = 20;
+  repeated Tag tags                                          = 20;
   message Tag {
-    tech.figure.util.UUID id = 1;
-    string tag_type = 2; // see TagExpectedType in ExpectedEnumValues.kt
+    tech.figure.util.UUID id                                 = 1;
+    string tag_type                                          = 2;        // see TagExpectedType
   }
 
-  Signature signature = 22; // digital signature of third party digitally signed documents
+  Signature signature                                        = 22;       // digital signature of third-party digitally signed documents
 
   message Signature {
-    tech.figure.util.UUID id = 1;
-    string signature = 10;
+    tech.figure.util.UUID id                                 = 1;
+    string signature                                         = 10;
     google.protobuf.Timestamp time_received_from_third_party = 11;
-    string vendor_name = 12;  // see ExpectedEnumValues, VendorName
-    string packet_type = 13;
+    string vendor_name                                       = 12;       // see VendorName
+    string packet_type                                       = 13;
 
     // attributes populated during digital signature validation
-    string validation_status = 20;
-    google.protobuf.Timestamp validation_time = 21;
+    string validation_status                                 = 20;
+    google.protobuf.Timestamp validation_time                = 21;
   }
 
-  tech.figure.util.AuditFields audit_fields = 999;
 }
