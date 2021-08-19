@@ -24,9 +24,18 @@ These tools are known to work. You can use others if you wish, but YMMV.
 - Kotlin 1.5.0
 - IntelliJ 2021.x or newer
 
+## Setup
+
+```shell
+$ gcloud auth login
+$ gcloud services enable containerregistry.googleapis.com
+$ gcloud auth configure-docker
+```
+
 ## Run the service locally
 
 ```shell
+$ ./dc.sh up
 $ ./gradlew build service:bootrun
 ```
 
