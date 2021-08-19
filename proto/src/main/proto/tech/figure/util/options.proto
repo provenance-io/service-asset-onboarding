@@ -1,4 +1,4 @@
-syntax               = "proto3";
+syntax = "proto3";
 
 package tech.figure.util;
 
@@ -8,5 +8,5 @@ extend google.protobuf.EnumValueOptions {
   string description = 50003;
 }
 extend google.protobuf.FieldOptions {
-  bool pii           = 65536;    // True if this field is PII (Personally Identifying Information). Please note: annotate primitive-level fields rather than Message types
+  bool pii = 65536; // True if this field is PII (Personally Identifying Information). Please note: annotate primitive-level fields rather than Message types
 }

@@ -1,7 +1,6 @@
-syntax                                                                     = "proto3";
+syntax = "proto3";
 
 package tech.figure.person;
-
 
 import "tech/figure/util/address.proto";
 import "tech/figure/util/options.proto";
@@ -10,56 +9,51 @@ import "google/protobuf/timestamp.proto";
 import "tech/figure/asset/loan/consent.proto";
 
 message Name {
-  tech.figure.util.UUID id                                                 = 1;
-  string first_name                                                        = 2 [(tech.figure.util.pii)         = true];
-  string last_name                                                         = 3 [(tech.figure.util.pii)         = true];
-  string middle_name                                                       = 4 [(tech.figure.util.pii)         = true];
-  string prefix                                                            = 5 [(tech.figure.util.pii)         = true];
-  string suffix                                                            = 6 [(tech.figure.util.pii)         = true];
+  tech.figure.util.UUID id          = 1;
+  string                first_name  = 2 [(tech.figure.util.pii) = true];
+  string                last_name   = 3 [(tech.figure.util.pii) = true];
+  string                middle_name = 4 [(tech.figure.util.pii) = true];
+  string                prefix      = 5 [(tech.figure.util.pii) = true];
+  string                suffix      = 6 [(tech.figure.util.pii) = true];
 }
-
 
 message Person {
 
-  tech.figure.util.UUID id                                                 = 1;
-  string party_type                                                        = 9;                                                           // see PartyType
-  Name name                                                                = 10;
-  tech.figure.util.Date dob                                                = 11 [(tech.figure.util.pii)        = true];
-  repeated tech.figure.util.PhoneNumber phone_numbers                      = 12;
-  repeated tech.figure.util.Address addresses                              = 13;
-  string ssn                                                               = 14 [(tech.figure.util.pii)        = true];
-  string email                                                             = 15 [(tech.figure.util.pii)       = true];
-  string citizenship                                                       = 16;
-  MaritalStatus marital_status                                             = 17;
-  repeated IncomeSource income_sources                                     = 18;
-  repeated tech.figure.asset.loan.Consent consents                         = 19;
-  tech.figure.util.Money yearly_income                                     = 20;
-  tech.figure.util.Money verified_yearly_income                            = 21;
-
+  tech.figure.util.UUID id                                       = 1;
+  string                party_type                               = 9; // see PartyType
+  Name                  name                                     = 10;
+  tech.figure.util.Date dob                                      = 11 [(tech.figure.util.pii) = true];
+  repeated tech.figure.util.PhoneNumber phone_numbers            = 12;
+  repeated tech.figure.util.Address addresses                    = 13;
+  string                            ssn                          = 14 [(tech.figure.util.pii) = true];
+  string                            email                        = 15 [(tech.figure.util.pii) = true];
+  string                            citizenship                  = 16;
+  MaritalStatus                     marital_status               = 17;
+  repeated IncomeSource             income_sources               = 18;
+  repeated tech.figure.asset.loan.Consent consents               = 19;
+  tech.figure.util.Money                  yearly_income          = 20;
+  tech.figure.util.Money                  verified_yearly_income = 21;
 }
 
-
 message IncomeSource {
-  tech.figure.util.UUID id                                                 = 1;
-  string employer                                                          = 2;
-  tech.figure.util.Money amount                                            = 3;
-  string employment_status                                                 = 4;                                                           // See EmploymentStatus
+  tech.figure.util.UUID     id                                             = 1;
+  string                    employer                                       = 2;
+  tech.figure.util.Money    amount                                         = 3;
+  string                    employment_status                              = 4; // See EmploymentStatus
   google.protobuf.Timestamp verification_of_employment_completed_timestamp = 5;
 }
 
-
 enum MaritalStatus {
-  UNKNOWN_MARITAL_STATUS                                                   = 0;
-  SINGLE                                                                   = 1 [(tech.figure.util.description) = "Unmarried"];
-  MARRIED                                                                  = 2 [(tech.figure.util.description) = "Married / Spouse"];
-  SEPARATED                                                                = 3 [(tech.figure.util.description) = "Separated"];
-  CIVIL_UNION                                                              = 4 [(tech.figure.util.description) = "Civil Union"];
-  DOMESTIC_PARTNERSHIP                                                     = 5 [(tech.figure.util.description) = "Domestic Partnership"];
-  OTHER                                                                    = 6 [(tech.figure.util.description) = "Other"];
+  UNKNOWN_MARITAL_STATUS = 0;
+  SINGLE                 = 1 [(tech.figure.util.description) = "Unmarried"];
+  MARRIED                = 2 [(tech.figure.util.description) = "Married / Spouse"];
+  SEPARATED              = 3 [(tech.figure.util.description) = "Separated"];
+  CIVIL_UNION            = 4 [(tech.figure.util.description) = "Civil Union"];
+  DOMESTIC_PARTNERSHIP   = 5 [(tech.figure.util.description) = "Domestic Partnership"];
+  OTHER                  = 6 [(tech.figure.util.description) = "Other"];
 }
 
-
 message Borrower {
-  Person primary                                                           = 1;
-  repeated Person additional_parties                                       = 2;
+  Person          primary            = 1;
+  repeated Person additional_parties = 2;
 }

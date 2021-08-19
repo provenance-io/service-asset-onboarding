@@ -1,4 +1,4 @@
-syntax                                                 = "proto3";
+syntax = "proto3";
 
 package tech.figure.asset.loan;
 
@@ -14,70 +14,66 @@ import "tech/figure/util/util.proto";
 */
 message Loan {
 
-  Meta meta                                            = 1;        // Identifiers/Meta
-  tech.figure.person.Borrower borrower                 = 10;       // Borrower(s), co-signers, etc
-  Terms terms                                          = 2;        // Loan terms: amount, duration, rates
-  tech.figure.document.Disclosure signed_prom_note     = 40;       // Signed promissory note
-  repeated FundingInstruction funding_instructions     = 3;        // Instructions on how to fund loan/where to send money
-  PaymentDetails payment_details                       = 4;        // Information on how monthly payment to be collected
-  repeated Consent consents                            = 5;        // Loan options to which borrower has/has not consented
-
+  Meta                            meta                 = 1;  // Identifiers/Meta
+  tech.figure.person.Borrower     borrower             = 10; // Borrower(s), co-signers, etc
+  Terms                           terms                = 2;  // Loan terms: amount, duration, rates
+  tech.figure.document.Disclosure signed_prom_note     = 40; // Signed promissory note
+  repeated FundingInstruction     funding_instructions = 3;  // Instructions on how to fund loan/where to send money
+  PaymentDetails                  payment_details      = 4;  // Information on how monthly payment to be collected
+  repeated Consent                consents             = 5;  // Loan options to which borrower has/has not consented
 }
-
 
 message Meta {
-  tech.figure.util.UUID id                             = 1 ;       // Loan id
-  string loan_number                                   = 2 ;       // Originator's internal loan identifier
-  string loan_type                                     = 3 ;       // Loan Type (Mortgage, HELOC, Personal Loan, etc.)
-  string loan_purpose                                  = 4 ;       // Borrower's intended purpose for loan
-  string originator_name                               = 5;        // Human-readable name of the originating firm
+  tech.figure.util.UUID id              = 1; // Loan id
+  string                loan_number     = 2; // Originator's internal loan identifier
+  string                loan_type       = 3; // Loan Type (Mortgage, HELOC, Personal Loan, etc.)
+  string                loan_purpose    = 4; // Borrower's intended purpose for loan
+  string                originator_name = 5; // Human-readable name of the originating firm
 }
-
 
 message Terms {
-  tech.figure.util.UUID id                             = 1;        // Id for this set of terms/offer
-  tech.figure.util.Money principal_amount              = 2;        // Loan amount, not including fees or interest
-  tech.figure.util.Money total_amount                  = 3;        // Principal loan amount + origination fees
-  int32 term_in_months                                 = 4;
+  tech.figure.util.UUID  id               = 1; // Id for this set of terms/offer
+  tech.figure.util.Money principal_amount = 2; // Loan amount, not including fees or interest
+  tech.figure.util.Money total_amount     = 3; // Principal loan amount + origination fees
+  int32                  term_in_months   = 4;
 
   // todo not sure if this should go here
-  tech.figure.util.Date closing_date                   = 5;        // tech.figure.util.Date the Note is signed
+  tech.figure.util.Date closing_date = 5; // tech.figure.util.Date the Note is signed
 
-  int32 offer_index                                    = 10;
-  string pay_type                                      = 13;
-  string rate_type                                     = 14;
-  tech.figure.util.Decimal margin_rate                 = 17;
-  tech.figure.util.Decimal prime_rate                  = 15;
-  tech.figure.util.Decimal index_rate                  = 25;
-  tech.figure.util.Decimal interest_rate               = 16;       // Total interest rate for loan (margin_rate + prime_rate or index_rate)
-  string orig_fee_type                                 = 23;       // See OrigFeeExpectedType
-  tech.figure.util.Decimal origination_fee_rate        = 18;
-  tech.figure.util.Decimal rate_cap                    = 20;
-  tech.figure.util.Decimal base_pricing_rate           = 21;
-  tech.figure.util.Decimal other_pricing_rate          = 22;
-  string index_rate_type                               = 26;       // (prime, libor) See IndexRateType
+  int32                    offer_index          = 10;
+  string                   pay_type             = 13;
+  string                   rate_type            = 14;
+  tech.figure.util.Decimal margin_rate          = 17;
+  tech.figure.util.Decimal prime_rate           = 15;
+  tech.figure.util.Decimal index_rate           = 25;
+  tech.figure.util.Decimal interest_rate        = 16; // Total interest rate for loan (margin_rate + prime_rate or index_rate)
+  string                   orig_fee_type        = 23; // See OrigFeeExpectedType
+  tech.figure.util.Decimal origination_fee_rate = 18;
+  tech.figure.util.Decimal rate_cap             = 20;
+  tech.figure.util.Decimal base_pricing_rate    = 21;
+  tech.figure.util.Decimal other_pricing_rate   = 22;
+  string                   index_rate_type      = 26; // (prime, libor) See IndexRateType
 
   // All rate discounts available to this asset.
-  repeated RateDiscount rate_discounts                 = 30;
+  repeated RateDiscount rate_discounts = 30;
 }
 
-
 message PaymentDetails {
-  tech.figure.util.Money monthly_payment_amount        = 215;      // Principal and interest only (no escrow/fees)
-  tech.figure.util.Date first_payment_date             = 315;
-  tech.figure.util.Date grace_period_end_date          = 320;
-  tech.figure.util.Date amort_start_date               = 325 ;
-  tech.figure.finance.FinancialAccount autopay_account = 505 ;     // - if borrower has agreed to automated monthly payments
+  tech.figure.util.Money               monthly_payment_amount = 215; // Principal and interest only (no escrow/fees)
+  tech.figure.util.Date                first_payment_date     = 315;
+  tech.figure.util.Date                grace_period_end_date  = 320;
+  tech.figure.util.Date                amort_start_date       = 325;
+  tech.figure.finance.FinancialAccount autopay_account        = 505; // - if borrower has agreed to automated monthly payments
 }
 
 message RateDiscount {
-  string discount_type                                 = 1;        // see RateDiscountType
-  tech.figure.util.Decimal discount_rate               = 2;        // Decimal rate between 0.0 and 1.0 where 1.0 = 100%
-  bool rate_discount_included_in_margin                = 3;        // Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay.
+  string                   discount_type                    = 1; // see RateDiscountType
+  tech.figure.util.Decimal discount_rate                    = 2; // Decimal rate between 0.0 and 1.0 where 1.0 = 100%
+  bool                     rate_discount_included_in_margin = 3; // Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay.
 
   enum RateDiscountType {
-    UNKNOWN                                            = 0;
-    AUTOPAY                                            = 1;
-    CREDIT_UNION_MEMBERSHIP                            = 2;
+    UNKNOWN                 = 0;
+    AUTOPAY                 = 1;
+    CREDIT_UNION_MEMBERSHIP = 2;
   }
 }

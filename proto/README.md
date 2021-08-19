@@ -11,6 +11,8 @@ should be globally unique
 
 - Why we represent UUID as string: https://newbedev.com/how-do-i-represent-a-uuid-in-a-protobuf-message
 
+- `clang-format` docs https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+
 ## Loans
 
 - Only info common to all loans goes into the loan proto. For specific loan types, establish separate facts in the scope 

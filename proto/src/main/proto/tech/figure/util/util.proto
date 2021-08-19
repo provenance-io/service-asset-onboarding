@@ -1,4 +1,4 @@
-syntax            = "proto3";
+syntax = "proto3";
 
 package tech.figure.util;
 
@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 // In Java: Use LocalDate to represent this value. Date stored as ISO8601 string. EX: "2020-05-22". For OffsetDateTime, use proto Timestamp
 message Date {
-  string value    = 1;
+  string value = 1;
 }
 
 // In Java: Use Joda Money, BigMoney, or BigDecimal to represent this value
@@ -17,17 +17,14 @@ message Money {
 
 // In Java: Use BigDecimal to represent this value
 message Decimal {
-  string value    = 1;
+  string value = 1;
 }
 
 // UUID stored as a string
 message UUID {
-  string value    = 1;
+  string value = 1;
 }
 
 message Bytes {
-  bytes value     = 1;
+  bytes value = 1;
 }
-
-
-

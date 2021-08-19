@@ -1,4 +1,4 @@
-syntax                                        = "proto3";
+syntax = "proto3";
 
 package tech.figure.finance;
 
@@ -9,47 +9,45 @@ import "google/protobuf/descriptor.proto";
 
 message FinancialAccount {
 
-  tech.figure.util.UUID id                    = 1;
-  tech.figure.util.UUID owner_id              = 3;                                               // UUID of the borrower or owner of the account
+  tech.figure.util.UUID id       = 1;
+  tech.figure.util.UUID owner_id = 3; // UUID of the borrower or owner of the account
 
-  string account_number                       = 10 [(tech.figure.util.pii)        = true];
-  string routing_number                       = 11 [(tech.figure.util.pii)        = true];
-  string owner_name                           = 12 [(tech.figure.util.pii)        = true];
+  string account_number = 10 [(tech.figure.util.pii) = true];
+  string routing_number = 11 [(tech.figure.util.pii) = true];
+  string owner_name     = 12 [(tech.figure.util.pii) = true];
 
-  string financial_institution                = 13;
-  string account_name                         = 14;                                              // Account owner's personal nickname for account, e.g. "My checking"
-  string account_use                          = 15;
+  string financial_institution = 13;
+  string account_name          = 14; // Account owner's personal nickname for account, e.g. "My checking"
+  string account_use           = 15;
 
-  AccountType account_type                    = 16;
+  AccountType account_type = 16;
 
   enum AccountType {
-    UNKNOWN                                   = 0;
-    CHECKING                                  = 1 [(tech.figure.util.description) = "Checking"];
-    SAVINGS                                   = 2 [(tech.figure.util.description) = "Savings"];
-    OTHER                                     = 3 [(tech.figure.util.description) = "Other"];
-    MARKER                                    = 4 [(tech.figure.util.description) = "Marker"];
+    UNKNOWN  = 0;
+    CHECKING = 1 [(tech.figure.util.description) = "Checking"];
+    SAVINGS  = 2 [(tech.figure.util.description) = "Savings"];
+    OTHER    = 3 [(tech.figure.util.description) = "Other"];
+    MARKER   = 4 [(tech.figure.util.description) = "Marker"];
   }
 
-  bool is_ach_account                         = 18;
+  bool is_ach_account = 18;
 
   // TODO we should restructure into a oneof
 
   // wire specific info
-  tech.figure.util.Address account_address    = 20 [(tech.figure.util.pii)        = true];
-  string wire_instructions                    = 21 [(tech.figure.util.pii)        = true];
+  tech.figure.util.Address account_address   = 20 [(tech.figure.util.pii) = true];
+  string                   wire_instructions = 21 [(tech.figure.util.pii) = true];
 
   // additional info for SWIFT bank accounts
-  string swift_id                             = 23 [(tech.figure.util.pii)        = true];       //SWIFT bank account id
-  tech.figure.util.Address swift_bank_address = 24 [(tech.figure.util.pii)        = true];
+  string                   swift_id           = 23 [(tech.figure.util.pii) = true]; //SWIFT bank account id
+  tech.figure.util.Address swift_bank_address = 24 [(tech.figure.util.pii) = true];
 
-  string owner_type                           = 25;                                              //see BankAccountOwnerType in ExpectedEnumValues
-  string status                               = 26;                                              // see BankAccountStatus enum in ExpectedEnumValues
+  string owner_type = 25; //see BankAccountOwnerType in ExpectedEnumValues
+  string status     = 26; // see BankAccountStatus enum in ExpectedEnumValues
 
-  repeated string verification_messages       = 27;                                              // verification messages to give more context to the status, set by 3rd party or manual verification processes
+  repeated string verification_messages = 27; // verification messages to give more context to the status, set by 3rd party or manual verification processes
 
   // TODO should we keep this? seems to be used by servicing for Figure Pay bank credit loans
   // Provenance marker location
-  string marker_address                       = 30;
-
+  string marker_address = 30;
 }
-
