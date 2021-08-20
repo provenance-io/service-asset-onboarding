@@ -1,0 +1,2850 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Asset Model</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0;  
+      }
+
+       
+      .field-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(3) {  
+        width: 6em;
+      }
+      .field-table td:nth-child(4) {  
+        width: auto;
+      }
+
+       
+      .extension-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(3) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(4) {  
+        width: 5em;
+      }
+      .extension-table td:nth-child(5) {  
+        width: auto;
+      }
+
+       
+      .enum-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) {  
+        width: auto;
+      }
+
+       
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+       
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+       
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+       
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Asset Model</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fasset%2fasset.proto">tech/figure/asset/asset.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.asset.Asset"><span class="badge">M</span>Asset</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.Asset.PayloadEntry"><span class="badge">M</span>Asset.PayloadEntry</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fasset%2floan%2fconsent.proto">tech/figure/asset/loan/consent.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.Consent"><span class="badge">M</span>Consent</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.Consent.OptStatus"><span class="badge">E</span>Consent.OptStatus</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fasset%2floan%2fcredit_report.proto">tech/figure/asset/loan/credit_report.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.CreditReport"><span class="badge">M</span>CreditReport</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fasset%2floan%2ffunding.proto">tech/figure/asset/loan/funding.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.FundingInstruction"><span class="badge">M</span>FundingInstruction</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fasset%2floan%2floan.proto">tech/figure/asset/loan/loan.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.Loan"><span class="badge">M</span>Loan</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.LoanMetadata"><span class="badge">M</span>LoanMetadata</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.Materials"><span class="badge">M</span>Materials</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.PaymentDetails"><span class="badge">M</span>PaymentDetails</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.RateDiscount"><span class="badge">M</span>RateDiscount</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.Terms"><span class="badge">M</span>Terms</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#tech.figure.asset.loan.RateDiscount.RateDiscountType"><span class="badge">E</span>RateDiscount.RateDiscountType</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fdocument%2fdisclosure.proto">tech/figure/document/disclosure.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.document.Disclosure"><span class="badge">M</span>Disclosure</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.Disclosure.SubstitutionDataEntry"><span class="badge">M</span>Disclosure.SubstitutionDataEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.ElectronicSignature"><span class="badge">M</span>ElectronicSignature</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.ElectronicSignature.Data"><span class="badge">M</span>ElectronicSignature.Data</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.ElectronicSignature.Location"><span class="badge">M</span>ElectronicSignature.Location</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.ElectronicSignature.Notary"><span class="badge">M</span>ElectronicSignature.Notary</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.ElectronicSignature.Witness"><span class="badge">M</span>ElectronicSignature.Witness</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fdocument%2fdocument.proto">tech/figure/document/document.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.document.DataAuthority"><span class="badge">M</span>DataAuthority</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.DocumentMetadata"><span class="badge">M</span>DocumentMetadata</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.Signature"><span class="badge">M</span>Signature</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.document.Tag"><span class="badge">M</span>Tag</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2ffinance%2ffinancial_account.proto">tech/figure/finance/financial_account.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.finance.FinancialAccount"><span class="badge">M</span>FinancialAccount</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#tech.figure.finance.FinancialAccount.AccountType"><span class="badge">E</span>FinancialAccount.AccountType</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2fperson%2fperson.proto">tech/figure/person/person.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.person.Borrower"><span class="badge">M</span>Borrower</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.person.IncomeSource"><span class="badge">M</span>IncomeSource</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.person.Name"><span class="badge">M</span>Name</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.person.Person"><span class="badge">M</span>Person</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#tech.figure.person.MaritalStatus"><span class="badge">E</span>MaritalStatus</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2futil%2faddress.proto">tech/figure/util/address.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.util.Address"><span class="badge">M</span>Address</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.util.PhoneNumber"><span class="badge">M</span>PhoneNumber</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2futil%2foptions.proto">tech/figure/util/options.proto</a>
+            <ul>
+              
+              
+              
+                <li>
+                  <a href="#tech%2ffigure%2futil%2foptions.proto-extensions"><span class="badge">X</span>File-level Extensions</a>
+                </li>
+              
+                <li>
+                  <a href="#tech%2ffigure%2futil%2foptions.proto-extensions"><span class="badge">X</span>File-level Extensions</a>
+                </li>
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#tech%2ffigure%2futil%2futil.proto">tech/figure/util/util.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#tech.figure.util.Date"><span class="badge">M</span>Date</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.util.Decimal"><span class="badge">M</span>Decimal</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.util.Money"><span class="badge">M</span>Money</a>
+                </li>
+              
+                <li>
+                  <a href="#tech.figure.util.UUID"><span class="badge">M</span>UUID</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/asset/asset.proto">tech/figure/asset/asset.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.asset.Asset">Asset</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>User-defined type </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>User-defined name </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payload</td>
+                  <td><a href="#tech.figure.asset.Asset.PayloadEntry">Asset.PayloadEntry</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.Asset.PayloadEntry">Asset.PayloadEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/asset/loan/consent.proto">tech/figure/asset/loan/consent.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.asset.loan.Consent">Consent</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>consent_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See ConsentExpectedType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>opt_status</td>
+                  <td><a href="#tech.figure.asset.loan.Consent.OptStatus">Consent.OptStatus</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="tech.figure.asset.loan.Consent.OptStatus">Consent.OptStatus</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>OPT_STATUS_UNKNOWN</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IN</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OUT</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/asset/loan/credit_report.proto">tech/figure/asset/loan/credit_report.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.asset.loan.CreditReport">CreditReport</h3>
+        <p>TODO</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>uuid</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>party_uuid</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>report_timestamp</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/asset/loan/funding.proto">tech/figure/asset/loan/funding.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.asset.loan.FundingInstruction">FundingInstruction</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p>ID of this disbursement </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>disburse_account</td>
+                  <td><a href="#tech.figure.finance.FinancialAccount">tech.figure.finance.FinancialAccount</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>disbursement_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Description of the disbursement type (e.g. loan funding, refi payoff, referral_fee, etc.) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>fiat_movement_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Wire, ACH, etc See FiatMovementType (default to ACH) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/asset/loan/loan.proto">tech/figure/asset/loan/loan.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.asset.loan.Loan">Loan</h3>
+        <p>Loan information at the time of origination</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>meta</td>
+                  <td><a href="#tech.figure.asset.loan.LoanMetadata">LoanMetadata</a></td>
+                  <td></td>
+                  <td><p>Identifiers/Meta </p></td>
+                </tr>
+              
+                <tr>
+                  <td>borrower</td>
+                  <td><a href="#tech.figure.person.Borrower">tech.figure.person.Borrower</a></td>
+                  <td></td>
+                  <td><p>Borrower(s), co-signers, etc </p></td>
+                </tr>
+              
+                <tr>
+                  <td>terms</td>
+                  <td><a href="#tech.figure.asset.loan.Terms">Terms</a></td>
+                  <td></td>
+                  <td><p>Loan terms: amount, duration, rates </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signed_prom_note</td>
+                  <td><a href="#tech.figure.document.Disclosure">tech.figure.document.Disclosure</a></td>
+                  <td></td>
+                  <td><p>Signed promissory note </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payment_details</td>
+                  <td><a href="#tech.figure.asset.loan.PaymentDetails">PaymentDetails</a></td>
+                  <td></td>
+                  <td><p>Information on how monthly payment to be collected </p></td>
+                </tr>
+              
+                <tr>
+                  <td>funding_instructions</td>
+                  <td><a href="#tech.figure.asset.loan.FundingInstruction">FundingInstruction</a></td>
+                  <td>repeated</td>
+                  <td><p>Instructions on how to fund loan/where to send money </p></td>
+                </tr>
+              
+                <tr>
+                  <td>consents</td>
+                  <td><a href="#tech.figure.asset.loan.Consent">Consent</a></td>
+                  <td>repeated</td>
+                  <td><p>Loan options to which borrower has/has not consented </p></td>
+                </tr>
+              
+                <tr>
+                  <td>doc_meta</td>
+                  <td><a href="#tech.figure.document.DocumentMetadata">tech.figure.document.DocumentMetadata</a></td>
+                  <td>repeated</td>
+                  <td><p>Metadata about documents related to the loan, but stored separately </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.loan.LoanMetadata">LoanMetadata</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p>Loan id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>loan_number</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Originator&#39;s internal loan identifier </p></td>
+                </tr>
+              
+                <tr>
+                  <td>loan_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Loan Type (Mortgage, HELOC, Personal Loan, etc.) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>loan_purpose</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Borrower&#39;s intended purpose for loan </p></td>
+                </tr>
+              
+                <tr>
+                  <td>originator_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Human-readable name of the originating firm </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.loan.Materials">Materials</h3>
+        <p>Borrower materials & records from loan application</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>credit_reports</td>
+                  <td><a href="#tech.figure.asset.loan.CreditReport">CreditReport</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.loan.PaymentDetails">PaymentDetails</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>monthly_payment_amount</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p>Principal and interest only (no escrow/fees) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>first_payment_date</td>
+                  <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grace_period_end_date</td>
+                  <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amort_start_date</td>
+                  <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>autopay_account</td>
+                  <td><a href="#tech.figure.finance.FinancialAccount">tech.figure.finance.FinancialAccount</a></td>
+                  <td></td>
+                  <td><p>- if borrower has agreed to automated monthly payments </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.loan.RateDiscount">RateDiscount</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>discount_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See RateDiscountType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>discount_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p>Decimal rate between 0.0 and 1.0 where 1.0 = 100% </p></td>
+                </tr>
+              
+                <tr>
+                  <td>rate_discount_included_in_margin</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.asset.loan.Terms">Terms</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p>Id for this set of terms/offer </p></td>
+                </tr>
+              
+                <tr>
+                  <td>principal_amount</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p>Loan amount, not including fees or interest </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_amount</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p>Principal loan amount &#43; origination fees </p></td>
+                </tr>
+              
+                <tr>
+                  <td>term_in_months</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>closing_date</td>
+                  <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
+                  <td></td>
+                  <td><p>tech.figure.util.Date the Note is signed   // todo not sure if this should go here </p></td>
+                </tr>
+              
+                <tr>
+                  <td>offer_index</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pay_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>rate_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>margin_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>prime_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>index_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>interest_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p>Total interest rate for loan (margin_rate &#43; prime_rate or index_rate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>orig_fee_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See OrigFeeExpectedType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>origination_fee_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>rate_cap</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>base_pricing_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>other_pricing_rate</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>index_rate_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>(prime, libor) See IndexRateType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>rate_discounts</td>
+                  <td><a href="#tech.figure.asset.loan.RateDiscount">RateDiscount</a></td>
+                  <td>repeated</td>
+                  <td><p>All rate discounts available to this asset. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="tech.figure.asset.loan.RateDiscount.RateDiscountType">RateDiscount.RateDiscountType</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>UNKNOWN</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AUTOPAY</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CREDIT_UNION_MEMBERSHIP</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/document/disclosure.proto">tech/figure/document/disclosure.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.document.Disclosure">Disclosure</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signed_document</td>
+                  <td><a href="#tech.figure.document.DocumentMetadata">DocumentMetadata</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>unsigned_document</td>
+                  <td><a href="#tech.figure.document.DocumentMetadata">DocumentMetadata</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>electronic_signature</td>
+                  <td><a href="#tech.figure.document.ElectronicSignature">ElectronicSignature</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>substitution_data</td>
+                  <td><a href="#tech.figure.document.Disclosure.SubstitutionDataEntry">Disclosure.SubstitutionDataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>disclosure_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signed_doc_checksum</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signed_doc_checksum_algorithm</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signature_required</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.Disclosure.SubstitutionDataEntry">Disclosure.SubstitutionDataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.ElectronicSignature">ElectronicSignature</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>checksum</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>checksum_algorithm</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>data</td>
+                  <td><a href="#tech.figure.document.ElectronicSignature.Data">ElectronicSignature.Data</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>identity_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>application_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>document_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.ElectronicSignature.Data">ElectronicSignature.Data</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>identity_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>notary</td>
+                  <td><a href="#tech.figure.document.ElectronicSignature.Notary">ElectronicSignature.Notary</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ip</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>user_agent</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>location</td>
+                  <td><a href="#tech.figure.document.ElectronicSignature.Location">ElectronicSignature.Location</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>two_factor_signing_token</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>two_factor_timestamp</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signing_timestamp</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#tech.figure.person.Name">tech.figure.person.Name</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>witnesses</td>
+                  <td><a href="#tech.figure.document.ElectronicSignature.Witness">ElectronicSignature.Witness</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.ElectronicSignature.Location">ElectronicSignature.Location</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>latitude</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>longitude</td>
+                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.ElectronicSignature.Notary">ElectronicSignature.Notary</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>identity_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#tech.figure.person.Name">tech.figure.person.Name</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>commission_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>commission_expiration</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>resident</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.ElectronicSignature.Witness">ElectronicSignature.Witness</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>identity_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#tech.figure.person.Name">tech.figure.person.Name</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/document/document.proto">tech/figure/document/document.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.document.DataAuthority">DataAuthority</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>public_key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>data_key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>nonce</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.DocumentMetadata">DocumentMetadata</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>uri</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>document_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See DocumentExpectedType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>extension</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sha512_hash</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>md5_sum</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>data_authorities</td>
+                  <td><a href="#tech.figure.document.DataAuthority">DataAuthority</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>has_signature</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tags</td>
+                  <td><a href="#tech.figure.document.Tag">Tag</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signature</td>
+                  <td><a href="#tech.figure.document.Signature">Signature</a></td>
+                  <td></td>
+                  <td><p>Digital signature of third-party digitally signed documents </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.Signature">Signature</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signature</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_received_from_third_party</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>vendor_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See VendorName </p></td>
+                </tr>
+              
+                <tr>
+                  <td>packet_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.document.Tag">Tag</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tag_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See TagExpectedType </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/finance/financial_account.proto">tech/figure/finance/financial_account.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.finance.FinancialAccount">FinancialAccount</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p>UUID of the borrower or owner of the account </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>financial_institution</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Account owner&#39;s personal nickname for account, e.g. &#34;Household checking&#34; </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_use</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_type</td>
+                  <td><a href="#tech.figure.finance.FinancialAccount.AccountType">FinancialAccount.AccountType</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>is_ach_account</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_number</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>routing_number</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_address</td>
+                  <td><a href="#tech.figure.util.Address">tech.figure.util.Address</a></td>
+                  <td></td>
+                  <td><p>wire specific info </p></td>
+                </tr>
+              
+                <tr>
+                  <td>wire_instructions</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>wire specific info </p></td>
+                </tr>
+              
+                <tr>
+                  <td>swift_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>SWIFT bank account id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>swift_bank_address</td>
+                  <td><a href="#tech.figure.util.Address">tech.figure.util.Address</a></td>
+                  <td></td>
+                  <td><p>SWIFT bank physical address </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See BankAccountOwnerType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See BankAccountStatus </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verification_messages</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>verification messages to give more context to the status, set by 3rd party or manual verification processes </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="tech.figure.finance.FinancialAccount.AccountType">FinancialAccount.AccountType</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>UNKNOWN</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CHECKING</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SAVINGS</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OTHER</td>
+                <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/person/person.proto">tech/figure/person/person.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.person.Borrower">Borrower</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>primary</td>
+                  <td><a href="#tech.figure.person.Person">Person</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>additional_parties</td>
+                  <td><a href="#tech.figure.person.Person">Person</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.person.IncomeSource">IncomeSource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>employer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>employment_status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See EmploymentStatus </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verification_of_employment_completed_timestamp</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.person.Name">Name</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>first_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>last_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>middle_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>prefix</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>suffix</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.person.Person">Person</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">tech.figure.util.UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>party_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See PartyType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#tech.figure.person.Name">Name</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>dob</td>
+                  <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone_numbers</td>
+                  <td><a href="#tech.figure.util.PhoneNumber">tech.figure.util.PhoneNumber</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>addresses</td>
+                  <td><a href="#tech.figure.util.Address">tech.figure.util.Address</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ssn</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>citizenship</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>marital_status</td>
+                  <td><a href="#tech.figure.person.MaritalStatus">MaritalStatus</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>income_sources</td>
+                  <td><a href="#tech.figure.person.IncomeSource">IncomeSource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>consents</td>
+                  <td><a href="#tech.figure.asset.loan.Consent">tech.figure.asset.loan.Consent</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>yearly_income</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verified_yearly_income</td>
+                  <td><a href="#tech.figure.util.Money">tech.figure.util.Money</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="tech.figure.person.MaritalStatus">MaritalStatus</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>UNKNOWN_MARITAL_STATUS</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SINGLE</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>MARRIED</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SEPARATED</td>
+                <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CIVIL_UNION</td>
+                <td>4</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>DOMESTIC_PARTNERSHIP</td>
+                <td>5</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OTHER</td>
+                <td>6</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/util/address.proto">tech/figure/util/address.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.util.Address">Address</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>street</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>street2</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>street3</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>city</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>state</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>or Province </p></td>
+                </tr>
+              
+                <tr>
+                  <td>country</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>zip</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>unit_number</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>address_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See AddressExpectedType </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownership</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_legal_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>whole_street_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.util.PhoneNumber">PhoneNumber</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#tech.figure.util.UUID">UUID</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>number</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>number_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>See NumberExpectedType </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/util/options.proto">tech/figure/util/options.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+
+      
+
+      
+        <h3 id="tech/figure/util/options.proto-extensions">File-level Extensions</h3>
+        <table class="extension-table">
+          <thead>
+            <tr><td>Extension</td><td>Type</td><td>Base</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>description</td>
+                <td><a href="#string">string</a></td>
+                <td><a href="#google.protobuf.EnumValueOptions">.google.protobuf.EnumValueOptions</a></td>
+                <td>50003</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>pii</td>
+                <td><a href="#bool">bool</a></td>
+                <td><a href="#google.protobuf.FieldOptions">.google.protobuf.FieldOptions</a></td>
+                <td>65536</td>
+                <td><p>True if this field is PII (Personally Identifying Information). Please note: annotate primitive-level fields rather than Message types</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="tech/figure/util/util.proto">tech/figure/util/util.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="tech.figure.util.Date">Date</h3>
+        <p>In Java: Use LocalDate to represent this value. Date stored as ISO8601 string. EX: "2020-05-22". For OffsetDateTime, use proto Timestamp</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.util.Decimal">Decimal</h3>
+        <p>In Java: Use BigDecimal to represent this value</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.util.Money">Money</h3>
+        <p>In Java: Use Joda Money, BigMoney, or BigDecimal to represent this value</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>currency</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="tech.figure.util.UUID">UUID</h3>
+        <p>UUID stored as a string</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++</td><td>Java</td><td>Python</td><td>Go</td><td>C#</td><td>PHP</td><td>Ruby</td></tr>
+      </thead>
+      <tbody>
+        
+          <tr id="double">
+            <td>double</td>
+            <td></td>
+            <td>double</td>
+            <td>double</td>
+            <td>float</td>
+            <td>float64</td>
+            <td>double</td>
+            <td>float</td>
+            <td>Float</td>
+          </tr>
+        
+          <tr id="float">
+            <td>float</td>
+            <td></td>
+            <td>float</td>
+            <td>float</td>
+            <td>float</td>
+            <td>float32</td>
+            <td>float</td>
+            <td>float</td>
+            <td>Float</td>
+          </tr>
+        
+          <tr id="int32">
+            <td>int32</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="int64">
+            <td>int64</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="uint32">
+            <td>uint32</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int/long</td>
+            <td>uint32</td>
+            <td>uint</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="uint64">
+            <td>uint64</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>uint64</td>
+            <td>ulong</td>
+            <td>integer/string</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sint32">
+            <td>sint32</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sint64">
+            <td>sint64</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="fixed32">
+            <td>fixed32</td>
+            <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>uint32</td>
+            <td>uint</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="fixed64">
+            <td>fixed64</td>
+            <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>uint64</td>
+            <td>ulong</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="sfixed32">
+            <td>sfixed32</td>
+            <td>Always four bytes.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sfixed64">
+            <td>sfixed64</td>
+            <td>Always eight bytes.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="bool">
+            <td>bool</td>
+            <td></td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>boolean</td>
+            <td>bool</td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>TrueClass/FalseClass</td>
+          </tr>
+        
+          <tr id="string">
+            <td>string</td>
+            <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+            <td>string</td>
+            <td>String</td>
+            <td>str/unicode</td>
+            <td>string</td>
+            <td>string</td>
+            <td>string</td>
+            <td>String (UTF-8)</td>
+          </tr>
+        
+          <tr id="bytes">
+            <td>bytes</td>
+            <td>May contain any arbitrary sequence of bytes.</td>
+            <td>string</td>
+            <td>ByteString</td>
+            <td>str</td>
+            <td>[]byte</td>
+            <td>ByteString</td>
+            <td>string</td>
+            <td>String (ASCII-8BIT)</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </body>
+</html>
+

@@ -26,7 +26,3 @@ message Money {
   string amount   = 1;
   string currency = 2;
 }
-
-
-
-

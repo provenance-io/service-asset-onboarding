@@ -17,13 +17,13 @@ import "tech/figure/util/util.proto";
  Loan information at the time of origination
 */
 message Loan {
-  LoanMetadata                    meta = 1;  // Identifiers/Meta
-  tech.figure.person.Borrower     borrower = 10; // Borrower(s), co-signers, etc
-  Terms                           terms = 20; // Loan terms: amount, duration, rates
-  tech.figure.document.Disclosure signed_prom_note = 30; // Signed promissory note
-  PaymentDetails                  payment_details = 40; // Information on how monthly payment to be collected
-  repeated FundingInstruction     funding_instructions = 50; // Instructions on how to fund loan/where to send money
-  repeated Consent                consents = 60; // Loan options to which borrower has/has not consented
+  LoanMetadata                    meta                    = 1;  // Identifiers/Meta
+  tech.figure.person.Borrower     borrower                = 10; // Borrower(s), co-signers, etc
+  Terms                           terms                   = 20; // Loan terms: amount, duration, rates
+  tech.figure.document.Disclosure signed_prom_note        = 30; // Signed promissory note
+  PaymentDetails                  payment_details         = 40; // Information on how monthly payment to be collected
+  repeated FundingInstruction     funding_instructions    = 50; // Instructions on how to fund loan/where to send money
+  repeated Consent                consents                = 60; // Loan options to which borrower has/has not consented
   repeated tech.figure.document.DocumentMetadata doc_meta = 70; // Metadata about documents related to the loan, but stored separately
 
   // todo: digital sig packets

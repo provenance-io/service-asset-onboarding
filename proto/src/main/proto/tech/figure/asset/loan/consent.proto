@@ -7,7 +7,6 @@ option java_multiple_files = true;
 message Consent {
   string    consent_type = 1; // See ConsentExpectedType
   OptStatus opt_status   = 2;
-  string    credit_union = 3;
 
   enum OptStatus {
     OPT_STATUS_UNKNOWN = 0;
