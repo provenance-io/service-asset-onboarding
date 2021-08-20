@@ -2,14 +2,16 @@ syntax = "proto3";
 
 package tech.figure.asset.loan;
 
+option java_multiple_files = true;
+
 message Consent {
-  string    consent_type = 1; // see ConsentExpectedType
+  string    consent_type = 1; // See ConsentExpectedType
   OptStatus opt_status   = 2;
   string    credit_union = 3;
-}
 
-enum OptStatus {
-  OPT_STATUS_UNKNOWN = 0;
-  IN                 = 1;
-  OUT                = 2;
+  enum OptStatus {
+    OPT_STATUS_UNKNOWN = 0;
+    IN                 = 1;
+    OUT                = 2;
+  }
 }

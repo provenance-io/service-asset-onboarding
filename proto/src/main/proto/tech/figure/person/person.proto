@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package tech.figure.person;
 
+option java_multiple_files = true;
+
 import "tech/figure/util/address.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
@@ -20,7 +22,7 @@ message Name {
 message Person {
 
   tech.figure.util.UUID id                                       = 1;
-  string                party_type                               = 9; // see PartyType
+  string                party_type                               = 9; // See PartyType
   Name                  name                                     = 10;
   tech.figure.util.Date dob                                      = 11 [(tech.figure.util.pii) = true];
   repeated tech.figure.util.PhoneNumber phone_numbers            = 12;

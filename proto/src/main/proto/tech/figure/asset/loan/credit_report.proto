@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package tech.figure.asset.loan;
+
+option java_multiple_files = true;
+
+import "tech/figure/util/util.proto";
+import "google/protobuf/timestamp.proto";
+
+message CreditReport { // TODO
+  tech.figure.util.UUID uuid       = 1;
+  tech.figure.util.UUID party_uuid = 2;
+
+  google.protobuf.Timestamp report_timestamp = 4;
+}

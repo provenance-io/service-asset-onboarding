@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package tech.figure.asset.loan;
 
+option java_multiple_files = true;
+
 import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
 import "tech/figure/finance/financial_account.proto";
@@ -16,19 +18,19 @@ message FundingInstruction {
 
 //// TODO BELOW HERE - THIS IS PROBABLY ALL GONNA CHANGE
 
-message Funding {
-  bool                        complete             = 1; // All disbursements have been sent
-  google.protobuf.Timestamp   started_date         = 3; // tech.figure.util.Date stablecoin was transferred to borrower redemption address (for first disbursement)
-  google.protobuf.Timestamp   completed_date       = 2; // tech.figure.util.Date stablecoin was burned (for final disbursement)
-  repeated DisbursementRecord disbursement_records = 4;
-  bool                        initiated            = 5; // Funding process has been initiated
-}
-
-message DisbursementRecord {
-  tech.figure.util.UUID disbursement_id    = 1; // Reference to the Disbursement object
-  string                redemption_address = 2; // Stablecoin redemption address registered by omnibus
-  bool                  completed          = 3;
-  tech.figure.util.UUID coin_reference_id  = 4; // Coin redemption reference id
-  tech.figure.util.UUID bank_account_id    = 5; // The omnibus bank account id
-  bool                  initiated          = 6;
-}
+//message Funding {
+//  bool                        complete             = 1; // All disbursements have been sent
+//  google.protobuf.Timestamp   started_date         = 3; // tech.figure.util.Date stablecoin was transferred to borrower redemption address (for first disbursement)
+//  google.protobuf.Timestamp   completed_date       = 2; // tech.figure.util.Date stablecoin was burned (for final disbursement)
+//  repeated DisbursementRecord disbursement_records = 4;
+//  bool                        initiated            = 5; // Funding process has been initiated
+//}
+//
+//message DisbursementRecord {
+//  tech.figure.util.UUID disbursement_id    = 1; // Reference to the Disbursement object
+//  string                redemption_address = 2; // Stablecoin redemption address registered by omnibus
+//  bool                  completed          = 3;
+//  tech.figure.util.UUID coin_reference_id  = 4; // Coin redemption reference id
+//  tech.figure.util.UUID bank_account_id    = 5; // The omnibus bank account id
+//  bool                  initiated          = 6;
+//}

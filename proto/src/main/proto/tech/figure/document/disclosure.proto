@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package tech.figure.document;
 
+option java_multiple_files = true;
+
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/timestamp.proto";
 import "tech/figure/document/document.proto";
@@ -10,17 +12,15 @@ import "tech/figure/util/util.proto";
 import "tech/figure/person/person.proto";
 
 message Disclosure {
-  tech.figure.util.UUID id = 1;
-
-  tech.figure.document.Document signed_document      = 10;
-  tech.figure.document.Document unsigned_document    = 11;
-  ElectronicSignature           electronic_signature = 12;
-  map<string, string>           substitution_data    = 13;
-  string                        disclosure_type      = 14;
-
-  string signed_doc_checksum           = 24;
-  string signed_doc_checksum_algorithm = 25;
-  bool   signature_required            = 26;
+  tech.figure.util.UUID         id                            = 1;
+  tech.figure.document.DocumentMetadata signed_document               = 10;
+  tech.figure.document.DocumentMetadata unsigned_document             = 11;
+  ElectronicSignature           electronic_signature          = 12;
+  map<string, string>           substitution_data             = 13;
+  string                        disclosure_type               = 14;
+  string                        signed_doc_checksum           = 24;
+  string                        signed_doc_checksum_algorithm = 25;
+  bool                          signature_required            = 26;
 }
 
 message ElectronicSignature {
@@ -28,10 +28,9 @@ message ElectronicSignature {
   string                checksum           = 5;
   string                checksum_algorithm = 6;
   repeated Data         data               = 7;
-
-  tech.figure.util.UUID identity_id    = 8;
-  tech.figure.util.UUID application_id = 9;
-  tech.figure.util.UUID document_id    = 10;
+  tech.figure.util.UUID identity_id        = 8;
+  tech.figure.util.UUID application_id     = 9;
+  tech.figure.util.UUID document_id        = 10;
 
   message Data {
     tech.figure.util.UUID     identity_id              = 1;

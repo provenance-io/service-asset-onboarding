@@ -2,10 +2,14 @@ syntax = "proto3";
 
 package tech.figure.asset.loan;
 
+option java_multiple_files = true;
+
+import "tech/figure/asset/loan/credit_report.proto";
 import "tech/figure/asset/loan/consent.proto";
 import "tech/figure/asset/loan/funding.proto";
 import "tech/figure/person/person.proto";
 import "tech/figure/document/disclosure.proto";
+import "tech/figure/document/document.proto";
 import "tech/figure/finance/financial_account.proto";
 import "tech/figure/util/util.proto";
 
@@ -13,17 +17,19 @@ import "tech/figure/util/util.proto";
  Loan information at the time of origination
 */
 message Loan {
+  LoanMetadata                    meta = 1;  // Identifiers/Meta
+  tech.figure.person.Borrower     borrower = 10; // Borrower(s), co-signers, etc
+  Terms                           terms = 20; // Loan terms: amount, duration, rates
+  tech.figure.document.Disclosure signed_prom_note = 30; // Signed promissory note
+  PaymentDetails                  payment_details = 40; // Information on how monthly payment to be collected
+  repeated FundingInstruction     funding_instructions = 50; // Instructions on how to fund loan/where to send money
+  repeated Consent                consents = 60; // Loan options to which borrower has/has not consented
+  repeated tech.figure.document.DocumentMetadata doc_meta = 70; // Metadata about documents related to the loan, but stored separately
 
-  Meta                            meta                 = 1;  // Identifiers/Meta
-  tech.figure.person.Borrower     borrower             = 10; // Borrower(s), co-signers, etc
-  Terms                           terms                = 2;  // Loan terms: amount, duration, rates
-  tech.figure.document.Disclosure signed_prom_note     = 40; // Signed promissory note
-  repeated FundingInstruction     funding_instructions = 3;  // Instructions on how to fund loan/where to send money
-  PaymentDetails                  payment_details      = 4;  // Information on how monthly payment to be collected
-  repeated Consent                consents             = 5;  // Loan options to which borrower has/has not consented
+  // todo: digital sig packets
 }
 
-message Meta {
+message LoanMetadata {
   tech.figure.util.UUID id              = 1; // Loan id
   string                loan_number     = 2; // Originator's internal loan identifier
   string                loan_type       = 3; // Loan Type (Mortgage, HELOC, Personal Loan, etc.)
@@ -32,14 +38,11 @@ message Meta {
 }
 
 message Terms {
-  tech.figure.util.UUID  id               = 1; // Id for this set of terms/offer
-  tech.figure.util.Money principal_amount = 2; // Loan amount, not including fees or interest
-  tech.figure.util.Money total_amount     = 3; // Principal loan amount + origination fees
-  int32                  term_in_months   = 4;
-
-  // todo not sure if this should go here
-  tech.figure.util.Date closing_date = 5; // tech.figure.util.Date the Note is signed
-
+  tech.figure.util.UUID    id                   = 1; // Id for this set of terms/offer
+  tech.figure.util.Money   principal_amount     = 2; // Loan amount, not including fees or interest
+  tech.figure.util.Money   total_amount         = 3; // Principal loan amount + origination fees
+  int32                    term_in_months       = 4;
+  tech.figure.util.Date    closing_date         = 5; // tech.figure.util.Date the Note is signed   // todo not sure if this should go here
   int32                    offer_index          = 10;
   string                   pay_type             = 13;
   string                   rate_type            = 14;
@@ -53,9 +56,7 @@ message Terms {
   tech.figure.util.Decimal base_pricing_rate    = 21;
   tech.figure.util.Decimal other_pricing_rate   = 22;
   string                   index_rate_type      = 26; // (prime, libor) See IndexRateType
-
-  // All rate discounts available to this asset.
-  repeated RateDiscount rate_discounts = 30;
+  repeated RateDiscount    rate_discounts       = 30; // All rate discounts available to this asset.
 }
 
 message PaymentDetails {
@@ -67,7 +68,7 @@ message PaymentDetails {
 }
 
 message RateDiscount {
-  string                   discount_type                    = 1; // see RateDiscountType
+  string                   discount_type                    = 1; // See RateDiscountType
   tech.figure.util.Decimal discount_rate                    = 2; // Decimal rate between 0.0 and 1.0 where 1.0 = 100%
   bool                     rate_discount_included_in_margin = 3; // Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay.
 
@@ -76,4 +77,9 @@ message RateDiscount {
     AUTOPAY                 = 1;
     CREDIT_UNION_MEMBERSHIP = 2;
   }
+}
+
+// Borrower materials & records from loan application
+message Materials {
+  repeated CreditReport credit_reports = 1;
 }
