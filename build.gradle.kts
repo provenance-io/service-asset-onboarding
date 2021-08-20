@@ -36,7 +36,7 @@ subprojects {
                 "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
             )
             jvmTarget = "11"
-            allWarningsAsErrors = true
+            allWarningsAsErrors = false
         }
     }
 }
