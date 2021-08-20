@@ -125,38 +125,7 @@ object Dependencies {
 
     // Figure
     object Figure {
-        val IdentityClient = DependencySpec(
-            "com.figure.identity:identity-client",
-            Versions.Master,
-            isChanging = true,
-            exclude = listOf("com.figure:stream-data", "com.figure:figure-util")
-        )
-        val ProfileApi = DependencySpec(
-            "com.figure.profile:api", Versions.Master, isChanging = true,
-            exclude = listOf(
-                "com.figure:stream-data"
-            )
-        )
-        val FidoApi = DependencySpec(
-            "com.figure.document:api",
-            Versions.Master,
-            exclude = listOf(
-                "com.figure:stream-data"
-            )
-        )
-        val CalculatorClient = DependencySpec(
-            "com.figure.lending.calculator:calculator-domain",
-            Versions.Develop,
-            isChanging = true,
-            exclude = listOf("com.figure:stream-data")
-        )
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
-        val Util = DependencySpec("com.figure:figure-util", Versions.Master)
-        val UtilProto = DependencySpec("com.figure:util-proto", Versions.Master, isChanging = true)
-        val WebFluxSecurity = DependencySpec(
-            "com.figure.spring:spring-webflux-security-identity",
-            Versions.Master
-        )
     }
 
     object Provenance {
