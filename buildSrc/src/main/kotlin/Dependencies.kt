@@ -125,7 +125,7 @@ object Dependencies {
 
     // Figure
     object Figure {
-
+        val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
     }
 
     object Provenance {

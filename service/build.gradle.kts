@@ -33,15 +33,7 @@ dependencies {
         Dependencies.SpringBoot.StarterDevTools,
         Dependencies.SpringBoot.StarterSecurity,
         Dependencies.SpringBoot.StarterValidation,
-        Dependencies.Provenance.CoreLocking,
-        Dependencies.Provenance.CoreCoroutinesSupport,
-        Dependencies.Retrofit.Core,
-        Dependencies.Retrofit.JacksonConverter,
-        Dependencies.Retrofit.ScalarsConverter,
-        Dependencies.OkHttp.Core,
         Dependencies.OkHttp.LoggingInterceptor,
-        // Needed to play nice with WebFlux Coroutines stuff
-        Dependencies.Reactor.Core,
         Dependencies.KotlinLogging,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Jackson.Hubspot
