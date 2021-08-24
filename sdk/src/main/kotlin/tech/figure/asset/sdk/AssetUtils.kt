@@ -75,7 +75,7 @@ class AssetUtils (
         return res.getDecryptedPayload(DirectKeyRef(publicKey, privateKey)).readAllBytes()
     }
 
-    inline fun <reified T: Message> retrieveAndDecrypt(hash: ByteArray, publicKey: PublicKey, privateKey: PrivateKey): T {
+    inline fun <reified T : Message> retrieveAndDecrypt(hash: ByteArray, publicKey: PublicKey, privateKey: PrivateKey): T {
         val decryptedBytes = retrieveAndDecrypt(hash, publicKey, privateKey)
         val parser = T::class.staticFunctions.find { it.name == "parseFrom" && it.parameters.size == 1 && it.parameters[0].type.classifier == ByteArray::class }
             ?: throw IllegalStateException("Unable to find parseFrom function on ${T::class.java.name}")
