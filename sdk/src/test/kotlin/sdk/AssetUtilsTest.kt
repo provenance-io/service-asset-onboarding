@@ -11,9 +11,7 @@ import tech.figure.asset.Asset
 class AssetUtilsTest {
 
     companion object {
-        val OS_CONFIG_HOST: String = "localhost"
-        val OS_CONFIG_PORT: UShort = 8080u
-        val OS_CONFIG_SECURE: Boolean = false
+        val OS_CONFIG_URL: String = "grpc://localhost:8081"
         val OS_CONFIG_TIMEOUT_MS: Long = 20000
 
         val ASSET_TYPE: String = "TestAssetType"
@@ -33,9 +31,7 @@ class AssetUtilsTest {
 
     val assetUtils = AssetUtils(AssetUtilsConfig(
         osConfig = ObjectStoreConfig(
-            host = OS_CONFIG_HOST,
-            port = OS_CONFIG_PORT,
-            secure = OS_CONFIG_SECURE,
+            url = OS_CONFIG_URL,
             timeoutMs = OS_CONFIG_TIMEOUT_MS
         )
     ))
@@ -66,4 +62,5 @@ class AssetUtilsTest {
             }
         }
     }
+
 }

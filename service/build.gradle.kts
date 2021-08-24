@@ -33,6 +33,7 @@ dependencies {
         Dependencies.SpringBoot.StarterDevTools,
         Dependencies.SpringBoot.StarterSecurity,
         Dependencies.SpringBoot.StarterValidation,
+        Dependencies.Swagger.Annotations,
         Dependencies.OkHttp.LoggingInterceptor,
         Dependencies.KotlinLogging,
         Dependencies.Jackson.KotlinModule,

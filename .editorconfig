@@ -1,0 +1,7 @@
+root = true
+
+# Comma-separated list of rules to disable
+# Note that rules in any ruleset other than the standard ruleset will need to be prefixed
+# by the ruleset identifier.
+[*.{kt,kts}]
+disabled_rules=no-blank-line-before-rbrace

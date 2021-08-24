@@ -6,14 +6,15 @@ dependencies {
     implementation(project(":proto"))
 
     listOf(
+        Dependencies.GoogleGuava,
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
         Dependencies.Kotlin.CoroutinesJdk8,
         Dependencies.Kotlin.Reflect,
-        Dependencies.Protobuf.Java,
-        Dependencies.GoogleGuava,
         Dependencies.P8eScope.Encryption,
-        Dependencies.P8eScope.OsClient
+        Dependencies.P8eScope.OsClient,
+        Dependencies.Protobuf.Java,
+        Dependencies.Protobuf.JavaUtil
     ).forEach { dep ->
         dep.implementation(this)
     }

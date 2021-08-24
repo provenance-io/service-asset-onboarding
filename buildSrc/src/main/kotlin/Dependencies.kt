@@ -28,6 +28,7 @@ object Versions {
     const val Reactor = "3.4.6"
     const val JunitJupiter = "5.2.0"
     const val Guava = "30.1.1-jre"
+    const val Swagger = "1.6.2"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -126,6 +127,10 @@ object Dependencies {
     }
 
     val GoogleGuava = DependencySpec("com.google.guava:guava", Versions.Guava)
+
+    object Swagger {
+        val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
+    }
 
     // Figure
     object Figure {
