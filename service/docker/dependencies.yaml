@@ -15,3 +15,5 @@ services:
     container_name: object-store
     env_file:
       - ./common.env
+    ports:
+      - 8080:8080

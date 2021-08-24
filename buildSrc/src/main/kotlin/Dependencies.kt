@@ -15,6 +15,7 @@ object Versions {
     const val Develop = "develop-+"
 
     const val ProvenanceCore = Master
+    const val P8eScope = "0.1.0"
     const val StreamData = Master
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
@@ -26,6 +27,7 @@ object Versions {
     const val OkHttp = "4.2.1"
     const val Reactor = "3.4.6"
     const val JunitJupiter = "5.2.0"
+    const val Guava = "30.1.1-jre"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -123,6 +125,8 @@ object Dependencies {
         )
     }
 
+    val GoogleGuava = DependencySpec("com.google.guava:guava", Versions.Guava)
+
     // Figure
     object Figure {
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
@@ -135,6 +139,12 @@ object Dependencies {
             "io.provenance:core-coroutines-support",
             Versions.ProvenanceCore
         )
+    }
+
+    object P8eScope {
+        val Encryption = DependencySpec("io.provenance.scope:encryption", Versions.P8eScope)
+        val OsClient = DependencySpec("io.provenance.scope:os-client", Versions.P8eScope)
+        val Sdk = DependencySpec("io.provenance.scope:sdk", Versions.P8eScope)
     }
 
     val KotlinLogging = DependencySpec("io.github.microutils:kotlin-logging-jvm", Versions.KotlinLogging)

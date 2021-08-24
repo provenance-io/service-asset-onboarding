@@ -8,7 +8,12 @@ dependencies {
     listOf(
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
-        Dependencies.Kotlin.CoroutinesJdk8
+        Dependencies.Kotlin.CoroutinesJdk8,
+        Dependencies.Kotlin.Reflect,
+        Dependencies.Protobuf.Java,
+        Dependencies.GoogleGuava,
+        Dependencies.P8eScope.Encryption,
+        Dependencies.P8eScope.OsClient
     ).forEach { dep ->
         dep.implementation(this)
     }
