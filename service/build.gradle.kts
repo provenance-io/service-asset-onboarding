@@ -49,20 +49,39 @@ dependencies {
         Dependencies.Mockk,
         Dependencies.KotlinFaker,
         Dependencies.Kotlin.CoroutinesTest,
+        Dependencies.Jupiter.JupiterApi,
         Dependencies.SpringMockk,
         Dependencies.SpringBoot.StarterTest
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }
+
+    listOf(
+        Dependencies.Jupiter.JupiterEngine
+    ).forEach { runtimeDep ->
+        runtimeDep.testRuntimeOnly(this)
+    }
 }
 
 tasks.withType<Test> {
+    dependsOn("testComposeUp")
+    finalizedBy("testComposeDown")
     useJUnitPlatform {
         includeEngines("junit-jupiter")
     }
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+tasks.register<Exec>("testComposeUp") {
+    workingDir("../")
+    commandLine("./dc.sh", "up")
+}
+
+tasks.register<Exec>("testComposeDown") {
+    workingDir("../")
+    commandLine("./dc.sh", "down")
 }
 
 tasks.register<JavaExec>("ktlint") {

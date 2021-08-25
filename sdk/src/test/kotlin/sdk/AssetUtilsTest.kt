@@ -37,7 +37,7 @@ class AssetUtilsTest {
     ))
 
     @Test
-    fun `#encryptAndStoreWithRandomSigner asset can be decrypted to buffer`() {
+    fun `#encryptAndStore (using random signer) asset can be decrypted to buffer`() {
         runBlockingTest {
             assetUtils.encryptAndStore(testAsset, testKeyPair.public).also { hash ->
                 val decrypted = assetUtils.retrieveAndDecrypt(hash, testKeyPair.public, testKeyPair.private)
@@ -51,7 +51,7 @@ class AssetUtilsTest {
     }
 
     @Test
-    fun `#encryptAndStoreWithRandomSigner asset can be decrypted to type`() {
+    fun `#encryptAndStore (using random signer) asset can be decrypted to type`() {
         runBlockingTest {
             assetUtils.encryptAndStore(testAsset, testKeyPair.public).also { hash ->
                 val decryptedAsset: Asset = assetUtils.retrieveAndDecrypt<Asset>(hash, testKeyPair.public, testKeyPair.private)
