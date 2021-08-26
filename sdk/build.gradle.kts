@@ -14,7 +14,9 @@ dependencies {
         Dependencies.P8eScope.Encryption,
         Dependencies.P8eScope.OsClient,
         Dependencies.Protobuf.Java,
-        Dependencies.Protobuf.JavaUtil
+        Dependencies.Protobuf.JavaUtil,
+        Dependencies.Provenance.PbcProto,
+        Dependencies.Provenance.Protobuf.PbProtoJava
     ).forEach { dep ->
         dep.implementation(this)
     }

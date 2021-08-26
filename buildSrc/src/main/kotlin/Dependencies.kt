@@ -15,6 +15,8 @@ object Versions {
     const val Develop = "develop-+"
 
     const val ProvenanceCore = Master
+    const val ProvenancePbc = Master
+    const val ProvenanceProtobuf = Master
     const val P8eScope = "0.1.0"
     const val StreamData = Master
     // const val Detekt = "1.17.0"
@@ -144,6 +146,10 @@ object Dependencies {
             "io.provenance:core-coroutines-support",
             Versions.ProvenanceCore
         )
+        val PbcProto = DependencySpec("io.provenance.pbc:pbc-proto", Versions.ProvenancePbc)
+        object Protobuf {
+            val PbProtoJava = DependencySpec("io.provenance.protobuf:pb-proto-java", Versions.ProvenanceProtobuf)
+        }
     }
 
     object P8eScope {
