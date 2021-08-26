@@ -37,6 +37,8 @@ object Plugins { // please keep this sorted in sections
     val Flyway = PluginSpec("org.flywaydb.flyway", "7.7.0")
     val Idea = PluginSpec("idea")
     val Protobuf = PluginSpec("com.google.protobuf", "0.8.16")
+//    val Kroto = PluginSpec( "protoc-gen-kroto-plus", "0.6.1")
+    val Kroto = PluginSpec("com.github.marcoferrer.kroto-plus", "0.6.1")
     val SpringBoot = PluginSpec("org.springframework.boot", Versions.SpringBoot)
     val SpringDependencyManagement = PluginSpec("io.spring.dependency-management", "1.0.11.RELEASE")
 }
@@ -98,6 +100,8 @@ object Dependencies {
     object Protobuf {
         val Java = DependencySpec("com.google.protobuf:protobuf-java", Versions.Protobuf)
         val JavaUtil = DependencySpec("com.google.protobuf:protobuf-java-util", Versions.Protobuf)
+//        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus")
+        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus", "0.6.1")
     }
 
     // Square's Retrofit API client

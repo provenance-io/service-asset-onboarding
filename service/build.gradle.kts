@@ -73,7 +73,7 @@ tasks.register<JavaExec>("ktlint") {
 }
 
 tasks.named("check") {
-    dependsOn(tasks.named("ktlint"))
+//    dependsOn(tasks.named("ktlint"))
 }
 
 tasks.register<JavaExec>("ktlintFormat") {
