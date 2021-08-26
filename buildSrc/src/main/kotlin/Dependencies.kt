@@ -3,6 +3,7 @@ import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.ScriptHandlerScope
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.plugin.use.PluginDependenciesSpec
+import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaAnnotation
 
 object RepositoryLocations {
     const val FigureNexusMirror = "https://nexus.figure.com/repository/mirror"
@@ -20,6 +21,8 @@ object Versions {
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
     const val Protobuf = "3.16.0"
+    const val KrotoPlus = "0.6.1"
+    const val JavaAnnotation = "1.3.1"
     const val SpringBoot = "2.4.5"
     const val KotlinLogging = "2.0.6"
     const val Retrofit = "2.9.0"
@@ -100,8 +103,8 @@ object Dependencies {
     object Protobuf {
         val Java = DependencySpec("com.google.protobuf:protobuf-java", Versions.Protobuf)
         val JavaUtil = DependencySpec("com.google.protobuf:protobuf-java-util", Versions.Protobuf)
-//        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus")
-        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus", "0.6.1")
+        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus", Versions.KrotoPlus)
+        val JavaAnnotation = DependencySpec("javax.annotation:javax.annotation-api", Versions.JavaAnnotation)
     }
 
     // Square's Retrofit API client

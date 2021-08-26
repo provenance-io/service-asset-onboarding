@@ -12,13 +12,10 @@ dependencies {
             Dependencies.Protobuf.Java,
             Dependencies.Protobuf.JavaUtil,
             Dependencies.Protobuf.Kroto,
+            Dependencies.Protobuf.JavaAnnotation,
     ).forEach { dep ->
         dep.implementation(this)
     }
-
-    implementation("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus:0.6.1")
-    implementation("javax.annotation:javax.annotation-api:1.3.1")
-
 }
 
 protobuf {
@@ -33,7 +30,7 @@ protobuf {
     }
     plugins {
         id("kroto") {
-            artifact = "com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus:0.6.1"
+            artifact = Dependencies.Protobuf.Kroto.toDependencyNotation()
         }
     }
     generateProtoTasks {
