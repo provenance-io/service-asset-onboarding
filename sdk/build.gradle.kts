@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":proto"))
 
     listOf(
+        Dependencies.Figure.Wallet.PbClient,
         Dependencies.GoogleGuava,
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
@@ -13,6 +14,7 @@ dependencies {
         Dependencies.Kotlin.Reflect,
         Dependencies.P8eScope.Encryption,
         Dependencies.P8eScope.OsClient,
+        Dependencies.P8eScope.Util,
         Dependencies.Protobuf.Java,
         Dependencies.Protobuf.JavaUtil,
         Dependencies.Provenance.PbcProto,

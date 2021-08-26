@@ -1,12 +1,14 @@
 package tech.figure.asset.sdk
 
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
+import io.provenance.scope.encryption.util.getAddress
 import java.security.KeyPair
 import java.util.UUID
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import tech.figure.asset.Asset
+import tech.figure.asset.sdk.extensions.toJson
 
 class AssetUtilsTest {
 
@@ -26,6 +28,8 @@ class AssetUtilsTest {
         asset.name = ASSET_NAME
         // TODO: asset.payload["TestKey1"] =
     }.build()
+
+    val testScopeId: UUID = UUID.randomUUID()
 
     val testKeyPair: KeyPair = ProvenanceKeyGenerator.generateKeyPair()
 
@@ -59,6 +63,18 @@ class AssetUtilsTest {
                 Assertions.assertEquals(testAsset.id, decryptedAsset.id)
                 Assertions.assertEquals(testAsset.type, decryptedAsset.type)
                 Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+            }
+        }
+    }
+
+    @Test
+    fun `#buildNewScopeMetadataTransaction ???`() {
+        runBlockingTest {
+            assetUtils.buildNewScopeMetadataTransaction(testKeyPair.public.getAddress(false), testScopeId).also { result ->
+                Assertions.assertEquals(result.first, testScopeId)
+                Assertions.assertEquals(result.second.messagesCount, 2)
+
+                println("${result.second.toJson()}")
             }
         }
     }

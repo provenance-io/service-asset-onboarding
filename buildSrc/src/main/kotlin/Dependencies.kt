@@ -19,6 +19,7 @@ object Versions {
     const val ProvenanceProtobuf = Master
     const val P8eScope = "0.1.0"
     const val StreamData = Master
+    const val WalletPbClient = Master
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
@@ -137,6 +138,9 @@ object Dependencies {
     // Figure
     object Figure {
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
+        object Wallet {
+            val PbClient = DependencySpec("com.figure.wallet:pb-client", Versions.WalletPbClient)
+        }
     }
 
     object Provenance {
@@ -156,6 +160,7 @@ object Dependencies {
         val Encryption = DependencySpec("io.provenance.scope:encryption", Versions.P8eScope)
         val OsClient = DependencySpec("io.provenance.scope:os-client", Versions.P8eScope)
         val Sdk = DependencySpec("io.provenance.scope:sdk", Versions.P8eScope)
+        val Util = DependencySpec("io.provenance.scope:util", Versions.P8eScope)
     }
 
     val KotlinLogging = DependencySpec("io.github.microutils:kotlin-logging-jvm", Versions.KotlinLogging)
