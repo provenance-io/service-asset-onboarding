@@ -32,6 +32,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
         with:
           project_id: 'figure-development'
+          service_account_key: ${{ secrets.GCP_AUTH_JSON }}
 
       - name: Google Cloud SDK Info
         run: gcloud info
