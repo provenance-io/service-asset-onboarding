@@ -42,7 +42,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Gradle Build
-        run: ./gradlew clean build --no-daemon --parallel --refresh-dependencies
+        run: ./gradlew clean build -x test --no-daemon --parallel --refresh-dependencies
 
       - name: Gradle Unit & Functional Tests
         run: ./gradlew test --no-daemon
