@@ -7,7 +7,7 @@
 
 set -e
 
-EXTRA_CSS='.required {font-weight: bolder;}'
+#EXTRA_CSS='.required {font-weight: bolder;}'
 TMP_DIR=build/tmp-docs-protos
 HTML_FILE="$(pwd)/docs/asset-protos.html"
 
@@ -28,7 +28,7 @@ set -x
 docker run --entrypoint  "/bin/ls"  -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc "/protos"
 echo " "
 echo " "
-docker run -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc $FILE_LIST
+docker run -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc $FILE_LIST --doc_opt=:validate/*
 
 sed -e 's/href="#\([A-Z]\)/href="#\.\1/g' "$(pwd)/docs/index.html" > ${HTML_FILE}
 rm "$(pwd)/docs/index.html"
