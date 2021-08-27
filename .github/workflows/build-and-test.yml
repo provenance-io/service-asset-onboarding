@@ -34,6 +34,9 @@ jobs:
           project_id: 'figure-development'
           service_account_key: ${{ secrets.GCP_AUTH_JSON }}
 
+      - name: Google Cloud SDK Configure
+        run: gcloud services enable containerregistry.googleapis.com && gcloud auth configure-docker
+
       - name: Google Cloud SDK Info
         run: gcloud info
 
