@@ -28,12 +28,12 @@ message ElectronicSignature {
   string                checksum           = 5;
   string                checksum_algorithm = 6;
   repeated Data         data               = 7;
-  tech.figure.util.UUID identity_id        = 8;
+  tech.figure.util.UUID person_id        = 8;
   tech.figure.util.UUID application_id     = 9;
   tech.figure.util.UUID document_id        = 10;
 
   message Data {
-    tech.figure.util.UUID     identity_id              = 1;
+    tech.figure.util.UUID     person_id              = 1;
     Notary                    notary                   = 5;
     string                    email                    = 6 [(tech.figure.util.pii) = true];
     string                    ip                       = 7;
@@ -52,7 +52,7 @@ message ElectronicSignature {
   }
 
   message Notary {
-    tech.figure.util.UUID     identity_id           = 1;
+    tech.figure.util.UUID     person_id           = 1;
     tech.figure.person.Name   name                  = 2;
     string                    commission_id         = 3;
     google.protobuf.Timestamp commission_expiration = 4;
@@ -60,7 +60,7 @@ message ElectronicSignature {
   }
 
   message Witness {
-    tech.figure.util.UUID   identity_id = 1;
+    tech.figure.util.UUID   person_id = 1;
     tech.figure.person.Name name        = 2;
   }
 }

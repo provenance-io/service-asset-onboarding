@@ -8,8 +8,8 @@ import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
 
 message CreditReport { // TODO
-  tech.figure.util.UUID uuid       = 1;
-  tech.figure.util.UUID party_uuid = 2;
+  tech.figure.util.UUID id       = 1;
+  tech.figure.util.UUID person_id = 2;
 
   google.protobuf.Timestamp report_timestamp = 4;
 }

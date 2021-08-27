@@ -13,12 +13,19 @@ dependencies {
             Dependencies.Protobuf.JavaUtil,
             Dependencies.Protobuf.Kroto,
             Dependencies.Protobuf.JavaAnnotation,
+            Dependencies.Protobuf.ProtoValidation,
     ).forEach { dep ->
         dep.implementation(this)
     }
+    implementation("io.envoyproxy.protoc-gen-validate:pgv-java-stub:0.6.1")
 }
 
 protobuf {
+
+    // protoc plugin names
+    val kroto = "kroto"
+    val validation = "javapgv"
+
     protoc {
         if (Platform.OS.isAppleSilicon) {
             // Need to use locally installed protoc on Apple Silicon until maven repo starts serving ARM binaries
@@ -29,8 +36,11 @@ protobuf {
         }
     }
     plugins {
-        id("kroto") {
+        id(kroto) {
             artifact = Dependencies.Protobuf.Kroto.toDependencyNotation()
+        }
+        id(validation) {
+            artifact = Dependencies.Protobuf.ProtoValidation.toDependencyNotation()
         }
     }
     generateProtoTasks {
@@ -40,9 +50,12 @@ protobuf {
             it.inputs.files(krotoConfig)
             it.plugins {
                 ofSourceSet("main")
-                id("kroto") {
+                id(kroto) {
                     outputSubDir = "java"
                     option("ConfigPath=$krotoConfig")
+                }
+                id(validation) {
+                    option("lang=java")
                 }
             }
         }

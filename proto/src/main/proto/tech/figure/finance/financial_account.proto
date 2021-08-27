@@ -12,7 +12,7 @@ import "google/protobuf/descriptor.proto";
 message FinancialAccount {
 
   tech.figure.util.UUID id       = 1;
-  tech.figure.util.UUID owner_id = 3; // UUID of the borrower or owner of the account
+  tech.figure.util.UUID account_owner_id = 3; // UUID of the borrower or owner of the account
 
   string                   owner_name            = 12 [(tech.figure.util.pii) = true];
   string                   financial_institution = 13;

@@ -27,3 +27,8 @@ to consider:
 - package structure
 - file organization
 - message names
+
+https://github.com/marcoferrer/kroto-plus
+
+https://github.com/envoyproxy/protoc-gen-validate
+
