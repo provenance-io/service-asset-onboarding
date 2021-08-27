@@ -1,5 +1,9 @@
 package tech.figure.asset.sdk
 
+import io.provenance.metadata.v1.MsgWriteRecordRequest
+import io.provenance.metadata.v1.MsgWriteScopeRequest
+import io.provenance.metadata.v1.PartyType
+import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.util.getAddress
 import java.security.KeyPair
@@ -8,7 +12,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import tech.figure.asset.Asset
-import tech.figure.asset.sdk.extensions.toJson
 
 class AssetUtilsTest {
 
@@ -18,6 +21,10 @@ class AssetUtilsTest {
 
         val ASSET_TYPE: String = "TestAssetType"
         val ASSET_NAME: String = "TestAssetName"
+
+        val ASSET_RECORD_NAME: String = "TestRecordName"
+        val ASSET_RECORD_INPUT_1_NAME: String = "TestInputName"
+        val ASSET_RECORD_INPUT_1_HASH: String = "TestInputHash"
     }
 
     val testAsset: Asset = Asset.newBuilder().also { asset ->
@@ -26,7 +33,6 @@ class AssetUtilsTest {
         }.build()
         asset.type = ASSET_TYPE
         asset.name = ASSET_NAME
-        // TODO: asset.payload["TestKey1"] =
     }.build()
 
     val testScopeId: UUID = UUID.randomUUID()
@@ -68,13 +74,68 @@ class AssetUtilsTest {
     }
 
     @Test
-    fun `#buildNewScopeMetadataTransaction ???`() {
+    fun `#buildNewScopeMetadataTransaction`() {
         runBlockingTest {
-            assetUtils.buildNewScopeMetadataTransaction(testKeyPair.public.getAddress(false), testScopeId).also { result ->
+            assetUtils.buildNewScopeMetadataTransaction(
+                testKeyPair.public.getAddress(false),
+                ASSET_RECORD_NAME,
+                mapOf(Pair(ASSET_RECORD_INPUT_1_NAME, ASSET_RECORD_INPUT_1_HASH)),
+                testScopeId
+            ).also { result ->
+                // returns the scope id
                 Assertions.assertEquals(result.first, testScopeId)
+
+                // there should be two messages in the tx body
                 Assertions.assertEquals(result.second.messagesCount, 2)
 
-                println("${result.second.toJson()}")
+                // the first message is the write-scope request
+                result.second.getMessages(0).unpack(MsgWriteScopeRequest::class.java).also { writeScope ->
+                    // there's only one signer
+                    Assertions.assertEquals(writeScope.signersCount, 1)
+                    writeScope.getSigners(0).also { signer ->
+                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                    }
+
+                    // there's only one owner
+                    Assertions.assertEquals(writeScope.scope.ownersCount, 1)
+                    writeScope.scope.getOwners(0).also { owner ->
+                        Assertions.assertEquals(owner.address, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(owner.role, PartyType.PARTY_TYPE_OWNER)
+                    }
+
+                    // scope id
+                    Assertions.assertEquals(UUID.fromString(writeScope.scope.scopeId.toStringUtf8()), testScopeId)
+
+                    // value owner
+                    Assertions.assertEquals(writeScope.scope.valueOwnerAddress, testKeyPair.public.getAddress(false))
+                }
+
+                // the second message is the write-record request
+                result.second.getMessages(1).unpack(MsgWriteRecordRequest::class.java).also { writeRecord ->
+                    // there's only one signer
+                    Assertions.assertEquals(writeRecord.signersCount, 1)
+                    writeRecord.getSigners(0).also { signer ->
+                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                    }
+
+                    // there's only one party
+                    Assertions.assertEquals(writeRecord.partiesCount, 1)
+                    writeRecord.getParties(0).also { party ->
+                        Assertions.assertEquals(party.address, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(party.role, PartyType.PARTY_TYPE_OWNER)
+                    }
+
+                    // the record has a name
+                    Assertions.assertEquals(writeRecord.record.name, ASSET_RECORD_NAME)
+
+                    // there's only one input in the record
+                    Assertions.assertEquals(writeRecord.record.inputsCount, 1)
+                    writeRecord.record.getInputs(0).also { input ->
+                        Assertions.assertEquals(input.name, ASSET_RECORD_INPUT_1_NAME)
+                        Assertions.assertEquals(input.hash, ASSET_RECORD_INPUT_1_HASH)
+                        Assertions.assertEquals(input.status, RecordInputStatus.RECORD_INPUT_STATUS_RECORD)
+                    }
+                }
             }
         }
     }

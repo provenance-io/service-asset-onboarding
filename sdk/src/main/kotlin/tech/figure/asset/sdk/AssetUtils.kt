@@ -97,7 +97,7 @@ class AssetUtils (
     }
 
     // Builds the Provenance metadata transaction for writing a new scope to the chain
-    fun buildNewScopeMetadataTransaction(owner: String, scopeId: UUID = UUID.randomUUID()): Pair<UUID, TxOuterClass.TxBody> {
+    fun buildNewScopeMetadataTransaction(owner: String, recordName: String, scopeInputs: Map<String, String>, scopeId: UUID = UUID.randomUUID()): Pair<UUID, TxOuterClass.TxBody> {
         /*  TODO ....
             So many questions:
                 1. Should we ne using PARTY_TYPE_ORIGINATOR for the record party role?
@@ -137,12 +137,14 @@ class AssetUtils (
                 ))
                 addAllSigners(listOf(owner))
                 record = Record.newBuilder().apply {
-                    name = ""
-                    addInputs(RecordInput.newBuilder().apply {
-                        name = ""
-                        hash = ""
-                        status = RecordInputStatus.RECORD_INPUT_STATUS_RECORD
-                    }.build())
+                    name = recordName
+                    scopeInputs.forEach { (inputName, inputHash) ->
+                        addInputs(RecordInput.newBuilder().apply {
+                            name = inputName
+                            hash = inputHash
+                            status = RecordInputStatus.RECORD_INPUT_STATUS_RECORD
+                        }.build())
+                    }
                 }.build()
                 //contractSpecUuid =
                 //sessionIdComponents =

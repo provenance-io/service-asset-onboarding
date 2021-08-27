@@ -12,10 +12,17 @@ services:
       - 5432:5432
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: [ CMD-SHELL, pg_isready -U postgres ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   object-store:
     image: 'us.gcr.io/figure-production/object-store:0.2.0'
     container_name: object-store
+    depends_on:
+      - postgres
     env_file:
       - ./common.env
     ports:

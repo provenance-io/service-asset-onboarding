@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+// import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
 
 @RestController
@@ -32,6 +33,8 @@ class AssetController(
         // TODO: convert the JSON encoded asset to a proto (assume Asset base type?)
         // TODO: encrypt and store the asset in the object store (assetOnboardService.encryptAndStore)
         // TODO: build the scope metadata transaction messages (assetOnboardService.buildNewScopeMetadataTransaction)
+
+        // println("${result.second.toJson()}")
 
         return "" // TODO: return the JSON encoded TX messages
     }
