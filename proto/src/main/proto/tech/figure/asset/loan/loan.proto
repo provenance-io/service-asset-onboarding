@@ -18,24 +18,24 @@ import "validate/validate.proto";
  Loan information at the time of origination
 */
 message Loan {
-  string                          id                      = 1 [(validate.rules).string.uuid = true]; // Loan UUID identifier
-  LoanMetadata                    meta                    = 2;                                       // Identifiers/Meta
-  tech.figure.person.Borrower     borrower                = 10;                                      // Borrower(s), co-signers, etc
-  Terms                           terms                   = 20;                                      // Loan terms: amount, duration, rates
-  tech.figure.document.Disclosure signed_prom_note        = 30;                                      // Signed promissory note
-  PaymentDetails                  payment_details         = 40;                                      // Information on how monthly payment to be collected
-  repeated FundingInstruction     funding_instructions    = 50;                                      // Instructions on how to fund loan/where to send money
-  repeated Consent                consents                = 60;                                      // Loan options to which borrower has/has not consented
-  repeated tech.figure.document.DocumentMetadata doc_meta = 70;                                      // Metadata about documents related to the loan, but stored separately
+  string                          id                      = 1 [(validate.rules).string.uuid = true];       // Loan UUID identifier
+  LoanMetadata                    meta                    = 2 [(validate.rules).message.required = true];  // Identifiers/Meta
+  tech.figure.person.Borrower     borrower                = 10 [(validate.rules).message.required = true]; // Borrower(s), co-signers, etc
+  Terms                           terms                   = 20 [(validate.rules).message.required = true]; // Loan terms: amount, duration, rates
+  tech.figure.document.Disclosure signed_prom_note        = 30 [(validate.rules).message.required = true]; // Signed promissory note
+  PaymentDetails                  payment_details         = 40;                                            // Information on how monthly payment to be collected
+  repeated FundingInstruction     funding_instructions    = 50;                                            // Instructions on how to fund loan/where to send money
+  repeated Consent                consents                = 60;                                            // Loan options to which borrower has/has not consented
+  repeated tech.figure.document.DocumentMetadata doc_meta = 70;                                            // Metadata about documents related to the loan, but stored separately
 
   // todo: digital sig packets
 }
 
 message LoanMetadata {
-  string loan_number     = 2; // Originator's internal loan identifier
-  string loan_type       = 3; // Loan Type (Mortgage, HELOC, Personal Loan, etc.)
-  string loan_purpose    = 4; // Borrower's intended purpose for loan
-  string originator_name = 5; // Human-readable name of the originating firm
+  string loan_number     = 2;                                       // Originator's internal loan identifier
+  string loan_type       = 3 [(validate.rules).string.min_len = 3]; // Loan Type (Mortgage, HELOC, Personal Loan, etc.)
+  string loan_purpose    = 4;                                       // Borrower's intended purpose for loan
+  string originator_name = 5 [(validate.rules).string.min_len = 3]; // Human-readable name of the originating firm
 }
 
 message Terms {

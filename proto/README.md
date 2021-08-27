@@ -33,5 +33,5 @@ https://github.com/marcoferrer/kroto-plus
 https://github.com/envoyproxy/protoc-gen-validate
 
 ```
- find . -name "*.proto"  -exec clang-format -i {} \;
+find . -name "*.proto"  -exec clang-format -i {} \;
  ```

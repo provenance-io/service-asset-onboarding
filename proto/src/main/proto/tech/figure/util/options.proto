@@ -5,11 +5,10 @@ package tech.figure.util;
 option java_multiple_files = true;
 
 import "google/protobuf/descriptor.proto";
-import "validate/validate.proto";
 
 extend google.protobuf.EnumValueOptions {
   string description = 50003;
 }
 extend google.protobuf.FieldOptions {
-  bool pii = 65536; // True if this field is PII (Personally Identifying Information). Please note: annotate primitive-level fields rather than Message types
+  bool pii = 65536; // True if this field value contains Personally Identifying Information (PII).
 }

@@ -5,7 +5,6 @@ package tech.figure.document;
 option java_multiple_files = true;
 
 import "google/protobuf/timestamp.proto";
-import "tech/figure/util/util.proto";
 import "validate/validate.proto";
 
 message DocumentMetadata {

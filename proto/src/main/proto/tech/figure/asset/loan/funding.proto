@@ -5,7 +5,7 @@ package tech.figure.asset.loan;
 option java_multiple_files = true;
 
 import "tech/figure/util/util.proto";
-import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp.proto";
 import "tech/figure/finance/financial_account.proto";
 import "validate/validate.proto";
 

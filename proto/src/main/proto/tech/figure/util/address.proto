@@ -5,7 +5,6 @@ package tech.figure.util;
 option java_multiple_files = true;
 
 import "tech/figure/util/options.proto";
-import "tech/figure/util/util.proto";
 import "validate/validate.proto";
 
 message Address {

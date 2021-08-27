@@ -4,7 +4,6 @@ package tech.figure.asset;
 
 option java_multiple_files = true;
 
-import "tech/figure/util/util.proto";
 import "google/protobuf/any.proto";
 import "validate/validate.proto";
 
