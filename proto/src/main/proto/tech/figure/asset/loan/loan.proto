@@ -39,7 +39,7 @@ message LoanMetadata {
 }
 
 message Terms {
-  tech.figure.util.UUID    id                   = 1; // Id for this set of terms/offer
+  string  id   = 1 [(validate.rules).string.uuid = true]; // Id for this set of terms/offer
   tech.figure.util.Money   principal_amount     = 2; // Loan amount, not including fees or interest
   tech.figure.util.Money   total_amount         = 3; // Principal loan amount + origination fees
   int32                    term_in_months       = 4;

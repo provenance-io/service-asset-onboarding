@@ -6,10 +6,11 @@ option java_multiple_files = true;
 
 import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 message CreditReport { // TODO
-  tech.figure.util.UUID id       = 1;
-  tech.figure.util.UUID person_id = 2;
+  string  id   = 1 [(validate.rules).string.uuid = true];
+  string  person_id   = 2 [(validate.rules).string.uuid = true];
 
   google.protobuf.Timestamp report_timestamp = 4;
 }

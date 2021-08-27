@@ -5,6 +5,7 @@ package tech.figure.util;
 option java_multiple_files = true;
 
 import "google/protobuf/descriptor.proto";
+import "validate/validate.proto";
 
 extend google.protobuf.EnumValueOptions {
   string description = 50003;

@@ -7,9 +7,10 @@ option java_multiple_files = true;
 import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
 import "tech/figure/finance/financial_account.proto";
+import "validate/validate.proto";
 
 message FundingInstruction {
-  tech.figure.util.UUID                id                 = 1; // ID of this disbursement
+  string  id   = 1 [(validate.rules).string.uuid = true]; // ID of this disbursement
   tech.figure.util.Money               amount             = 2;
   tech.figure.finance.FinancialAccount disburse_account   = 3;
   string                               disbursement_type  = 4; // Description of the disbursement type (e.g. loan funding, refi payoff, referral_fee, etc.)
@@ -27,10 +28,10 @@ message FundingInstruction {
 //}
 //
 //message DisbursementRecord {
-//  tech.figure.util.UUID disbursement_id    = 1; // Reference to the Disbursement object
+//  string  disbursement_id   = 1 [(validate.rules).string.uuid = true]; // Reference to the Disbursement object
 //  string                redemption_address = 2; // Stablecoin redemption address registered by omnibus
 //  bool                  completed          = 3;
-//  tech.figure.util.UUID coin_reference_id  = 4; // Coin redemption reference id
-//  tech.figure.util.UUID bank_account_id    = 5; // The omnibus bank account id
+//  string  coin_reference_id   = 4 [(validate.rules).string.uuid = true]; // Coin redemption reference id
+//  string  bank_account_id   = 5 [(validate.rules).string.uuid = true]; // The omnibus bank account id
 //  bool                  initiated          = 6;
 //}

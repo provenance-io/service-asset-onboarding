@@ -8,11 +8,12 @@ import "tech/figure/util/address.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
 import "google/protobuf/descriptor.proto";
+import "validate/validate.proto";
 
 message FinancialAccount {
 
-  tech.figure.util.UUID id       = 1;
-  tech.figure.util.UUID account_owner_id = 3; // UUID of the borrower or owner of the account
+  string  id   = 1 [(validate.rules).string.uuid = true];
+  string  account_owner_id   = 3 [(validate.rules).string.uuid = true]; // UUID of the borrower or owner of the account
 
   string                   owner_name            = 12 [(tech.figure.util.pii) = true];
   string                   financial_institution = 13;

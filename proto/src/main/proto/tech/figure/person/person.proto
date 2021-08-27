@@ -9,9 +9,10 @@ import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
 import "tech/figure/asset/loan/consent.proto";
+import "validate/validate.proto";
 
 message Name {
-  tech.figure.util.UUID id          = 1;
+  string  id   = 1 [(validate.rules).string.uuid = true];
   string                first_name  = 2 [(tech.figure.util.pii) = true];
   string                last_name   = 3 [(tech.figure.util.pii) = true];
   string                middle_name = 4 [(tech.figure.util.pii) = true];
@@ -20,8 +21,7 @@ message Name {
 }
 
 message Person {
-
-  tech.figure.util.UUID id                                       = 1;
+  string  id   = 1 [(validate.rules).string.uuid = true];
   string                party_type                               = 9; // See PartyType
   Name                  name                                     = 10;
   tech.figure.util.Date dob                                      = 11 [(tech.figure.util.pii) = true];
@@ -38,7 +38,7 @@ message Person {
 }
 
 message IncomeSource {
-  tech.figure.util.UUID     id                                             = 1;
+  string  id   = 1 [(validate.rules).string.uuid = true];
   string                    employer                                       = 2;
   tech.figure.util.Money    amount                                         = 3;
   string                    employment_status                              = 4; // See EmploymentStatus
