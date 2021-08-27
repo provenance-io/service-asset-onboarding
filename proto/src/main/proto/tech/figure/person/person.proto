@@ -12,7 +12,7 @@ import "tech/figure/asset/loan/consent.proto";
 import "validate/validate.proto";
 
 message Name {
-  string id          = 1 [(validate.rules).string.uuid = true];
+  //  string id          = 1 [(validate.rules).string.uuid = true];
   string first_name  = 2 [(tech.figure.util.pii) = true];
   string last_name   = 3 [(tech.figure.util.pii) = true];
   string middle_name = 4 [(tech.figure.util.pii) = true];

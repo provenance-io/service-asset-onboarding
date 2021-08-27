@@ -48,8 +48,8 @@ message ElectronicSignature {
   }
 
   message Location {
-    tech.figure.util.Decimal latitude  = 1;
-    tech.figure.util.Decimal longitude = 2;
+    double latitude  = 1;
+    double longitude = 2;
   }
 
   message Notary {

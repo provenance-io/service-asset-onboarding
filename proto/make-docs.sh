@@ -21,20 +21,17 @@ cp -r docs/validate ${TMP_DIR}
 FILE_LIST=$( find ${TMP_DIR} -name "*.proto" | sort | grep -v "other_loan_types.proto")
 FILE_LIST=$( echo $FILE_LIST | sed "s|${TMP_DIR}/||g" )
 
-echo $FILE_LIST
+# Useful debug commands:
+#echo $FILE_LIST
+#docker run --rm --entrypoint  "/bin/ls"  -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc "/protos"
 
-set -x
-
-docker run --entrypoint  "/bin/ls"  -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc "/protos"
-echo " "
-echo " "
-docker run -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc $FILE_LIST --doc_opt=:validate/*
+docker run --rm -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc $FILE_LIST --doc_opt=:validate/*
 
 sed -e 's/href="#\([A-Z]\)/href="#\.\1/g' "$(pwd)/docs/index.html" > ${HTML_FILE}
 rm "$(pwd)/docs/index.html"
 
 # Fix up the title
-sed -i '' -e 's/Protocol Documentation/Asset Model/' ${HTML_FILE}
+sed -i '' -e 's/Protocol Documentation/Figure Tech Asset Model/' ${HTML_FILE}
 # Fancy-up the CSS
 #sed -i '' -e 's|Required|<span class="required">Required</span>|' ${HTML_FILE}
 

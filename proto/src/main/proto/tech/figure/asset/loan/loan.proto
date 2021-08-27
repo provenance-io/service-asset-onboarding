@@ -23,7 +23,7 @@ message Loan {
   tech.figure.person.Borrower     borrower                = 10 [(validate.rules).message.required = true]; // Borrower(s), co-signers, etc
   Terms                           terms                   = 20 [(validate.rules).message.required = true]; // Loan terms: amount, duration, rates
   tech.figure.document.Disclosure signed_prom_note        = 30 [(validate.rules).message.required = true]; // Signed promissory note
-  PaymentDetails                  payment_details         = 40;                                            // Information on how monthly payment to be collected
+  PaymentDetails                  payment_details         = 40 [(validate.rules).message.required = true]; // Information on how monthly payment to be collected
   repeated FundingInstruction     funding_instructions    = 50;                                            // Instructions on how to fund loan/where to send money
   repeated Consent                consents                = 60;                                            // Loan options to which borrower has/has not consented
   repeated tech.figure.document.DocumentMetadata doc_meta = 70;                                            // Metadata about documents related to the loan, but stored separately
@@ -39,39 +39,39 @@ message LoanMetadata {
 }
 
 message Terms {
-  string                   id                   = 1 [(validate.rules).string.uuid = true]; // Id for this set of terms/offer
-  tech.figure.util.Money   principal_amount     = 2;                                       // Loan amount, not including fees or interest
-  tech.figure.util.Money   total_amount         = 3;                                       // Principal loan amount + origination fees
-  int32                    term_in_months       = 4;
-  tech.figure.util.Date    closing_date         = 5; // tech.figure.util.Date the Note is signed   // todo not sure if this should go here
-  int32                    offer_index          = 10;
-  string                   pay_type             = 13;
-  string                   rate_type            = 14;
-  tech.figure.util.Decimal margin_rate          = 17;
-  tech.figure.util.Decimal prime_rate           = 15;
-  tech.figure.util.Decimal index_rate           = 25;
-  tech.figure.util.Decimal interest_rate        = 16; // Total interest rate for loan (margin_rate + prime_rate or index_rate)
-  string                   orig_fee_type        = 23; // See OrigFeeExpectedType
-  tech.figure.util.Decimal origination_fee_rate = 18;
-  tech.figure.util.Decimal rate_cap             = 20;
-  tech.figure.util.Decimal base_pricing_rate    = 21;
-  tech.figure.util.Decimal other_pricing_rate   = 22;
-  string                   index_rate_type      = 26; // (prime, libor) See IndexRateType
-  repeated RateDiscount    rate_discounts       = 30; // All rate discounts available to this asset.
+  string                 id                   = 1 [(validate.rules).string.uuid = true];      // Id for this set of terms/offer
+  tech.figure.util.Money principal_amount     = 2 [(validate.rules).message.required = true]; // Loan amount, not including fees or interest
+  tech.figure.util.Money total_amount         = 3 [(validate.rules).message.required = true]; // Principal loan amount + origination fees
+  int32                  term_in_months       = 4 [(validate.rules).int32.gt = 0];
+  tech.figure.util.Date  closing_date         = 5 [(validate.rules).message.required = true]; // Date the Note is signed   // todo not sure if this should go here
+  int32                  offer_index          = 10;
+  string                 pay_type             = 13;
+  string                 rate_type            = 14;
+  tech.figure.util.Rate  margin_rate          = 17;
+  tech.figure.util.Rate  prime_rate           = 15;
+  tech.figure.util.Rate  index_rate           = 25;
+  tech.figure.util.Rate  interest_rate        = 16 [(validate.rules).message.required = true]; // Total interest rate for loan (margin_rate + prime_rate or index_rate)
+  string                 orig_fee_type        = 23;                                            // See OrigFeeExpectedType
+  tech.figure.util.Rate  origination_fee_rate = 18;
+  tech.figure.util.Rate  rate_cap             = 20;
+  tech.figure.util.Rate  base_pricing_rate    = 21;
+  tech.figure.util.Rate  other_pricing_rate   = 22;
+  string                 index_rate_type      = 26; // (prime, libor) See IndexRateType
+  repeated RateDiscount  rate_discounts       = 30; // All rate discounts available to this asset.
 }
 
 message PaymentDetails {
-  tech.figure.util.Money               monthly_payment_amount = 215; // Principal and interest only (no escrow/fees)
+  tech.figure.util.Money               monthly_payment_amount = 215 [(validate.rules).message.required = true]; // Principal and interest only (no escrow/fees)
   tech.figure.util.Date                first_payment_date     = 315;
   tech.figure.util.Date                grace_period_end_date  = 320;
   tech.figure.util.Date                amort_start_date       = 325;
-  tech.figure.finance.FinancialAccount autopay_account        = 505; // - if borrower has agreed to automated monthly payments
+  tech.figure.finance.FinancialAccount autopay_account        = 505; // Populated if borrower has agreed to automated monthly payments
 }
 
 message RateDiscount {
-  string                   discount_type                    = 1; // See RateDiscountType
-  tech.figure.util.Decimal discount_rate                    = 2; // Decimal rate between 0.0 and 1.0 where 1.0 = 100%
-  bool                     rate_discount_included_in_margin = 3; // Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay.
+  string                discount_type                    = 1; // See RateDiscountType
+  tech.figure.util.Rate discount_rate                    = 2; // Decimal rate between 0.0 and 1.0 where 1.0 = 100%
+  bool                  rate_discount_included_in_margin = 3; // Indicate whether a discount is included in the loan margin or not. E.g. autopay discount only applied if starting on autopay.
 
   enum RateDiscountType {
     UNKNOWN                 = 0;

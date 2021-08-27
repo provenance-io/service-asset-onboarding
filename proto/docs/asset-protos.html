@@ -444,11 +444,11 @@
                 </li>
               
                 <li>
-                  <a href="#tech.figure.util.Decimal"><span class="badge">M</span>Decimal</a>
+                  <a href="#tech.figure.util.Money"><span class="badge">M</span>Money</a>
                 </li>
               
                 <li>
-                  <a href="#tech.figure.util.Money"><span class="badge">M</span>Money</a>
+                  <a href="#tech.figure.util.Rate"><span class="badge">M</span>Rate</a>
                 </li>
               
               
@@ -943,6 +943,61 @@
                   </td>
                 </tr>
               
+                <tr>
+                  <td>meta</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>borrower</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>terms</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>signed_prom_note</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>payment_details</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
               </tbody>
             </table>
             
@@ -991,6 +1046,44 @@
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Validated Fields</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Field</td>
+                  <td>Validations</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>loan_type</td>
+                  <td>
+                    <ul>
+                    
+                      <li>string.min_len: 3</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>originator_name</td>
+                  <td>
+                    <ul>
+                    
+                      <li>string.min_len: 3</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -1061,12 +1154,39 @@
                   <td>autopay_account</td>
                   <td><a href="#tech.figure.finance.FinancialAccount">tech.figure.finance.FinancialAccount</a></td>
                   <td></td>
-                  <td><p>- if borrower has agreed to automated monthly payments </p></td>
+                  <td><p>Populated if borrower has agreed to automated monthly payments </p></td>
                 </tr>
               
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Validated Fields</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Field</td>
+                  <td>Validations</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>monthly_payment_amount</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -1090,7 +1210,7 @@
               
                 <tr>
                   <td>discount_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p>Decimal rate between 0.0 and 1.0 where 1.0 = 100% </p></td>
                 </tr>
@@ -1151,7 +1271,7 @@
                   <td>closing_date</td>
                   <td><a href="#tech.figure.util.Date">tech.figure.util.Date</a></td>
                   <td></td>
-                  <td><p>tech.figure.util.Date the Note is signed   // todo not sure if this should go here </p></td>
+                  <td><p>Date the Note is signed   // todo not sure if this should go here </p></td>
                 </tr>
               
                 <tr>
@@ -1177,28 +1297,28 @@
               
                 <tr>
                   <td>margin_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>prime_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>index_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>interest_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p>Total interest rate for loan (margin_rate &#43; prime_rate or index_rate) </p></td>
                 </tr>
@@ -1212,28 +1332,28 @@
               
                 <tr>
                   <td>origination_fee_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>rate_cap</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>base_pricing_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>other_pricing_rate</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#tech.figure.util.Rate">tech.figure.util.Rate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1274,6 +1394,61 @@
                     <ul>
                     
                       <li>string.uuid: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>principal_amount</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>total_amount</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>term_in_months</td>
+                  <td>
+                    <ul>
+                    
+                      <li>int32.gt: 0</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>closing_date</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>interest_rate</td>
+                  <td>
+                    <ul>
+                    
+                      <li>message.required: true</li>
                     
                     </ul>
                   </td>
@@ -1726,14 +1901,14 @@
               
                 <tr>
                   <td>latitude</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#double">double</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>longitude</td>
-                  <td><a href="#tech.figure.util.Decimal">tech.figure.util.Decimal</a></td>
+                  <td><a href="#double">double</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2598,17 +2773,10 @@
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
                   <td>first_name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>string id          = 1 [(validate.rules).string.uuid = true]; </p></td>
                 </tr>
               
                 <tr>
@@ -2642,33 +2810,6 @@
             </tbody>
           </table>
 
-          
-            
-            
-            <h4>Validated Fields</h4>
-            <table>
-              <thead>
-                <tr>
-                  <td>Field</td>
-                  <td>Validations</td>
-                </tr>
-              </thead>
-              <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td>
-                    <ul>
-                    
-                      <li>string.uuid: true</li>
-                    
-                    </ul>
-                  </td>
-                </tr>
-              
-              </tbody>
-            </table>
-            
           
 
         
@@ -2883,7 +3024,7 @@
 
       
         <h3 id="tech.figure.util.Address">Address</h3>
-        <p></p>
+        <p>string id = 1 [(validate.rules).string.uuid = true];</p>
 
         
           <table class="field-table">
@@ -2891,13 +3032,6 @@
               <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
             </thead>
             <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
               
                 <tr>
                   <td>street</td>
@@ -2987,33 +3121,6 @@
           </table>
 
           
-            
-            
-            <h4>Validated Fields</h4>
-            <table>
-              <thead>
-                <tr>
-                  <td>Field</td>
-                  <td>Validations</td>
-                </tr>
-              </thead>
-              <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td>
-                    <ul>
-                    
-                      <li>string.uuid: true</li>
-                    
-                    </ul>
-                  </td>
-                </tr>
-              
-              </tbody>
-            </table>
-            
-          
 
         
       
@@ -3028,17 +3135,10 @@
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
                   <td>number</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>string id          = 1 [(validate.rules).string.uuid = true]; </p></td>
                 </tr>
               
                 <tr>
@@ -3051,33 +3151,6 @@
             </tbody>
           </table>
 
-          
-            
-            
-            <h4>Validated Fields</h4>
-            <table>
-              <thead>
-                <tr>
-                  <td>Field</td>
-                  <td>Validations</td>
-                </tr>
-              </thead>
-              <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td>
-                    <ul>
-                    
-                      <li>string.uuid: true</li>
-                    
-                    </ul>
-                  </td>
-                </tr>
-              
-              </tbody>
-            </table>
-            
           
 
         
@@ -3120,7 +3193,7 @@
                 <td><a href="#bool">bool</a></td>
                 <td><a href="#google.protobuf.FieldOptions">.google.protobuf.FieldOptions</a></td>
                 <td>65536</td>
-                <td><p>True if this field is PII (Personally Identifying Information). Please note: annotate primitive-level fields rather than Message types</p></td>
+                <td><p>True if this field value contains Personally Identifying Information (PII).</p></td>
               </tr>
             
           </tbody>
@@ -3137,7 +3210,7 @@
 
       
         <h3 id="tech.figure.util.Date">Date</h3>
-        <p>In Java: Use LocalDate to represent this value. Date stored as ISO8601 string. EX: "2020-05-22". For OffsetDateTime, use proto Timestamp</p>
+        <p>In Java: Use LocalDate to represent this value.  (For OffsetDateTime, use proto Timestamp.)</p><p>ISO8601 Date</p>
 
         
           <table class="field-table">
@@ -3150,36 +3223,39 @@
                   <td>value</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Date stored as ISO8601 string in the form &#34;yyyy-MM-dd&#34;. EX: &#34;2020-05-22&#34; </p></td>
                 </tr>
               
             </tbody>
           </table>
 
           
-
-        
-      
-        <h3 id="tech.figure.util.Decimal">Decimal</h3>
-        <p>In Java: Use BigDecimal to represent this value</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
+            
+            
+            <h4>Validated Fields</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Field</td>
+                  <td>Validations</td>
+                </tr>
+              </thead>
+              <tbody>
               
                 <tr>
                   <td>value</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
+                  <td>
+                    <ul>
+                    
+                      <li>string.pattern: \d{4}-\d{2}-\d{2}</li>
+                    
+                    </ul>
+                  </td>
                 </tr>
               
-            </tbody>
-          </table>
-
+              </tbody>
+            </table>
+            
           
 
         
@@ -3196,14 +3272,76 @@
               
                 <tr>
                   <td>amount</td>
-                  <td><a href="#string">string</a></td>
+                  <td><a href="#double">double</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Positive amounts only </p></td>
                 </tr>
               
                 <tr>
                   <td>currency</td>
                   <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>ISO 4217 3-digit currency code </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+            
+            
+            <h4>Validated Fields</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Field</td>
+                  <td>Validations</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>amount</td>
+                  <td>
+                    <ul>
+                    
+                      <li>double.gte: 0</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+                <tr>
+                  <td>currency</td>
+                  <td>
+                    <ul>
+                    
+                      <li>string.len: 3</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
+          
+
+        
+      
+        <h3 id="tech.figure.util.Rate">Rate</h3>
+        <p>In Java: Use BigDecimal to represent this value</p><p>Rate/percentage expressed as a decimal between 0 and 1.0, where 1.0 represents 100%</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#double">double</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -3211,6 +3349,35 @@
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Validated Fields</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Field</td>
+                  <td>Validations</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td>
+                    <ul>
+                    
+                      <li>double.lte: 1</li>
+                    
+                      <li>double.gte: 0</li>
+                    
+                    </ul>
+                  </td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         

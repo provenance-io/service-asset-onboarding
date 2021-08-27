@@ -19,7 +19,7 @@ should be globally unique
 for that particular loan type
 
 
-
+- what does and does NOT need to have a uuid on it
 
 
 to consider:
