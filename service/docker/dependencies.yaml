@@ -1,5 +1,7 @@
 version: '3.5'
+
 services:
+
   postgres:
     image: postgres:13
     container_name: postgres
@@ -10,8 +12,28 @@ services:
       - 5432:5432
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d/
+
   object-store:
     image: 'us.gcr.io/figure-production/object-store:0.2.0'
     container_name: object-store
     env_file:
       - ./common.env
+    ports:
+      - 8081:8081
+
+  provenance:
+    image: provenanceio/provenance:v1.5.0
+    container_name: provenance
+    command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
+    ports:
+      - 1317:1317
+      - 9090:9090
+      - 26657:26657
+    volumes:
+      - ./prov-init:/home/provenance_seed:ro
+      - provenance:/home/provenance
+
+volumes:
+  postgres:
+  object-store:
+  provenance:

@@ -6,9 +6,19 @@ dependencies {
     implementation(project(":proto"))
 
     listOf(
+        Dependencies.Figure.Wallet.PbClient,
+        Dependencies.GoogleGuava,
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
-        Dependencies.Kotlin.CoroutinesJdk8
+        Dependencies.Kotlin.CoroutinesJdk8,
+        Dependencies.Kotlin.Reflect,
+        Dependencies.P8eScope.Encryption,
+        Dependencies.P8eScope.OsClient,
+        Dependencies.P8eScope.Util,
+        Dependencies.Protobuf.Java,
+        Dependencies.Protobuf.JavaUtil,
+        Dependencies.Provenance.PbcProto,
+        Dependencies.Provenance.Protobuf.PbProtoJava
     ).forEach { dep ->
         dep.implementation(this)
     }
@@ -28,10 +38,22 @@ dependencies {
 }
 
 tasks.withType<Test> {
+    dependsOn("testComposeUp")
+    finalizedBy("testComposeDown")
     useJUnitPlatform {
         includeEngines("junit-jupiter")
     }
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+tasks.register<Exec>("testComposeUp") {
+    workingDir("../")
+    commandLine("./dc.sh", "up")
+}
+
+tasks.register<Exec>("testComposeDown") {
+    workingDir("../")
+    commandLine("./dc.sh", "down")
 }
