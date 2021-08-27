@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package tech.figure.asset;
+
+option java_package = "tech.figure.asset";
+option java_multiple_files = true;
+
+import "tech/figure/util/util.proto";
+import "google/protobuf/any.proto";
+
+message Asset {
+  tech.figure.util.UUID id   = 1;
+  string                type = 2; // user-defined type
+  string                name = 3; // user-defined name
+
+  map<string, google.protobuf.Any> payload = 4;
+}
