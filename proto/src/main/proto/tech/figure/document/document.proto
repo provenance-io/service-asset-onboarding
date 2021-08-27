@@ -9,7 +9,7 @@ import "tech/figure/util/util.proto";
 import "validate/validate.proto";
 
 message DocumentMetadata {
-  string  id   = 1 [(validate.rules).string.uuid = true];
+  string                 id               = 1 [(validate.rules).string.uuid = true];
   string                 uri              = 10;
   string                 name             = 12;
   string                 document_type    = 13; // See DocumentExpectedType
@@ -25,19 +25,19 @@ message DocumentMetadata {
 }
 
 message DataAuthority {
-  string  id   = 1 [(validate.rules).string.uuid = true];
-  string                public_key = 2;
-  string                data_key   = 3;
-  string                nonce      = 4;
+  string id         = 1 [(validate.rules).string.uuid = true];
+  string public_key = 2;
+  string data_key   = 3;
+  string nonce      = 4;
 }
 
 message Tag {
-  string  id   = 1 [(validate.rules).string.uuid = true];
-  string                tag_type = 2; // See TagExpectedType
+  string id       = 1 [(validate.rules).string.uuid = true];
+  string tag_type = 2; // See TagExpectedType
 }
 
 message Signature {
-  string  id   = 1 [(validate.rules).string.uuid = true];
+  string                    id                             = 1 [(validate.rules).string.uuid = true];
   string                    signature                      = 10;
   google.protobuf.Timestamp time_received_from_third_party = 11;
   string                    vendor_name                    = 12; // See VendorName

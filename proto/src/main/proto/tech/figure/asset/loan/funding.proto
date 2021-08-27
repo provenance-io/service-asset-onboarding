@@ -10,7 +10,7 @@ import "tech/figure/finance/financial_account.proto";
 import "validate/validate.proto";
 
 message FundingInstruction {
-  string  id   = 1 [(validate.rules).string.uuid = true]; // ID of this disbursement
+  string                               id                 = 1 [(validate.rules).string.uuid = true]; // ID of this disbursement
   tech.figure.util.Money               amount             = 2;
   tech.figure.finance.FinancialAccount disburse_account   = 3;
   string                               disbursement_type  = 4; // Description of the disbursement type (e.g. loan funding, refi payoff, referral_fee, etc.)

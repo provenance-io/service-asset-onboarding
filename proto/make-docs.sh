@@ -8,22 +8,27 @@
 set -e
 
 EXTRA_CSS='.required {font-weight: bolder;}'
+TMP_DIR=build/tmp-docs-protos
+HTML_FILE="$(pwd)/docs/asset-protos.html"
 
 docker pull pseudomuto/protoc-gen-doc
 
-rm -rf docs/*
+mkdir -p ${TMP_DIR}
 
-FILE_LIST=$( find src/main/proto -name "*.proto" | sort | grep -v "other_loan_types.proto")
-FILE_LIST=$( echo $FILE_LIST | sed 's|src/main/proto/||g' )
+cp -r src/main/proto/* ${TMP_DIR}
+cp -r docs/validate ${TMP_DIR}
 
-HTML_FILE="$(pwd)/docs/asset-protos.html"
+FILE_LIST=$( find ${TMP_DIR} -name "*.proto" | sort | grep -v "other_loan_types.proto")
+FILE_LIST=$( echo $FILE_LIST | sed "s|${TMP_DIR}/||g" )
+
+echo $FILE_LIST
 
 set -x
 
-docker run --entrypoint  "/bin/ls"  -v "$(pwd)/docs":/out -v "$(pwd)"/src/main/proto:/protos pseudomuto/protoc-gen-doc "/protos"
+docker run --entrypoint  "/bin/ls"  -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc "/protos"
 echo " "
 echo " "
-docker run -v "$(pwd)/docs":/out -v "$(pwd)"/src/main/proto:/protos pseudomuto/protoc-gen-doc $FILE_LIST
+docker run -v "$(pwd)/docs":/out -v "$(pwd)"/${TMP_DIR}:/protos pseudomuto/protoc-gen-doc $FILE_LIST
 
 sed -e 's/href="#\([A-Z]\)/href="#\.\1/g' "$(pwd)/docs/index.html" > ${HTML_FILE}
 rm "$(pwd)/docs/index.html"

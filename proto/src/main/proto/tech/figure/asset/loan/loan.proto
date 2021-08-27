@@ -39,9 +39,9 @@ message LoanMetadata {
 }
 
 message Terms {
-  string  id   = 1 [(validate.rules).string.uuid = true]; // Id for this set of terms/offer
-  tech.figure.util.Money   principal_amount     = 2; // Loan amount, not including fees or interest
-  tech.figure.util.Money   total_amount         = 3; // Principal loan amount + origination fees
+  string                   id                   = 1 [(validate.rules).string.uuid = true]; // Id for this set of terms/offer
+  tech.figure.util.Money   principal_amount     = 2;                                       // Loan amount, not including fees or interest
+  tech.figure.util.Money   total_amount         = 3;                                       // Principal loan amount + origination fees
   int32                    term_in_months       = 4;
   tech.figure.util.Date    closing_date         = 5; // tech.figure.util.Date the Note is signed   // todo not sure if this should go here
   int32                    offer_index          = 10;

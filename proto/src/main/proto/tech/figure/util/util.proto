@@ -7,7 +7,6 @@ option java_multiple_files = true;
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
-
 // In Java: Use LocalDate to represent this value. Date stored as ISO8601 string. EX: "2020-05-22". For OffsetDateTime, use proto Timestamp
 message Date {
   string value = 1;

@@ -9,8 +9,8 @@ import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 
 message CreditReport { // TODO
-  string  id   = 1 [(validate.rules).string.uuid = true];
-  string  person_id   = 2 [(validate.rules).string.uuid = true];
+  string id        = 1 [(validate.rules).string.uuid = true];
+  string person_id = 2 [(validate.rules).string.uuid = true];
 
   google.protobuf.Timestamp report_timestamp = 4;
 }

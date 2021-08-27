@@ -12,16 +12,16 @@ import "tech/figure/asset/loan/consent.proto";
 import "validate/validate.proto";
 
 message Name {
-  string  id   = 1 [(validate.rules).string.uuid = true];
-  string                first_name  = 2 [(tech.figure.util.pii) = true];
-  string                last_name   = 3 [(tech.figure.util.pii) = true];
-  string                middle_name = 4 [(tech.figure.util.pii) = true];
-  string                prefix      = 5 [(tech.figure.util.pii) = true];
-  string                suffix      = 6 [(tech.figure.util.pii) = true];
+  string id          = 1 [(validate.rules).string.uuid = true];
+  string first_name  = 2 [(tech.figure.util.pii) = true];
+  string last_name   = 3 [(tech.figure.util.pii) = true];
+  string middle_name = 4 [(tech.figure.util.pii) = true];
+  string prefix      = 5 [(tech.figure.util.pii) = true];
+  string suffix      = 6 [(tech.figure.util.pii) = true];
 }
 
 message Person {
-  string  id   = 1 [(validate.rules).string.uuid = true];
+  string                id                                       = 1 [(validate.rules).string.uuid = true];
   string                party_type                               = 9; // See PartyType
   Name                  name                                     = 10;
   tech.figure.util.Date dob                                      = 11 [(tech.figure.util.pii) = true];
@@ -38,7 +38,7 @@ message Person {
 }
 
 message IncomeSource {
-  string  id   = 1 [(validate.rules).string.uuid = true];
+  string                    id                                             = 1 [(validate.rules).string.uuid = true];
   string                    employer                                       = 2;
   tech.figure.util.Money    amount                                         = 3;
   string                    employment_status                              = 4; // See EmploymentStatus
