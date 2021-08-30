@@ -30,7 +30,7 @@ message ElectronicSignature {
   string        checksum_algorithm = 6;
   repeated Data data               = 7;
   string        person_id          = 8 [(validate.rules).string.uuid = true];
-  string        application_id     = 9 [(validate.rules).string.uuid = true];
+  string        asset_id           = 9 [(validate.rules).string.uuid = true];
   string        document_id        = 10 [(validate.rules).string.uuid = true];
 
   message Data {

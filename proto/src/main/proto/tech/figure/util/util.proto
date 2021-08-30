@@ -15,7 +15,7 @@ message Date {
 // In Java: Use BigDecimal to represent this value
 // Rate/percentage expressed as a decimal between 0 and 1.0, where 1.0 represents 100%
 message Rate {
-  double value = 1 [(validate.rules).double = {gte: 0; lte: 1}];  // Value in the range [0,1]
+  double value = 1 [(validate.rules).double = {gte: 0; lte: 1 }]; // Value in the range [0,1]
 }
 
 // In Java: Use Joda Money, BigMoney, or BigDecimal to represent this value

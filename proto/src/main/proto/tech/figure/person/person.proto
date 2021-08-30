@@ -46,7 +46,7 @@ message IncomeSource {
 }
 
 enum MaritalStatus {
-  UNKNOWN_MARITAL_STATUS = 0;
+  MARITAL_STATUS_UNKNOWN = 0;
   SINGLE                 = 1 [(tech.figure.util.description) = "Unmarried"];
   MARRIED                = 2 [(tech.figure.util.description) = "Married / Spouse"];
   SEPARATED              = 3 [(tech.figure.util.description) = "Separated"];

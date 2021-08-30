@@ -13,7 +13,7 @@ message Address {
   string street               = 10 [(tech.figure.util.pii) = true];
   string street2              = 15 [(tech.figure.util.pii) = true];
   string street3              = 20 [(tech.figure.util.pii) = true];
-  string city                 = 25 [(tech.figure.util.pii) = true];
+  string city                 = 25;
   string state                = 30; // or Province
   string country              = 35;
   string zip                  = 40;
