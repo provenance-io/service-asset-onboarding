@@ -5,11 +5,8 @@ package tech.figure.util;
 option java_multiple_files = true;
 
 import "tech/figure/util/options.proto";
-import "validate/validate.proto";
 
 message Address {
-  //  string id = 1 [(validate.rules).string.uuid = true];
-
   string street               = 10 [(tech.figure.util.pii) = true];
   string street2              = 15 [(tech.figure.util.pii) = true];
   string street3              = 20 [(tech.figure.util.pii) = true];
@@ -25,7 +22,6 @@ message Address {
 }
 
 message PhoneNumber {
-  //  string id          = 1 [(validate.rules).string.uuid = true];
   string number      = 2 [(tech.figure.util.pii) = true];
   string number_type = 11; // See NumberExpectedType
 }

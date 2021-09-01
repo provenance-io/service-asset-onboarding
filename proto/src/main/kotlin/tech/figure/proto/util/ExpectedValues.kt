@@ -81,6 +81,26 @@ enum class IndexRateType {
     PRIME
 }
 
+enum class IntRateExpectedType {
+    UNKNOWN,
+    FIXED,
+    FLOATING // variable interest rate
+}
+
+enum class LoanExpectedType {
+    HELOC,
+    HELOC_DRAW,
+    MORTGAGE_CASHOUT_REFI,
+    MORTGAGE_CONVENTIONAL,
+    MORTGAGE_ARM,
+    MORTGAGE_JUMBO,
+    MORTGAGE_HIGHBALANCE,
+    STUDENT_LOAN_REFI,
+    PERSONAL_LOAN,
+    RESIDENTIAL_BRIDGE,
+    AUTO_LOAN,
+}
+
 enum class NumberExpectedType {
     HOME,
     MOBILE,

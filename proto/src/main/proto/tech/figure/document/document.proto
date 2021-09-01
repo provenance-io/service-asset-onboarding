@@ -37,7 +37,7 @@ message Tag {
 
 message Signature {
   string                    id                             = 1 [(validate.rules).string.uuid = true];
-  string                    signature                      = 10;
+  string                    signature                      = 10; //
   google.protobuf.Timestamp time_received_from_third_party = 11;
   string                    vendor_name                    = 12; // See VendorName
   string                    packet_type                    = 13;

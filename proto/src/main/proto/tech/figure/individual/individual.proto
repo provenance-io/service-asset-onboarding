@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package tech.figure.person;
+package tech.figure.individual;
 
 option java_multiple_files = true;
 
@@ -12,7 +12,6 @@ import "tech/figure/asset/loan/consent.proto";
 import "validate/validate.proto";
 
 message Name {
-  //  string id          = 1 [(validate.rules).string.uuid = true];
   string first_name  = 2 [(tech.figure.util.pii) = true];
   string last_name   = 3 [(tech.figure.util.pii) = true];
   string middle_name = 4 [(tech.figure.util.pii) = true];
@@ -20,7 +19,7 @@ message Name {
   string suffix      = 6 [(tech.figure.util.pii) = true];
 }
 
-message Person {
+message Individual {
   string                id                                       = 1 [(validate.rules).string.uuid = true];
   string                party_type                               = 9; // See PartyType
   Name                  name                                     = 10;
@@ -33,12 +32,11 @@ message Person {
   MaritalStatus                     marital_status               = 17;
   repeated IncomeSource             income_sources               = 18;
   repeated tech.figure.asset.loan.Consent consents               = 19;
-  tech.figure.util.Money                  yearly_income          = 20;
-  tech.figure.util.Money                  verified_yearly_income = 21;
+  tech.figure.util.Money                  stated_yearly_income   = 20; // Annual income as stated by the individual
+  tech.figure.util.Money                  verified_yearly_income = 21; // Annual income as verified through some process
 }
 
 message IncomeSource {
-  string                    id                                             = 1 [(validate.rules).string.uuid = true];
   string                    employer                                       = 2;
   tech.figure.util.Money    amount                                         = 3;
   string                    employment_status                              = 4; // See EmploymentStatus
@@ -55,7 +53,7 @@ enum MaritalStatus {
   OTHER                  = 6 [(tech.figure.util.description) = "Other"];
 }
 
-message Borrower {
-  Person          primary            = 1;
-  repeated Person additional_parties = 2;
+message Borrowers {
+  Individual          primary            = 1;
+  repeated Individual additional_parties = 2;
 }

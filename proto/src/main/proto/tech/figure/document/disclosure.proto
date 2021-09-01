@@ -9,11 +9,10 @@ import "google/protobuf/timestamp.proto";
 import "tech/figure/document/document.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
-import "tech/figure/person/person.proto";
+import "tech/figure/individual/individual.proto";
 import "validate/validate.proto";
 
 message Disclosure {
-  string                                id                            = 1 [(validate.rules).string.uuid = true];
   tech.figure.document.DocumentMetadata signed_document               = 10;
   tech.figure.document.DocumentMetadata unsigned_document             = 11;
   ElectronicSignature                   electronic_signature          = 12;
@@ -25,7 +24,6 @@ message Disclosure {
 }
 
 message ElectronicSignature {
-  string        id                 = 1 [(validate.rules).string.uuid = true];
   string        checksum           = 5;
   string        checksum_algorithm = 6;
   repeated Data data               = 7;
@@ -34,17 +32,17 @@ message ElectronicSignature {
   string        document_id        = 10 [(validate.rules).string.uuid = true];
 
   message Data {
-    string                    person_id                = 1 [(validate.rules).string.uuid = true];
-    Notary                    notary                   = 5;
-    string                    email                    = 6 [(tech.figure.util.pii) = true];
-    string                    ip                       = 7;
-    string                    user_agent               = 8;
-    Location                  location                 = 9;
-    string                    two_factor_signing_token = 10;
-    google.protobuf.Timestamp two_factor_timestamp     = 11;
-    google.protobuf.Timestamp signing_timestamp        = 12;
-    tech.figure.person.Name   name                     = 13;
-    repeated Witness          witnesses                = 14;
+    string                      person_id                = 1 [(validate.rules).string.uuid = true];
+    Notary                      notary                   = 5;
+    string                      email                    = 6 [(tech.figure.util.pii) = true];
+    string                      ip                       = 7;
+    string                      user_agent               = 8;
+    Location                    location                 = 9;
+    string                      two_factor_signing_token = 10;
+    google.protobuf.Timestamp   two_factor_timestamp     = 11;
+    google.protobuf.Timestamp   signing_timestamp        = 12;
+    tech.figure.individual.Name name                     = 13;
+    repeated Witness            witnesses                = 14;
   }
 
   message Location {
@@ -53,15 +51,15 @@ message ElectronicSignature {
   }
 
   message Notary {
-    string                    person_id             = 1 [(validate.rules).string.uuid = true];
-    tech.figure.person.Name   name                  = 2;
-    string                    commission_id         = 3;
-    google.protobuf.Timestamp commission_expiration = 4;
-    bool                      resident              = 5;
+    string                      person_id             = 1 [(validate.rules).string.uuid = true];
+    tech.figure.individual.Name name                  = 2;
+    string                      commission_id         = 3;
+    google.protobuf.Timestamp   commission_expiration = 4;
+    bool                        resident              = 5;
   }
 
   message Witness {
-    string                  person_id = 1 [(validate.rules).string.uuid = true];
-    tech.figure.person.Name name      = 2;
+    string                      person_id = 1 [(validate.rules).string.uuid = true];
+    tech.figure.individual.Name name      = 2;
   }
 }

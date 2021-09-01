@@ -7,7 +7,7 @@ option java_multiple_files = true;
 import "tech/figure/asset/loan/credit_report.proto";
 import "tech/figure/asset/loan/consent.proto";
 import "tech/figure/asset/loan/funding.proto";
-import "tech/figure/person/person.proto";
+import "tech/figure/individual/individual.proto";
 import "tech/figure/document/disclosure.proto";
 import "tech/figure/document/document.proto";
 import "tech/figure/finance/financial_account.proto";
@@ -18,17 +18,21 @@ import "validate/validate.proto";
  Loan information at the time of origination
 */
 message Loan {
-  string                          id                      = 1 [(validate.rules).string.uuid = true];       // Loan UUID identifier
-  LoanMetadata                    meta                    = 2 [(validate.rules).message.required = true];  // Identifiers/Meta
-  tech.figure.person.Borrower     borrower                = 10 [(validate.rules).message.required = true]; // Borrower(s), co-signers, etc
-  Terms                           terms                   = 20 [(validate.rules).message.required = true]; // Loan terms: amount, duration, rates
-  tech.figure.document.Disclosure signed_prom_note        = 30 [(validate.rules).message.required = true]; // Signed promissory note
-  PaymentDetails                  payment_details         = 40 [(validate.rules).message.required = true]; // Information on how monthly payment to be collected
-  repeated FundingInstruction     funding_instructions    = 50;                                            // Instructions on how to fund loan
-  repeated Consent                consents                = 60;                                            // Loan options to which borrower has/has not consented
+  string                           id                     = 1 [(validate.rules).string.uuid = true];       // Loan UUID identifier
+  LoanMetadata                     meta                   = 2 [(validate.rules).message.required = true];  // Identifiers/Meta
+  tech.figure.individual.Borrowers borrowers              = 10 [(validate.rules).message.required = true]; // Borrower(s), co-signers, etc
+  Terms                            terms                  = 20 [(validate.rules).message.required = true]; // Loan terms: amount, duration, rates
+  tech.figure.document.Disclosure  signed_prom_note       = 30 [(validate.rules).message.required = true]; // Signed promissory note
+  PaymentDetails                   payment_details        = 40 [(validate.rules).message.required = true]; // Information on how monthly payment to be collected
+  repeated FundingInstruction      funding_instructions   = 50;                                            // Instructions on how to fund loan
+  repeated Consent                 consents               = 60;                                            // Loan options to which borrower has/has not consented
   repeated tech.figure.document.DocumentMetadata doc_meta = 70;                                            // Metadata about documents related to the loan, but stored separately
 
   // todo: digital sig packets
+  // todo: servicer info
+  // todo: enum strategy
+  // todo: lienProperty
+  // todo: should funding be part of loan fact or separate? multiple disbursements?
 }
 
 message LoanMetadata {
@@ -39,33 +43,33 @@ message LoanMetadata {
 }
 
 message Terms {
-  string                 id                   = 1 [(validate.rules).string.uuid = true];      // Id for this set of terms/offer
-  tech.figure.util.Money principal_amount     = 2 [(validate.rules).message.required = true]; // Loan amount, not including fees or interest
-  tech.figure.util.Money total_amount         = 3 [(validate.rules).message.required = true]; // Principal loan amount + origination fees
-  int32                  term_in_months       = 4 [(validate.rules).int32.gt = 0];
-  tech.figure.util.Date  closing_date         = 5 [(validate.rules).message.required = true]; // Date the Note is signed
-  int32                  offer_index          = 10;
-  string                 pay_type             = 13;
-  string                 rate_type            = 14;
-  tech.figure.util.Rate  interest_rate        = 16 [(validate.rules).message.required = true]; // Total interest rate for loan (margin_rate + prime_rate or index_rate)
-  tech.figure.util.Rate  margin_rate          = 17;
-  tech.figure.util.Rate  prime_rate           = 15;
-  tech.figure.util.Rate  index_rate           = 25;
-  string                 index_rate_type      = 26;                                            // (prime, libor) See IndexRateType
-  tech.figure.util.Rate  origination_fee_rate = 18;
-  string                 orig_fee_type        = 23;                                            // See OrigFeeExpectedType
-  tech.figure.util.Rate  rate_cap             = 20;
-  tech.figure.util.Rate  base_pricing_rate    = 21;
-  tech.figure.util.Rate  other_pricing_rate   = 22;
-  repeated RateDiscount  rate_discounts       = 30; // All rate discounts available to this asset.
+  tech.figure.util.Money principal_amount       = 2 [(validate.rules).message.required = true]; // Loan amount, not including fees or interest
+  tech.figure.util.Money total_amount           = 3 [(validate.rules).message.required = true]; // Principal loan amount + origination fees
+  int32                  term_in_months         = 4 [(validate.rules).int32.gt = 0];
+  tech.figure.util.Date  closing_date           = 5 [(validate.rules).message.required = true]; // Date the Note is signed
+  int32                  offer_index            = 10;
+  string                 pay_type               = 13;
+  string                 rate_type              = 14;
+  tech.figure.util.Rate  interest_rate          = 16 [(validate.rules).message.required = true]; // Total interest rate for loan (margin_rate + prime_rate or index_rate)
+  tech.figure.util.Rate  margin_rate            = 17;
+  tech.figure.util.Rate  prime_rate             = 15;
+  tech.figure.util.Rate  index_rate             = 25;
+  string                 index_rate_type        = 26; // (prime, libor) See IndexRateType
+  tech.figure.util.Money origination_fee_amount = 18; // Value amount of origination fee charged
+  tech.figure.util.Rate  origination_fee_rate   = 19;
+  string                 orig_fee_type          = 23; // See OrigFeeExpectedType
+  tech.figure.util.Rate  rate_cap               = 20;
+  tech.figure.util.Rate  base_pricing_rate      = 21;
+  tech.figure.util.Rate  other_pricing_rate     = 22;
+  repeated RateDiscount  rate_discounts         = 30; // All rate discounts available to this asset.
 }
 
 message PaymentDetails {
-  tech.figure.util.Money               monthly_payment_amount = 215 [(validate.rules).message.required = true]; // Principal and interest only (no escrow/fees)
-  tech.figure.util.Date                first_payment_date     = 315;
-  tech.figure.util.Date                grace_period_end_date  = 320;
-  tech.figure.util.Date                amort_start_date       = 325;
-  tech.figure.finance.FinancialAccount autopay_account        = 505; // Populated if borrower has agreed to automated monthly payments
+  tech.figure.util.Money               monthly_payment_amount  = 215 [(validate.rules).message.required = true]; // Principal and interest only (no escrow/fees)
+  tech.figure.util.Date                first_payment_date      = 315;
+  tech.figure.util.Date                grace_period_end_date   = 320;
+  tech.figure.util.Date                amortization_start_date = 325;
+  tech.figure.finance.FinancialAccount autopay_account         = 505; // Populated if borrower has agreed to automated monthly payments
 }
 
 message RateDiscount {
