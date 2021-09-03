@@ -26,10 +26,15 @@ These tools are known to work. You can use others if you wish, but YMMV.
 
 ## Setup
 
+Anyone wanting to onboard assets to Provenance will need a keypair and Provenance account. Generate one and remember it:
 ```shell
-$ gcloud auth login
-$ gcloud services enable containerregistry.googleapis.com
-$ gcloud auth configure-docker
+$ provenanced keys add SomeOnboarder --hd-path "44'/1'/0'/0/0"  -i --testnet
+```
+
+Alternatively for local testing, address `tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc` from the following mnemonic is created and funded with `nhash`:
+
+```
+jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp
 ```
 
 ## Run the service locally
@@ -37,6 +42,18 @@ $ gcloud auth configure-docker
 ```shell
 $ ./dc.sh up
 $ ./gradlew build service:bootrun
+```
+
+## Onboard using CLI
+
+Build the CLI app:
+```shell
+$ ./gradlew build -x test
+```
+
+Onboard a test asset (using address from the above mentioned default mnemonic):
+```shell
+$ ./cli/bin/cli onboard cli/src/test/json/asset1.json
 ```
 
 ## Architecture

@@ -19,10 +19,11 @@ object Versions {
     const val ProvenanceProtobuf = Master
     const val P8eScope = "0.1.0"
     const val StreamData = Master
-    const val WalletPbClient = Master
+    const val WalletPbClient = Develop
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
+    const val KotlinXCli = "0.3.3"
     const val Protobuf = "3.16.0"
     const val SpringBoot = "2.4.5"
     const val KotlinLogging = "2.0.6"
@@ -32,6 +33,7 @@ object Versions {
     const val JunitJupiter = "5.2.0"
     const val Guava = "30.1.1-jre"
     const val Swagger = "1.6.2"
+    const val BouncyCastle = "1.69"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -69,6 +71,10 @@ object Dependencies {
             "org.jetbrains.kotlinx:kotlinx-coroutines-test",
             Versions.KotlinCoroutines
         )
+    }
+
+    object KotlinX {
+        val CLI = DependencySpec("org.jetbrains.kotlinx:kotlinx-cli", Versions.KotlinXCli)
     }
 
     // Spring Boot
@@ -111,6 +117,10 @@ object Dependencies {
         val Core = DependencySpec("com.squareup.retrofit2:retrofit", Versions.Retrofit)
         val JacksonConverter = DependencySpec("com.squareup.retrofit2:converter-jackson", Versions.Retrofit)
         val ScalarsConverter = DependencySpec("com.squareup.retrofit2:converter-scalars", Versions.Retrofit)
+    }
+
+    object BouncyCastle {
+        val ProvJDK15On = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
     }
 
     object OkHttp {
