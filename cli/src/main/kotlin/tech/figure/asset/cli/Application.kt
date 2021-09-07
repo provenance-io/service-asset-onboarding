@@ -58,9 +58,11 @@ class Application {
 
             val inputFile = File(input)
             if (inputFile.exists()) {
+                // load the asset from the input file
                 val assetBytes: ByteArray = inputFile.readBytes()
-                var hash = ""
 
+                // encrypt and store the asset in the object-store
+                var hash = ""
                 try {
                     val assetBuilder = Asset.newBuilder()
                     JsonFormat.parser().merge(String(assetBytes, StandardCharsets.UTF_8), assetBuilder)
@@ -86,9 +88,9 @@ class Application {
                         System.exit(-1)
                     }
                 }
-
                 println("INFO: Encrypted and stored asset in object store with hash $hash")
 
+                // generate the Provenance metadata TX message for this asset scope
                 assetUtils.buildNewScopeMetadataTransaction(address, "Record", mapOf("Asset" to hash)).let {
                     val scopeId = it.first
                     val txBody = it.second
@@ -100,10 +102,11 @@ class Application {
                         txBody = txBody
                     )
 
+                    // simulate the TX
                     val gasEstimate = pbClient.estimateTx(baseReq)
 
+                    // broadcast the TX
                     println("INFO: Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
-
                     pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_SYNC).also {
                         it.txResponse.apply {
                             println("INFO: TX (height: $height, txhash: $txhash, codespace $codespace, code: $code, rawLog: $rawLog, gasWanted: $gasWanted, gasUsed: $gasUsed)")
@@ -192,9 +195,19 @@ class Application {
 }
 
 fun main(args: Array<String>) {
+    /* TEST (REMOVE)
     Application().main(arrayOf(
         "onboard",
         "cli/src/test/json/asset1.json"
     ))
-    //Application().main(args)
+     */
+
+    /*
+        When running from a fat-jar, we get:
+            "ERROR: Failed to encrypt and store the asset. Reason=JCE cannot authenticate the provider BC".
+
+         This is because the BouncyCastle JAR has been stripped of its signature when packed into the jar,
+         and so the chain of trust is broken. We need a way to preserve the signature of the BC jar in our app.
+     */
+    Application().main(args)
 }
