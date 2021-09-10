@@ -43,6 +43,7 @@ class Application {
 
         val input by argument(ArgType.String, description = "Input asset file")
         val `allow-blobs` by option(ArgType.Boolean, shortName = "b", description = "Allow Onboarding of Blob Data (non-asset proto)").default(false)
+        val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
 
         override fun execute() {
             shouldExecute = true
@@ -50,6 +51,7 @@ class Application {
 
         fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
             val allowBlobs = `allow-blobs`
+            val rawLog = `raw-log`
             val publicKey = ECUtils.convertBytesToPublicKey(key.publicKey().toByteArray())
             val address = key.address().getValue()
 
@@ -75,7 +77,7 @@ class Application {
                     }
                 } catch (t: Throwable) {
                     if (allowBlobs) {
-                        println("WARN: File `${input}` does not contain an asset protobuf.")
+                        println("File `${input}` does not contain an asset protobuf. Onboarding as blob.")
                         if (assetBytes.size > 0) {
                             hash = assetUtils.encryptAndStore(assetBytes, publicKey).toBase64String()
                         } else {
@@ -106,9 +108,12 @@ class Application {
 
                     // broadcast the TX
                     println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
-                    pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_SYNC).also {
+                    pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
                         it.txResponse.apply {
-                            println("TX (height: $height, txhash: $txhash, codespace $codespace, code: $code, rawLog: $rawLog, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                            println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                            if(rawLog) {
+                                println("LOG $rawLog")
+                            }
                         }
                     }
                 }
@@ -194,19 +199,5 @@ class Application {
 }
 
 fun main(args: Array<String>) {
-    /* TEST (REMOVE)
-    Application().main(arrayOf(
-        "onboard",
-        "cli/src/test/json/asset1.json"
-    ))
-     */
-
-    /*
-        When running from a fat-jar, we get:
-            "ERROR: Failed to encrypt and store the asset. Reason=JCE cannot authenticate the provider BC".
-
-         This is because the BouncyCastle JAR has been stripped of its signature when packed into the jar,
-         and so the chain of trust is broken. We need a way to preserve the signature of the BC jar in our app.
-     */
     Application().main(args)
 }
