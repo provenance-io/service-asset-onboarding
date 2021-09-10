@@ -7,14 +7,13 @@ import com.figure.wallet.pbclient.client.GrpcClientOpts
 import com.google.protobuf.util.JsonFormat
 import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastMode
 import io.provenance.scope.encryption.ecies.ECUtils
-import java.io.File
-import java.lang.System
 import kotlinx.cli.*
 import tech.figure.asset.Asset
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
 import tech.figure.asset.sdk.extensions.toBase64String
+import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
 
@@ -54,7 +53,7 @@ class Application {
             val publicKey = ECUtils.convertBytesToPublicKey(key.publicKey().toByteArray())
             val address = key.address().getValue()
 
-            println("INFO: Requestor key address $address")
+            println("Requestor key address $address")
 
             val inputFile = File(input)
             if (inputFile.exists()) {
@@ -88,14 +87,14 @@ class Application {
                         System.exit(-1)
                     }
                 }
-                println("INFO: Encrypted and stored asset in object store with hash $hash")
+                println("Encrypted and stored asset in object store with hash $hash")
 
                 // generate the Provenance metadata TX message for this asset scope
                 assetUtils.buildNewScopeMetadataTransaction(address, "Record", mapOf("Asset" to hash)).let {
                     val scopeId = it.first
                     val txBody = it.second
 
-                    println("INFO: Created new scope $scopeId")
+                    println("Created new scope $scopeId")
 
                     val baseReq = pbClient.baseRequest(
                         key = key,
@@ -106,10 +105,10 @@ class Application {
                     val gasEstimate = pbClient.estimateTx(baseReq)
 
                     // broadcast the TX
-                    println("INFO: Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                    println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
                     pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_SYNC).also {
                         it.txResponse.apply {
-                            println("INFO: TX (height: $height, txhash: $txhash, codespace $codespace, code: $code, rawLog: $rawLog, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                            println("TX (height: $height, txhash: $txhash, codespace $codespace, code: $code, rawLog: $rawLog, gasWanted: $gasWanted, gasUsed: $gasUsed)")
                         }
                     }
                 }
