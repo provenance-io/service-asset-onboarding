@@ -50,7 +50,11 @@ class AssetOnboardService(
     ): T = assetUtils.retrieveAndDecrypt<T>(hash, publicKey, privateKey)
 
     // Create a metadata TX message for a new scope onboard
-    fun buildNewScopeMetadataTransaction(owner: String, recordName: String, scopeInputs: Map<String, String>, scopeId: UUID): String =
-        assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second.toJson()
+    fun buildNewScopeMetadataTransaction(
+        owner: String,
+        recordName: String,
+        scopeInputs: Map<String, String>,
+        scopeId: UUID
+    ): String = assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second.toJson()
 
 }
