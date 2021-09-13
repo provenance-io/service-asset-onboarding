@@ -148,7 +148,9 @@ class AssetUtils (
             specificationId = ByteString.copyFrom(MetadataAddress.forRecordSpecification(contractSpecId, recordName).bytes)
             typeName = "${recordName}Type"
             resultType = DefinitionType.DEFINITION_TYPE_RECORD // TODO?
-            addAllResponsibleParties(listOf(PartyType.PARTY_TYPE_OWNER))
+            addAllResponsibleParties(listOf(
+                PartyType.PARTY_TYPE_OWNER
+            ))
             scopeInputs.forEach { (inputName, inputHash) ->
                 addInputs(InputSpecification.newBuilder().apply {
                     name = inputName

@@ -1,5 +1,6 @@
 package tech.figure.asset.sdk
 
+import io.provenance.metadata.v1.DefinitionType
 import io.provenance.metadata.v1.MsgWriteContractSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteRecordRequest
 import io.provenance.metadata.v1.MsgWriteRecordSpecificationRequest
@@ -8,6 +9,7 @@ import io.provenance.metadata.v1.MsgWriteScopeSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteSessionRequest
 import io.provenance.metadata.v1.PartyType
 import io.provenance.metadata.v1.RecordInputStatus
+import io.provenance.metadata.v1.ResultStatus
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.MetadataAddress
@@ -88,10 +90,10 @@ class AssetUtilsTest {
                 testScopeId
             ).also { result ->
                 // returns the scope id
-                Assertions.assertEquals(result.first, testScopeId)
+                Assertions.assertEquals(testScopeId, result.first)
 
                 // there should be two messages in the tx body
-                Assertions.assertEquals(result.second.messagesCount, 6)
+                Assertions.assertEquals(6, result.second.messagesCount)
 
                 /*
                 0 MsgWriteContractSpecificationRequest
@@ -104,6 +106,7 @@ class AssetUtilsTest {
 
                 var contractSpecId = ""
                 var scopeSpecId = ""
+                var scopeSessionId = ""
 
                 // the first message is the write-contract-specification request
                 result.second.getMessages(0).unpack(MsgWriteContractSpecificationRequest::class.java).also { writeContractSpec ->
@@ -112,27 +115,27 @@ class AssetUtilsTest {
                     contractSpecId = writeContractSpec.specUuid
 
                     // there's only one signer
-                    Assertions.assertEquals(writeContractSpec.signersCount, 1)
+                    Assertions.assertEquals(1, writeContractSpec.signersCount)
                     writeContractSpec.getSigners(0).also { signer ->
-                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
                     }
 
                     // the contract specification exists
                     writeContractSpec.specification.also { contractSpec ->
-                        Assertions.assertArrayEquals(contractSpec.specificationId.toByteArray(), MetadataAddress.forContractSpecification(UUID.fromString(contractSpecId)).bytes)
-                        Assertions.assertEquals(contractSpec.hash, "dummyContractSpecHash")
-                        Assertions.assertEquals(contractSpec.className, "dummyContractSpecClassName")
+                        Assertions.assertArrayEquals(MetadataAddress.forContractSpecification(UUID.fromString(contractSpecId)).bytes, contractSpec.specificationId.toByteArray())
+                        Assertions.assertEquals("dummyContractSpecHash", contractSpec.hash)
+                        Assertions.assertEquals("dummyContractSpecClassName", contractSpec.className)
 
                         // there's only one owner for the contract specification
-                        Assertions.assertEquals(contractSpec.ownerAddressesCount, 1)
+                        Assertions.assertEquals(1, contractSpec.ownerAddressesCount)
                         contractSpec.getOwnerAddresses(0).also { owner ->
-                            Assertions.assertEquals(owner, testKeyPair.public.getAddress(false))
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), owner)
                         }
 
                         // there's only one party involved for the contract specification
-                        Assertions.assertEquals(contractSpec.partiesInvolvedCount, 1)
+                        Assertions.assertEquals(1, contractSpec.partiesInvolvedCount)
                         contractSpec.getPartiesInvolved(0).also { partyType ->
-                            Assertions.assertEquals(partyType, PartyType.PARTY_TYPE_OWNER)
+                            Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, partyType)
                         }
                     }
                 }
@@ -144,29 +147,29 @@ class AssetUtilsTest {
                     scopeSpecId = writeScopeSpec.specUuid
 
                     // there's only one signer
-                    Assertions.assertEquals(writeScopeSpec.signersCount, 1)
+                    Assertions.assertEquals(1, writeScopeSpec.signersCount)
                     writeScopeSpec.getSigners(0).also { signer ->
-                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
                     }
 
                     // the scope specification exists
                     writeScopeSpec.specification.also { scopeSpec ->
                         // there's only one contract specification for the scope specification
-                        Assertions.assertEquals(scopeSpec.contractSpecIdsCount, 1)
+                        Assertions.assertEquals(1, scopeSpec.contractSpecIdsCount)
                         scopeSpec.getContractSpecIds(0).also { scopeContractSpecId ->
-                            Assertions.assertEquals(MetadataAddress.fromBytes(scopeContractSpecId.toByteArray()).getPrimaryUuid(), UUID.fromString(contractSpecId))
+                            Assertions.assertEquals(UUID.fromString(contractSpecId), MetadataAddress.fromBytes(scopeContractSpecId.toByteArray()).getPrimaryUuid())
                         }
 
                         // there's only one owner for the scope specification
-                        Assertions.assertEquals(scopeSpec.ownerAddressesCount, 1)
+                        Assertions.assertEquals(1, scopeSpec.ownerAddressesCount)
                         scopeSpec.getOwnerAddresses(0).also { owner ->
-                            Assertions.assertEquals(owner, testKeyPair.public.getAddress(false))
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), owner)
                         }
 
                         // there's only one party involved for the scope specification
-                        Assertions.assertEquals(scopeSpec.partiesInvolvedCount, 1)
+                        Assertions.assertEquals(1, scopeSpec.partiesInvolvedCount)
                         scopeSpec.getPartiesInvolved(0).also { partyType ->
-                            Assertions.assertEquals(partyType, PartyType.PARTY_TYPE_OWNER)
+                            Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, partyType)
                         }
                     }
                 }
@@ -174,67 +177,162 @@ class AssetUtilsTest {
                 // the third message is the write-scope request
                 result.second.getMessages(2).unpack(MsgWriteScopeRequest::class.java).also { writeScope ->
                     // the scope id is set
-                    Assertions.assertEquals(UUID.fromString(writeScope.scopeUuid), testScopeId)
+                    Assertions.assertEquals(testScopeId, UUID.fromString(writeScope.scopeUuid))
 
                     // the scope spec id is set
-                    Assertions.assertEquals(UUID.fromString(writeScope.specUuid), UUID.fromString(scopeSpecId))
+                    Assertions.assertEquals(UUID.fromString(scopeSpecId), UUID.fromString(writeScope.specUuid))
 
                     // there's only one signer
-                    Assertions.assertEquals(writeScope.signersCount, 1)
+                    Assertions.assertEquals(1, writeScope.signersCount)
                     writeScope.getSigners(0).also { signer ->
-                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
                     }
 
                     // the scope exists
                     writeScope.scope.also { scope ->
                         // the value owner of the scope is set
-                        Assertions.assertEquals(scope.valueOwnerAddress, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), scope.valueOwnerAddress)
 
                         // there's only one owner
-                        Assertions.assertEquals(scope.ownersCount, 1)
+                        Assertions.assertEquals(1, scope.ownersCount)
                         scope.getOwners(0).also { owner ->
-                            Assertions.assertEquals(owner.address, testKeyPair.public.getAddress(false))
-                            Assertions.assertEquals(owner.role, PartyType.PARTY_TYPE_OWNER)
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), owner.address)
+                            Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, owner.role)
                         }
                     }
                 }
 
                 // the fourth message is the write-session request
                 result.second.getMessages(3).unpack(MsgWriteSessionRequest::class.java).also { writeSession ->
-                    // TODO
+                    // the session id is valid
+                    writeSession.sessionIdComponents.also { sessionIdComponents ->
+                        // the scope id is set
+                        Assertions.assertEquals(testScopeId, UUID.fromString(sessionIdComponents.scopeUuid))
+
+                        // the session id exists
+                        Assertions.assertNotNull(sessionIdComponents.sessionUuid)
+                        scopeSessionId = sessionIdComponents.sessionUuid
+                    }
+
+                    // there's only one signer
+                    Assertions.assertEquals(1, writeSession.signersCount)
+                    writeSession.getSigners(0).also { signer ->
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
+                    }
+
+                    // the session exists
+                    writeSession.session.also { session ->
+                        // the session id is set
+                        Assertions.assertArrayEquals(MetadataAddress.forSession(testScopeId, UUID.fromString(scopeSessionId)).bytes, session.sessionId.toByteArray())
+
+                        // the specification id is set
+                        Assertions.assertArrayEquals(MetadataAddress.forContractSpecification(UUID.fromString(contractSpecId)).bytes, session.specificationId.toByteArray())
+
+                        // there's only one party involved for the session
+                        Assertions.assertEquals(1, session.partiesCount)
+                        session.getParties(0).also { party ->
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), party.address)
+                            Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, party.role)
+                        }
+
+                        // the audit is set
+                        session.audit.also { audit ->
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), audit.createdBy)
+                            Assertions.assertEquals(testKeyPair.public.getAddress(false), audit.updatedBy)
+                            Assertions.assertEquals(1, audit.version)
+                        }
+                    }
                 }
 
                 // the fifth message is the write-record-specification request
                 result.second.getMessages(4).unpack(MsgWriteRecordSpecificationRequest::class.java).also { writeRecordSpec ->
-                    // TODO
+                    // the contract spec id is set
+                    Assertions.assertEquals(contractSpecId, writeRecordSpec.contractSpecUuid)
+
+                    // there's only one signer
+                    Assertions.assertEquals(1, writeRecordSpec.signersCount)
+                    writeRecordSpec.getSigners(0).also { signer ->
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
+                    }
+
+                    // the specification exists
+                    writeRecordSpec.specification.also { recordSpec ->
+                        // the record name is set
+                        Assertions.assertEquals(ASSET_RECORD_NAME, recordSpec.name)
+
+                        // the specification id is valid
+                        Assertions.assertArrayEquals(MetadataAddress.forRecordSpecification(UUID.fromString(contractSpecId), ASSET_RECORD_NAME).bytes, recordSpec.specificationId.toByteArray())
+
+                        // the type name is set
+                        Assertions.assertEquals("${ASSET_RECORD_NAME}Type", recordSpec.typeName)
+
+                        // the result type is set
+                        Assertions.assertEquals(DefinitionType.DEFINITION_TYPE_RECORD, recordSpec.resultType)
+
+                        // there's only one party involved for the record specification
+                        Assertions.assertEquals(recordSpec.responsiblePartiesCount, 1)
+                        recordSpec.getResponsibleParties(0).also { partyType ->
+                            Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, partyType)
+                        }
+
+                        // there's only one input
+                        Assertions.assertEquals(recordSpec.inputsCount, 1)
+                        recordSpec.getInputs(0).also { input ->
+                            Assertions.assertEquals(ASSET_RECORD_INPUT_1_NAME, input.name)
+                            Assertions.assertEquals("${ASSET_RECORD_INPUT_1_NAME}Type", input.typeName)
+                            Assertions.assertEquals("dummyRecordSpecHash", input.hash)
+                        }
+                    }
                 }
 
                 // the sixth message is the write-record request
                 result.second.getMessages(5).unpack(MsgWriteRecordRequest::class.java).also { writeRecord ->
-                    // TODO
+                    // the contract spec id is set
+                    Assertions.assertEquals(contractSpecId, writeRecord.contractSpecUuid)
 
                     // there's only one signer
-                    Assertions.assertEquals(writeRecord.signersCount, 1)
+                    Assertions.assertEquals(1, writeRecord.signersCount)
                     writeRecord.getSigners(0).also { signer ->
-                        Assertions.assertEquals(signer, testKeyPair.public.getAddress(false))
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), signer)
                     }
 
                     // there's only one party
-                    Assertions.assertEquals(writeRecord.partiesCount, 1)
+                    Assertions.assertEquals(1, writeRecord.partiesCount)
                     writeRecord.getParties(0).also { party ->
-                        Assertions.assertEquals(party.address, testKeyPair.public.getAddress(false))
-                        Assertions.assertEquals(party.role, PartyType.PARTY_TYPE_OWNER)
+                        Assertions.assertEquals(testKeyPair.public.getAddress(false), party.address)
+                        Assertions.assertEquals(PartyType.PARTY_TYPE_OWNER, party.role)
                     }
 
-                    // the record has a name
-                    Assertions.assertEquals(writeRecord.record.name, ASSET_RECORD_NAME)
+                    // the record is set
+                    writeRecord.record.also { record ->
+                        // the record session id is set
+                        Assertions.assertArrayEquals(MetadataAddress.forSession(testScopeId, UUID.fromString(scopeSessionId)).bytes, record.sessionId.toByteArray())
 
-                    // there's only one input in the record
-                    Assertions.assertEquals(writeRecord.record.inputsCount, 1)
-                    writeRecord.record.getInputs(0).also { input ->
-                        Assertions.assertEquals(input.name, ASSET_RECORD_INPUT_1_NAME)
-                        Assertions.assertEquals(input.hash, ASSET_RECORD_INPUT_1_HASH)
-                        Assertions.assertEquals(input.status, RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED)
+                        // the record has a name
+                        Assertions.assertEquals(ASSET_RECORD_NAME, record.name)
+
+                        // the process is set
+                        record.process.also { process ->
+                            Assertions.assertEquals("dummyProcessName", process.name)
+                            Assertions.assertEquals("dummyProcessHash", process.hash)
+                            Assertions.assertEquals("dummyProcessMethod", process.method)
+                        }
+
+                        // there's only one input in the record
+                        Assertions.assertEquals(1, record.inputsCount)
+                        record.getInputs(0).also { input ->
+                            Assertions.assertEquals(ASSET_RECORD_INPUT_1_NAME, input.name)
+                            Assertions.assertEquals("${ASSET_RECORD_INPUT_1_NAME}Type", input.typeName)
+                            Assertions.assertEquals(ASSET_RECORD_INPUT_1_HASH, input.hash)
+                            Assertions.assertEquals(RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED, input.status)
+                        }
+
+                        // there's only one output in the record
+                        Assertions.assertEquals(1, record.outputsCount)
+                        record.getOutputs(0).also { output ->
+                            Assertions.assertEquals(ASSET_RECORD_INPUT_1_HASH, output.hash)
+                            Assertions.assertEquals(ResultStatus.RESULT_STATUS_PASS, output.status)
+                        }
                     }
                 }
             }
