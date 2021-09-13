@@ -5,8 +5,10 @@ import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
+import tech.figure.asset.sdk.extensions.toJson
 import java.security.PrivateKey
 import java.security.PublicKey
+import java.util.UUID
 
 class AssetOnboardService(
     private val objectStoreProperties: ObjectStoreProperties
@@ -46,5 +48,9 @@ class AssetOnboardService(
         publicKey: PublicKey,
         privateKey: PrivateKey,
     ): T = assetUtils.retrieveAndDecrypt<T>(hash, publicKey, privateKey)
+
+    // Create a metadata TX message for a new scope onboard
+    fun buildNewScopeMetadataTransaction(owner: String, recordName: String, scopeInputs: Map<String, String>, scopeId: UUID): String =
+        assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second.toJson()
 
 }

@@ -29,6 +29,7 @@ object Versions {
     const val KotlinLogging = "2.0.6"
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.2.1"
+    const val Arrow = "0.13.2"
     const val Reactor = "3.4.6"
     const val JunitJupiter = "5.2.0"
     const val Guava = "30.1.1-jre"
@@ -98,6 +99,11 @@ object Dependencies {
                     "org.mockito:mockito-core"
                 )
             )
+    }
+
+    // Arrow
+    object Arrow {
+        val Core = DependencySpec("io.arrow-kt:arrow-core", Versions.Arrow)
     }
 
     // Project Reactor

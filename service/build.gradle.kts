@@ -35,6 +35,10 @@ dependencies {
         Dependencies.Swagger.Annotations,
         Dependencies.OkHttp.LoggingInterceptor,
         Dependencies.KotlinLogging,
+        Dependencies.Arrow.Core,
+        Dependencies.P8eScope.Encryption,
+        Dependencies.Provenance.PbcProto,
+        Dependencies.Provenance.Protobuf.PbProtoJava,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Jackson.Hubspot
     ).forEach { dep ->
