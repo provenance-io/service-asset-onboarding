@@ -34,7 +34,7 @@ spec:
           test: 1
           prod: 1
         image:
-          test: us.gcr.io/figure-development/service-asset-onboarding:ch108515-deployment-2
+          test: us.gcr.io/figure-development/service-asset-onboarding:ch108515-deployment-5
           prod: us.gcr.io/figure-production/service-asset-onboarding:latest
         spring:
           enabled: true
