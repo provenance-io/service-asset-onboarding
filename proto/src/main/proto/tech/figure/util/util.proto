@@ -7,7 +7,7 @@ option java_multiple_files = true;
 import "validate/validate.proto";
 
 // In Java: Use LocalDate to represent this value.  (For OffsetDateTime, use proto Timestamp.)
-// ISO8601 Date
+// An ISO8601 Date
 message Date {
   string value = 1 [(validate.rules).string.pattern = "\\d{4}-\\d{2}-\\d{2}"]; // Date stored as ISO8601 string in the form "yyyy-MM-dd". EX: "2020-05-22"
 }
@@ -15,7 +15,7 @@ message Date {
 // In Java: Use BigDecimal to represent this value
 // Rate/percentage expressed as a decimal between 0 and 1.0, where 1.0 represents 100%
 message Rate {
-  double value = 1 [(validate.rules).double = {gte: 0; lte: 1 }]; // Value in the range [0,1]
+  double value = 1 [(validate.rules).double = {gte: 0; lte: 1 }]; // Value in the range [0,1], inclusive
 }
 
 // In Java: Use Joda Money, BigMoney, or BigDecimal to represent this value

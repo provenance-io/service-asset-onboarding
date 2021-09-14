@@ -7,7 +7,6 @@ enum class AddressExpectedType {
     INVESTMENT,
     MAILING,
     SECONDARY,
-    UNKNOWN,
 }
 
 enum class ConsentExpectedType {
@@ -60,7 +59,6 @@ enum class DocumentExpectedType {
     UNDERWRITING_DUE_DILIGENCE,
     UNDERWRITING_POLICY,
     UNDERWRITING_RATE_SHEET,
-    UNKNOWN,
 }
 
 enum class EmploymentStatus {
@@ -68,7 +66,6 @@ enum class EmploymentStatus {
     PART_TIME,
     STUDENT,
     UNEMPLOYED,
-    UNKNOWN,
 }
 
 enum class FiatMovementType {
@@ -81,8 +78,7 @@ enum class IndexRateType {
     PRIME
 }
 
-enum class IntRateExpectedType {
-    UNKNOWN,
+enum class InterestRateExpectedType {
     FIXED,
     FLOATING // variable interest rate
 }
@@ -104,12 +100,15 @@ enum class LoanExpectedType {
 enum class NumberExpectedType {
     HOME,
     MOBILE,
-    UNKNOWN,
     WORK,
 }
 
+enum class PaymentExpectedType {
+    MANUAL_PAYMENT,
+    AUTOPAY,
+}
+
 enum class RateDiscountType {
-    RATE_DISCOUNT_TYPE_UNKNOWN,
     AUTOPAY,
     CREDIT_UNION_MEMBERSHIP,
 }

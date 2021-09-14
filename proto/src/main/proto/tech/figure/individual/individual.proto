@@ -8,7 +8,6 @@ import "tech/figure/util/address.proto";
 import "tech/figure/util/options.proto";
 import "tech/figure/util/util.proto";
 import "google/protobuf/timestamp.proto";
-import "tech/figure/asset/loan/consent.proto";
 import "validate/validate.proto";
 
 message Name {
@@ -31,7 +30,6 @@ message Individual {
   string                            citizenship                  = 16;
   MaritalStatus                     marital_status               = 17;
   repeated IncomeSource             income_sources               = 18;
-  repeated tech.figure.asset.loan.Consent consents               = 19;
   tech.figure.util.Money                  stated_yearly_income   = 20; // Annual income as stated by the individual
   tech.figure.util.Money                  verified_yearly_income = 21; // Annual income as verified through some process
 }
