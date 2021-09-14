@@ -57,11 +57,6 @@ spec:
           connectionPoolSize:
             prod: 10
             test: 10
-        dbMigration:
-          enabled: true
-          image:
-            prod: us.gcr.io/figure-production/service-asset-onboarding-migrate:latest
-            test: us.gcr.io/figure-development/service-asset-onboarding-migrate:latest
         spring:
           enabled: true
         readinessProbe:
@@ -75,6 +70,9 @@ spec:
         env:
           - name: JAVA_OPTS
             value: -Xms512m -Xmx3g
+        configMap:
+          common:
+            OBJECT_STORE_URL: "grpc://object-store-v2.core:80"
         resources:
           requests:
             cpu: 200m
