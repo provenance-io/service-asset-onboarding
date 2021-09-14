@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [ self-hosted, ubuntu-latest ]
+    runs-on: [ self-hosted, linux ]
 
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
@@ -44,5 +44,5 @@ jobs:
       - name: Gradle Build
         run: ./gradlew clean build -x test --no-daemon --parallel --refresh-dependencies
 
-      - name: Gradle Unit & Functional Tests
-        run: ./gradlew test --no-daemon
+      #- name: Gradle Unit & Functional Tests
+      #  run: ./gradlew test --no-daemon
