@@ -34,6 +34,14 @@ jobs:
         uses: ./shared-actions/set-env-action
         with:
           prod_ref: refs/heads/master
+          
+      - name: Overwrite Build Tag
+        env:
+          AUTH: ${{ secrets.GCP_AUTH_JSON }}
+        run: |
+          echo "DOCKER_BUILD_TAG=$BRANCH-"$( \
+          curl -u "_json_key:$AUTH" --silent https://$GCR_HOST/v2/figure-$DEPLOYMENT/$REPO/tags/list | \
+          jq "[ .tags[] | capture( \"(?<b>$BRANCH)-(?<n>\\\\d+)\" ).n | tonumber ] | max + 1") >> $GITHUB_ENV
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
