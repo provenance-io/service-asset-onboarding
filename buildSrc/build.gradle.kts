@@ -1,6 +1,6 @@
 // https://docs.gradle.org/current/userguide/kotlin_dsl.html#sec:kotlin-dsl_plugin
 plugins {
-    id("org.gradle.kotlin.kotlin-dsl") version "2.1.6"
+    `kotlin-dsl`
 }
 
 repositories {
