@@ -27,8 +27,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .antMatchers("/v3/api-docs*").permitAll()
             .antMatchers("/v2/api-docs*").permitAll()
             .antMatchers("/api/**").permitAll()
-            .anyRequest()
-            .authenticated()
+
     }
 
     @Throws(Exception::class)
@@ -36,6 +35,11 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         webSecurity
             .ignoring()
             .antMatchers("/actuator/**")
+            .antMatchers("/swagger*/**").permitAll()
+            .antMatchers("/webjars/**").permitAll()
+            .antMatchers("/v3/api-docs*").permitAll()
+            .antMatchers("/v2/api-docs*").permitAll()
+            .antMatchers("/api/**").permitAll()
     }
 
 }

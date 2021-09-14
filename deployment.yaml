@@ -19,17 +19,13 @@ spec:
         services:
           - name: service-asset-onboarding
             proxy:
-              path: /service-asset-onboarding
+              path: /
             route:
               path: /service-asset-onboarding
               strip_path: true
               preserve_host: true
             jwt:
-              enabled: true
-              isCookieAuth: true
-              isFrontEnd: false
-              requiredGoogleGroups:
-                - team@figure.com
+              enabled: false
       deployment:
         business_unit: figure-tech
         business_product: asset-onboarding
@@ -38,7 +34,7 @@ spec:
           test: 1
           prod: 1
         image:
-          test: us.gcr.io/figure-development/service-asset-onboarding:ch108515-deployment-1
+          test: us.gcr.io/figure-development/service-asset-onboarding:ch108515-deployment-2
           prod: us.gcr.io/figure-production/service-asset-onboarding:latest
         spring:
           enabled: true
