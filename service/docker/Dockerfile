@@ -1,10 +1,9 @@
-FROM openjdk:11-jre-slim
+FROM openjdk:11-jre
 
-ADD build/libs/service*.jar /service-asset-onboarding.jar
-ADD ./docker/docker-entrypoint.sh /docker-entrypoint.sh
-
-RUN apt-get update && apt-get install -y procps
+ADD service/build/libs/service*.jar /service-asset-onboarding.jar
+ADD service/docker/configure /configure
 
 EXPOSE 8080/tcp
 
-ENTRYPOINT ./docker-entrypoint.sh /service-asset-onboarding.jar
+ENTRYPOINT ["/configure"]
+CMD ["java", "$JAVA_OPTS", "-jar", "/service-asset-onboarding.jar"]
