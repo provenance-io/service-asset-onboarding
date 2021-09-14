@@ -25,6 +25,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .antMatchers("/api/**").permitAll()
             .anyRequest()
             .authenticated()
+
+        http.csrf()
+            .disable()
     }
 
     @Throws(Exception::class)

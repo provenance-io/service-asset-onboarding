@@ -27,7 +27,7 @@ dependencies {
         Dependencies.Kotlin.CoroutinesReactor,
         Dependencies.SpringBoot.Starter,
         Dependencies.SpringBoot.StarterActuator,
-        Dependencies.SpringBoot.StarterWebFlux,
+        Dependencies.SpringBoot.StarterWeb,
         Dependencies.SpringBoot.StarterJetty,
         Dependencies.SpringBoot.StarterDevTools,
         Dependencies.SpringBoot.StarterSecurity,
