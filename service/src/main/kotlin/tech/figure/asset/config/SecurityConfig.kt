@@ -21,7 +21,13 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .csrf().disable()
             .headers().frameOptions().disable()
 
+//        http.authorizeRequests()
+//            .antMatchers("/api/**").permitAll()
+//            .anyRequest()
+//            .authenticated()
 
+        http.csrf()
+            .disable()
     }
 
     @Throws(Exception::class)

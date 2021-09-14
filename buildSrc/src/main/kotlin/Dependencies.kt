@@ -81,6 +81,10 @@ object Dependencies {
     // Spring Boot
     object SpringBoot {
         val Starter = DependencySpec("org.springframework.boot:spring-boot-starter")
+        val StarterWeb = DependencySpec(
+            name = "org.springframework.boot:spring-boot-starter-web",
+            exclude = listOf("org.springframework.boot:spring-boot-starter-tomcat")
+        )
         val StarterWebFlux = DependencySpec(
             name = "org.springframework.boot:spring-boot-starter-webflux",
             exclude = listOf("org.springframework.boot:spring-boot-starter-tomcat")
