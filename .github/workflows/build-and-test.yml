@@ -60,3 +60,9 @@ jobs:
         with:
           gcp_auth_json: ${{secrets.GCP_AUTH_JSON}}
           dockerfile: service/docker/Dockerfile
+
+      - name: Tag image and push latest
+        if: ${{ env.BRANCH == 'develop' || env.BRANCH == 'main' }}
+        run: |
+          docker tag $DOCKER_BASE_URL:$DOCKER_BUILD_TAG $DOCKER_BASE_URL:latest
+          docker push $DOCKER_BASE_URL:latest
