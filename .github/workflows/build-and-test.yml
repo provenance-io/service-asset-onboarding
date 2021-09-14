@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [ self-hosted, linux ]
+    runs-on: [ self-hosted, ubuntu-latest ]
 
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
@@ -41,9 +41,6 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           
-      - name: Install docker-compose
-        run: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && docker-compose --version
-
       - name: Gradle Build
         run: ./gradlew clean build -x test --no-daemon --parallel --refresh-dependencies
 
