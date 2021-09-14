@@ -36,10 +36,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .ignoring()
             .antMatchers("/actuator/**")
             .antMatchers("/swagger*/**")
-            .antMatchers("/webjars/**").permitAll()
-            .antMatchers("/v3/api-docs*").permitAll()
-            .antMatchers("/v2/api-docs*").permitAll()
-            .antMatchers("/api/**").permitAll()
+            .antMatchers("/webjars/**")
+            .antMatchers("/v3/api-docs*")
+            .antMatchers("/v2/api-docs*")
+            .antMatchers("/api/**")
     }
 
 }
