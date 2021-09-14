@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ self-hosted, linux ]
 
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
