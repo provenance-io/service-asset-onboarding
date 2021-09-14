@@ -22,6 +22,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .headers().frameOptions().disable()
 
         http.authorizeRequests()
+            .antMatchers("/swagger*/**").permitAll()
+            .antMatchers("/webjars/**").permitAll()
+            .antMatchers("/v3/api-docs*").permitAll()
+            .antMatchers("/v2/api-docs*").permitAll()
             .antMatchers("/api/**").permitAll()
             .anyRequest()
             .authenticated()

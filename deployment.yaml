@@ -35,28 +35,11 @@ spec:
         business_product: asset-onboarding
         port: 8080
         replicas:
-          prod: 1
           test: 1
+          prod: 1
         image:
+          test: us.gcr.io/figure-development/service-asset-onboarding:ch108515-deployment-1
           prod: us.gcr.io/figure-production/service-asset-onboarding:latest
-          test: us.gcr.io/figure-development/service-asset-onboarding:latest
-        db:
-          enabled: true
-          enablePgBouncer: true
-          version: "13"
-          instance: csp-1-db
-          name:
-            prod: service-asset-onboarding
-            test: service-asset-onboarding
-          schema:
-            prod: service-asset-onboarding
-            test: service-asset-onboarding
-          user:
-            prod: service-asset-onboarding
-            test: service-asset-onboarding
-          connectionPoolSize:
-            prod: 10
-            test: 10
         spring:
           enabled: true
         readinessProbe:
@@ -70,9 +53,8 @@ spec:
         env:
           - name: JAVA_OPTS
             value: -Xms512m -Xmx3g
-        configMap:
-          common:
-            OBJECT_STORE_URL: "grpc://object-store-v2.core:80"
+          - name: OBJECT_STORE_URL
+            value: grpc://object-store-v2.core:80
         resources:
           requests:
             cpu: 200m
@@ -81,6 +63,6 @@ spec:
             cpu: 3000m
             memory: 6Gi
         vault:
-          enabled: true
+          enabled: false
           vault.hashicorp.com/agent-inject: true
           vault.hashicorp.com/log-level: info
