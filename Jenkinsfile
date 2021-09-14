@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Gradle Build') {
             steps {
-                sh "./gradlew --no-daemon --parallel clean build  --refresh-dependencies -x test -PartifactVersion=${common.fixedBranchName()}-${env.BUILD_NUMBER}"
+                sh "./gradlew --no-daemon --parallel clean build  --refresh-dependencies -x test -x ktlint -PartifactVersion=${common.fixedBranchName()}-${env.BUILD_NUMBER}"
             }
         }
         stage('Deployment') {

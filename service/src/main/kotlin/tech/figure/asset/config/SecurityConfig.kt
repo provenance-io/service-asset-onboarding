@@ -20,7 +20,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .and()
             .csrf().disable()
             .headers().frameOptions().disable()
-        
+
 
     }
 
