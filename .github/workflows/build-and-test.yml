@@ -34,6 +34,8 @@ jobs:
         uses: ./shared-actions/set-env-action
         with:
           prod_ref: refs/heads/master
+          dev_cluster: figure-tech-test
+          prod_cluster: figure-tech-prod
           
       - name: Overwrite Build Tag
         env:
