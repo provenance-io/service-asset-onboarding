@@ -12,6 +12,7 @@ allprojects {
 
     repositories {
         figureNexusMirrorRepository(project)
+        mavenCentral()
     }
 }
 

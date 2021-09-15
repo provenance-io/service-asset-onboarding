@@ -94,6 +94,8 @@ object Dependencies {
         val StarterDevTools = DependencySpec("org.springframework.boot:spring-boot-devtools")
         val StarterSecurity = DependencySpec("org.springframework.boot:spring-boot-starter-security")
         val StarterValidation = DependencySpec("org.springframework.boot:spring-boot-starter-validation")
+        val Swagger = DependencySpec(    "io.springfox:springfox-boot-starter", "3.0.0")
+        val SwaggerUI = DependencySpec(    "io.springfox:springfox-swagger-ui", "3.0.0")
 
         val StarterTest =
             DependencySpec(

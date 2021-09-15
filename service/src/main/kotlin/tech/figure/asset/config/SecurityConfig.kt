@@ -21,10 +21,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .csrf().disable()
             .headers().frameOptions().disable()
 
-        http.authorizeRequests()
-            .antMatchers("/api/**").permitAll()
-            .anyRequest()
-            .authenticated()
+//        http.authorizeRequests()
+//            .antMatchers("/api/**").permitAll()
+//            .anyRequest()
+//            .authenticated()
 
         http.csrf()
             .disable()
@@ -35,6 +35,11 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         webSecurity
             .ignoring()
             .antMatchers("/actuator/**")
+            .antMatchers("/swagger*/**")
+            .antMatchers("/webjars/**")
+            .antMatchers("/v3/api-docs*")
+            .antMatchers("/v2/api-docs*")
+            .antMatchers("/api/**")
     }
 
 }
