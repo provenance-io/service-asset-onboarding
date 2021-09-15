@@ -55,14 +55,21 @@ jobs:
       #- name: Gradle Unit & Functional Tests
       #  run: ./gradlew test --no-daemon
 
-      - name: Build image
+      - name: Build Image
         uses: ./shared-actions/docker-image-action
         with:
           gcp_auth_json: ${{secrets.GCP_AUTH_JSON}}
           dockerfile: service/docker/Dockerfile
 
-      - name: Tag image and push latest
+      - name: Tag & Push Image
         if: ${{ env.BRANCH == 'develop' || env.BRANCH == 'main' }}
         run: |
           docker tag $DOCKER_BASE_URL:$DOCKER_BUILD_TAG $DOCKER_BASE_URL:latest
           docker push $DOCKER_BASE_URL:latest
+
+      - name: Deploy
+        if: ${{ env.BRANCH == 'develop' || env.BRANCH == 'main' }}
+        uses: ./shared-actions/deploy-action
+        with:
+          gcp_auth_json: ${{secrets.GCP_AUTH_JSON}}
+          deployinator_auth_json: ${{secrets.DEPLOYINATOR_AUTH_JSON}}
