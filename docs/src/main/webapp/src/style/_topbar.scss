@@ -3,6 +3,11 @@
     padding: 10px 0;
 
     background-color: $topbar-background-color;
+
+    .toplogo {
+    margin-right: 10px;
+    }
+
     .topbar-wrapper
     {
         display: flex;
