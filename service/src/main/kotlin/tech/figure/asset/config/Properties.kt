@@ -13,3 +13,12 @@ class ObjectStoreProperties : LoggableProperties() {
     var timeoutMs: Long = 60000L
 
 }
+
+@ConfigurationProperties(prefix = "docket")
+class DocketProperties : LoggableProperties() {
+    @NotNull
+    lateinit var host: String
+
+    @NotNull
+    lateinit var protocols: Set<String>
+}
