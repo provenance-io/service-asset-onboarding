@@ -29,6 +29,8 @@ spec:
       deployment:
         business_unit: figure-tech
         business_product: asset-onboarding
+        updateStrategy:
+          type: Recreate
         port: 8080
         replicas:
           test: 1
