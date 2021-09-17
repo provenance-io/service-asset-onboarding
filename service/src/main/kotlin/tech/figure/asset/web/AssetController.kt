@@ -67,7 +67,7 @@ class AssetController(
                 assetOnboardService.encryptAndStore(assetObj, publicKey).toBase64String()
             }
         )
-        logger.info("Stored asset with hash $hash for $address using key $publicKey")
+        logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
 
         // create the metadata TX message
         return assetOnboardService.buildNewScopeMetadataTransaction(address, "AssetRecord", mapOf("Asset" to hash), scopeId)
