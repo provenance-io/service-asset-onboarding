@@ -1,14 +1,18 @@
 package tech.figure.asset.services
 
 import com.google.protobuf.Message
+import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
+import io.provenance.scope.encryption.proto.Encryption
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
+import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import tech.figure.asset.sdk.extensions.toJson
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class AssetOnboardService(
     private val objectStoreProperties: ObjectStoreProperties
@@ -34,6 +38,24 @@ class AssetOnboardService(
         asset: Message,
         encryptPublicKey: PublicKey,
     ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey)
+
+    // Get a DIME by its hash and public key
+    fun getDIME(
+        hash: ByteArray,
+        publicKey: PublicKey
+    ): Encryption.DIME = assetUtils.getDIME(hash, publicKey)
+
+    // Retrieve an encrypted asset as a byte array by its hash and public key
+    fun retrieve(
+        hash: ByteArray,
+        publicKey: PublicKey
+    ): ByteArray = assetUtils.retrieve(hash, publicKey)
+
+    // Retrieve an encrypted asset as a byte array with its DIME by its hash and public key
+    fun retrieveWithDIME(
+        hash: ByteArray,
+        publicKey: PublicKey
+    ): Pair<Encryption.DIME, ByteArray> = assetUtils.retrieveWithDIME(hash, publicKey)
 
     // Retrieve the asset as a byte array and decrypt using the provided keypair
     fun retrieveAndDecrypt(
