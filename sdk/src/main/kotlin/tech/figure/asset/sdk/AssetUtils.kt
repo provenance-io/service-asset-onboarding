@@ -31,10 +31,13 @@ import io.provenance.metadata.v1.SessionIdComponents
 import io.provenance.objectstore.proto.Objects
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.encryption.crypto.Pen
+import io.provenance.scope.encryption.dime.ProvenanceDIME
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
+import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
+import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.security.PrivateKey
@@ -97,7 +100,26 @@ class AssetUtils (
         return res.hash.toByteArray()
     }
 
-    // TODO: retrieve ONLY from hash and publicKey (require client to decrypt) ... can only be ByteArray
+    // Get a DIME by its hash and public key
+    fun getDIME(hash: ByteArray, publicKey: PublicKey): Encryption.DIME {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return res.dime
+    }
+
+    // Retrieve an encrypted asset as a byte array by its hash and public key
+    fun retrieve(hash: ByteArray, publicKey: PublicKey): ByteArray {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return res.getEncryptedPayload()
+    }
+
+    // Retrieve an encrypted asset as a byte array with its DIME by its hash and public key
+    fun retrieveWithDIME(hash: ByteArray, publicKey: PublicKey): Pair<Encryption.DIME, ByteArray> {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return Pair(res.dime, res.getEncryptedPayload())
+    }
 
     // Retrieve an asset as a byte array by its hash and decrypt using the provided key-pair
     fun retrieveAndDecrypt(hash: ByteArray, publicKey: PublicKey, privateKey: PrivateKey): ByteArray {

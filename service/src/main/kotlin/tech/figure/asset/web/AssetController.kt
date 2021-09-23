@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -84,6 +85,43 @@ class AssetController(
             json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
             base64 = txBody.second.toBase64String()
         )
+    }
+
+    @GetMapping("/{scopeId}")
+    @ApiOperation(value = "Retrieve an asset")
+    @ApiResponse(
+        message = "Returns JSON encoded TX messages for writing scope to Provenance.",
+        code = 200
+    )
+    fun getAsset(
+        @PathVariable scopeId: UUID,
+        @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
+        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?
+    ): String {
+        logger.info("REST request to get asset $scopeId")
+
+        val publicKey: PublicKey
+
+        // get the public key & client PB address from the headers
+        if (xAuthJWT != null) {
+            // TODO: decode the JWT and extract the public key
+            throw IllegalStateException("JWT authentication unimplemented")
+        } else if (xPublicKey != null) {
+            publicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
+        } else {
+            throw MissingPublicKeyException()
+        }
+
+        // TODO: locate hash by scope
+
+        return assetOnboardService.retrieveWithDIME(ByteArray(0) /*TODO*/, publicKey).let { result ->
+            val dime = result.first
+            val encrypted = result.second
+
+            // TODO: return the JSON encoded DIME and the encrypted payload (should we encode the payload in the dime itself? base64?)
+
+            ""
+        }
     }
 
 }

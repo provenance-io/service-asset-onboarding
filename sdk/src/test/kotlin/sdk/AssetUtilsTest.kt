@@ -10,7 +10,10 @@ import io.provenance.metadata.v1.MsgWriteSessionRequest
 import io.provenance.metadata.v1.PartyType
 import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.ResultStatus
+import io.provenance.scope.encryption.dime.ProvenanceDIME
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
+import io.provenance.scope.encryption.model.DirectKeyRef
+import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.MetadataAddress
 import java.security.KeyPair
@@ -19,6 +22,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import tech.figure.asset.Asset
+import java.io.ByteArrayInputStream
 
 class AssetUtilsTest {
 
@@ -32,6 +36,8 @@ class AssetUtilsTest {
         val ASSET_RECORD_NAME: String = "TestRecordName"
         val ASSET_RECORD_INPUT_1_NAME: String = "TestInputName"
         val ASSET_RECORD_INPUT_1_HASH: String = "TestInputHash"
+
+        val ENCRYPTED_ASSET_SIZE: Int = 102
     }
 
     val testAsset: Asset = Asset.newBuilder().also { asset ->
@@ -76,6 +82,48 @@ class AssetUtilsTest {
                 Assertions.assertEquals(testAsset.id, decryptedAsset.id)
                 Assertions.assertEquals(testAsset.type, decryptedAsset.type)
                 Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+            }
+        }
+    }
+
+    @Test
+    fun `#getDIME returns DIME object for asset`() {
+        runBlockingTest {
+            assetUtils.encryptAndStore(testAsset, testKeyPair.public).also { hash ->
+                val dime: Encryption.DIME = assetUtils.getDIME(hash, testKeyPair.public)
+
+                Assertions.assertNotNull(dime.uuid.value)
+                Assertions.assertDoesNotThrow { UUID.fromString(dime.uuid.value) }
+            }
+        }
+    }
+
+    @Test
+    fun `#retrieve returns encrypted asset`() {
+        runBlockingTest {
+            assetUtils.encryptAndStore(testAsset, testKeyPair.public).also { hash ->
+                val encrypted = assetUtils.retrieve(hash, testKeyPair.public)
+
+                Assertions.assertEquals(encrypted.size, ENCRYPTED_ASSET_SIZE)
+            }
+        }
+    }
+
+    @Test
+    fun `#retrieveWithDIME returns encrypted asset`() {
+        runBlockingTest {
+            assetUtils.encryptAndStore(testAsset, testKeyPair.public).also { hash ->
+                assetUtils.retrieveWithDIME(hash, testKeyPair.public).also { result ->
+                    val dime = result.first
+                    val encrypted = result.second
+                    val decrypted = ProvenanceDIME.getDEK(dime.audienceList, DirectKeyRef(testKeyPair.public, testKeyPair.private))
+                        .let { ProvenanceDIME.decryptPayload(ByteArrayInputStream(encrypted), it) }
+                    val decryptedAsset: Asset = Asset.parseFrom(decrypted)
+
+                    Assertions.assertEquals(testAsset.id, decryptedAsset.id)
+                    Assertions.assertEquals(testAsset.type, decryptedAsset.type)
+                    Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+                }
             }
         }
     }
