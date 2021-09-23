@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tech.figure.asset.Asset
 import tech.figure.asset.exceptions.MissingPublicKeyException
+import tech.figure.asset.extensions.toUUID
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
@@ -38,40 +39,29 @@ class AssetController(
 
     @CrossOrigin
     @PostMapping("/{scopeId}")
-    @ApiOperation(value = "Onboard an asset")
+    @ApiOperation(value = "Onboard an asset (Store asset in EOS and build scope for blockchain submission.)")
     @ApiResponse(
         message = "Returns JSON encoded TX messages for writing scope to Provenance.",
         code = 200
     )
     fun onboard(
-        @PathVariable scopeId: UUID,
         @RequestBody asset: Asset,
-        @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
-        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?,
-        @RequestHeader(name = "x-address", required = false) xAddress: String?
+        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String,
+        @RequestHeader(name = "x-address", required = true) xAddress: String
     ): TxBody {
+        val scopeId = asset.id
         logger.info("REST request to onboard asset $scopeId")
 
-        val publicKey: PublicKey
-        val address: String
-
         // get the public key & client PB address from the headers
-        if (xAuthJWT != null) {
-            // TODO: decode the JWT and extract the public key and address
-            throw IllegalStateException("JWT authentication unimplemented")
-        } else if (xPublicKey != null && xAddress != null) {
-            publicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
-            address = xAddress
-        } else {
-            throw MissingPublicKeyException()
-        }
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
+        val address: String = xAddress
 
         // encrypt and store the asset to the object-store using the provided public key
         val hash = assetOnboardService.encryptAndStore(asset, publicKey).toBase64String()
         logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
 
         // create the metadata TX message
-        val txBody = assetOnboardService.buildNewScopeMetadataTransaction(address, "AssetRecord", mapOf("Asset" to hash), scopeId)
+        val txBody = assetOnboardService.buildNewScopeMetadataTransaction(address, "AssetRecord", mapOf("Asset" to hash), scopeId.toUUID())
         return TxBody(
             json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
             base64 = txBody.second.toBase64String()
