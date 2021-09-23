@@ -6,6 +6,7 @@ import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.http.MediaType
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.ApiInfo
 import springfox.documentation.service.ApiKey
@@ -69,8 +70,8 @@ class AppConfig(
         return Docket(DocumentationType.OAS_30)
             .apiInfo(apiInfo)
             .host(docketProperties.host)
-            .consumes(setOf("application/json"))
-            .produces(setOf("application/json"))
+            .consumes(setOf(MediaType.APPLICATION_JSON_VALUE))
+            .produces(setOf(MediaType.APPLICATION_JSON_VALUE))
             .protocols(docketProperties.protocols)
             .forCodeGeneration(true)
             .securitySchemes(listOf(
@@ -79,26 +80,6 @@ class AppConfig(
             ))
             .select()
             .apis(RequestHandlerSelectors.basePackage("tech.figure.asset.web"))
-            .build()
-    }
-
-    @Bean
-    fun uiConfig(): UiConfiguration {
-        return UiConfigurationBuilder.builder()
-            .deepLinking(true)
-            .displayOperationId(false)
-            .defaultModelsExpandDepth(1)
-            .defaultModelExpandDepth(1)
-            .defaultModelRendering(ModelRendering.EXAMPLE)
-            .displayRequestDuration(false)
-            .docExpansion(DocExpansion.FULL)
-            .filter(false)
-            .maxDisplayedTags(null)
-            .operationsSorter(OperationsSorter.ALPHA)
-            .showExtensions(false)
-            .showCommonExtensions(false)
-            .tagsSorter(TagsSorter.ALPHA)
-            .validatorUrl(null)
             .build()
     }
 

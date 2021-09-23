@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import tech.figure.asset.exceptions.MissingPublicKeyException
@@ -18,6 +19,17 @@ class GlobalControllerAdvice : ResponseEntityExceptionHandler() {
     fun handleMissingPublicKey(exception: MissingPublicKeyException, request: WebRequest): ResponseEntity<ErrorMessage> {
         logger.warn("Missing public key: ${request.contextPath}")
         return ResponseEntity(ErrorMessage(listOf(exception.message ?: "Missing public key")), HttpStatus.FORBIDDEN)
+    }
+
+    /**
+     * Catch-all for everything else
+     */
+    @ExceptionHandler(Exception::class)
+    @ResponseBody
+    fun handleAny(exception: Exception, request: WebRequest): ResponseEntity<String> {
+        val message = exception.message ?: exception.javaClass.simpleName
+        logger.error("${request.contextPath} failed with error $message (catch-all handler)", exception)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message)
     }
 
 }
