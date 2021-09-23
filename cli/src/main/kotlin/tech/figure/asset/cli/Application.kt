@@ -4,6 +4,7 @@ import com.figure.wallet.account.InMemoryKeyHolder
 import com.figure.wallet.account.Key
 import com.figure.wallet.pbclient.client.GrpcClient
 import com.figure.wallet.pbclient.client.GrpcClientOpts
+import com.google.common.io.BaseEncoding
 import com.google.protobuf.util.JsonFormat
 import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastMode
 import io.provenance.scope.encryption.ecies.ECUtils
@@ -89,7 +90,7 @@ class Application {
                         System.exit(-1)
                     }
                 }
-                println("Encrypted and stored asset in object store with hash $hash")
+                println("Encrypted and stored asset in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
 
                 // generate the Provenance metadata TX message for this asset scope
                 assetUtils.buildNewScopeMetadataTransaction(address, "Record", mapOf("Asset" to hash)).let {
