@@ -42,7 +42,8 @@ dependencies {
         Dependencies.Provenance.PbcProto,
         Dependencies.Provenance.Protobuf.PbProtoJava,
         Dependencies.Jackson.KotlinModule,
-        Dependencies.Jackson.Hubspot
+        Dependencies.Jackson.Hubspot,
+        Dependencies.Figure.Util
     ).forEach { dep ->
         dep.implementation(this)
     }
