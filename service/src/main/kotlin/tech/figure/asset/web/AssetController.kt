@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tech.figure.asset.Asset
 import tech.figure.asset.exceptions.MissingPublicKeyException
-import tech.figure.asset.extensions.jsonToAsset
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
@@ -46,7 +45,7 @@ class AssetController(
     )
     fun onboard(
         @PathVariable scopeId: UUID,
-        @RequestBody asset: ByteArray,
+        @RequestBody asset: Asset,
         @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?,
         @RequestHeader(name = "x-address", required = false) xAddress: String?
@@ -68,15 +67,7 @@ class AssetController(
         }
 
         // encrypt and store the asset to the object-store using the provided public key
-        val hash = asset.jsonToAsset().fold(
-            { t: Throwable ->
-                // TODO: if blobs are enabled, onboard as blob, otherwise throw exception
-                ""
-            },
-            { assetObj: Asset ->
-                assetOnboardService.encryptAndStore(assetObj, publicKey).toBase64String()
-            }
-        )
+        val hash = assetOnboardService.encryptAndStore(asset, publicKey).toBase64String()
         logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
 
         // create the metadata TX message

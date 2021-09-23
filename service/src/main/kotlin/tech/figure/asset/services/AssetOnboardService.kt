@@ -1,18 +1,16 @@
 package tech.figure.asset.services
 
 import com.google.protobuf.Message
-import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.proto.Encryption
+import tech.figure.asset.Asset
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
-import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import tech.figure.asset.sdk.extensions.toJson
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 class AssetOnboardService(
     private val objectStoreProperties: ObjectStoreProperties
@@ -27,15 +25,9 @@ class AssetOnboardService(
         )
     )
 
-    // Encrypt and store a byte array asset using a random keypair for the signer
-    fun encryptAndStore(
-        asset: ByteArray,
-        encryptPublicKey: PublicKey,
-    ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey)
-
     // Encrypt and store a protobuf asset using a random keypair for the signer
     fun encryptAndStore(
-        asset: Message,
+        asset: Asset,
         encryptPublicKey: PublicKey,
     ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey)
 

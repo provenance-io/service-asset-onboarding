@@ -31,14 +31,13 @@ import io.provenance.metadata.v1.SessionIdComponents
 import io.provenance.objectstore.proto.Objects
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.encryption.crypto.Pen
-import io.provenance.scope.encryption.dime.ProvenanceDIME
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
+import tech.figure.asset.Asset
 import tech.figure.asset.sdk.extensions.getEncryptedPayload
-import java.io.ByteArrayInputStream
 import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -71,24 +70,9 @@ class AssetUtils (
     }
      */
 
-    // Encrypt and store a byte array asset using a random keypair for the signer
-    fun encryptAndStore(
-        asset: ByteArray,
-        encryptPublicKey: PublicKey,
-    ): ByteArray {
-        val future = osClient.put(
-            ByteArrayInputStream(asset),
-            encryptPublicKey,
-            Pen(ProvenanceKeyGenerator.generateKeyPair(encryptPublicKey)),
-            asset.size.toLong()
-        )
-        val res: Objects.ObjectResponse = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
-        return res.hash.toByteArray()
-    }
-
     // Encrypt and store a protobuf asset using a random keypair for the signer
     fun encryptAndStore(
-        asset: Message,
+        asset: Asset,
         encryptPublicKey: PublicKey,
     ): ByteArray {
         val future = osClient.put(
