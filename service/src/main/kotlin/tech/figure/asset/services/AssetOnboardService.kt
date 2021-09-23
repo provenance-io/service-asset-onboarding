@@ -55,6 +55,9 @@ class AssetOnboardService(
         recordName: String,
         scopeInputs: Map<String, String>,
         scopeId: UUID
-    ): String = assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second.toJson()
+    ): Pair<String, ByteArray> {
+        val txBody = assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second
+        return Pair(txBody.toJson(), txBody.toByteArray())
+    }
 
 }

@@ -9,7 +9,7 @@ ADDRESS=tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc
 scope_id=$1
 asset_file=$2
 
-curl --http1.1 -v --location --request POST http://${SERVICE_ASSET_ONBOARDING_HOST}/api/v1/asset/${scope_id} \
+curl --http1.1 --silent --location --request POST http://${SERVICE_ASSET_ONBOARDING_HOST}/api/v1/asset/${scope_id} \
   --header "Content-Type: application/json" \
   --header "Accept: application/json" \
   --header "x-public-key: ${PUBLIC_KEY}" \

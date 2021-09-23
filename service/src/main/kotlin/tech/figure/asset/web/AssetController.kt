@@ -1,5 +1,7 @@
 package tech.figure.asset.web
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -19,6 +21,11 @@ import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
 import java.util.UUID
+
+data class TxBody(
+    val json: ObjectNode,
+    val base64: String
+)
 
 @RestController
 @RequestMapping("/api/v1/asset")
@@ -42,11 +49,11 @@ class AssetController(
         @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?,
         @RequestHeader(name = "x-address", required = false) xAddress: String?
-    ): String {
+    ): TxBody {
         logger.info("REST request to onboard asset $scopeId")
 
-        var publicKey: PublicKey
-        var address: String
+        val publicKey: PublicKey
+        val address: String
 
         // get the public key & client PB address from the headers
         if (xAuthJWT != null) {
@@ -72,7 +79,11 @@ class AssetController(
         logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
 
         // create the metadata TX message
-        return assetOnboardService.buildNewScopeMetadataTransaction(address, "AssetRecord", mapOf("Asset" to hash), scopeId)
+        val txBody = assetOnboardService.buildNewScopeMetadataTransaction(address, "AssetRecord", mapOf("Asset" to hash), scopeId)
+        return TxBody(
+            json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
+            base64 = txBody.second.toBase64String()
+        )
     }
 
 }
