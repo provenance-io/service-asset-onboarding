@@ -19,6 +19,7 @@ object Versions {
     const val ProvenanceProtobuf = Master
     const val P8eScope = "0.1.0"
     const val StreamData = Master
+    const val FigureUtil = Master
     const val WalletPbClient = Develop
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
@@ -159,6 +160,7 @@ object Dependencies {
 
     // Figure
     object Figure {
+        val Util = DependencySpec("com.figure:figure-util", Versions.FigureUtil)
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
         object Wallet {
             val PbClient = DependencySpec("com.figure.wallet:pb-client", Versions.WalletPbClient)

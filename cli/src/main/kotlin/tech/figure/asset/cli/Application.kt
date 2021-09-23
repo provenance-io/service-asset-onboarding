@@ -43,7 +43,6 @@ class Application {
         }
 
         val input by argument(ArgType.String, description = "Input asset file")
-        val `allow-blobs` by option(ArgType.Boolean, shortName = "b", description = "Allow Onboarding of Blob Data (non-asset proto)").default(false)
         val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
 
         override fun execute() {
@@ -51,7 +50,6 @@ class Application {
         }
 
         fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
-            val allowBlobs = `allow-blobs`
             val rawLog = `raw-log`
             val publicKey = ECUtils.convertBytesToPublicKey(key.publicKey().toByteArray())
             val address = key.address().getValue()
@@ -77,18 +75,8 @@ class Application {
                         System.exit(-1)
                     }
                 } catch (t: Throwable) {
-                    if (allowBlobs) {
-                        println("File `${input}` does not contain an asset protobuf. Onboarding as blob.")
-                        if (assetBytes.size > 0) {
-                            hash = assetUtils.encryptAndStore(assetBytes, publicKey).toBase64String()
-                        } else {
-                            println("ERROR: File `${input}` is empty.")
-                            System.exit(-1)
-                        }
-                    } else {
-                        println("ERROR: File `${input}` does not contain an asset protobuf and blobs are not allowed.")
-                        System.exit(-1)
-                    }
+                    println("ERROR: File `${input}` does not contain an asset protobuf and blobs are not allowed.")
+                    System.exit(-1)
                 }
                 println("Encrypted and stored asset in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
 

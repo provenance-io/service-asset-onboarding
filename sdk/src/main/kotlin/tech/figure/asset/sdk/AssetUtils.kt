@@ -34,8 +34,10 @@ import io.provenance.scope.encryption.crypto.Pen
 import io.provenance.scope.encryption.domain.inputstream.DIMEInputStream
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
+import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
-import java.io.ByteArrayInputStream
+import tech.figure.asset.Asset
+import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import java.net.URI
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -68,24 +70,9 @@ class AssetUtils (
     }
      */
 
-    // Encrypt and store a byte array asset using a random keypair for the signer
-    fun encryptAndStore(
-        asset: ByteArray,
-        encryptPublicKey: PublicKey,
-    ): ByteArray {
-        val future = osClient.put(
-            ByteArrayInputStream(asset),
-            encryptPublicKey,
-            Pen(ProvenanceKeyGenerator.generateKeyPair(encryptPublicKey)),
-            asset.size.toLong()
-        )
-        val res: Objects.ObjectResponse = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
-        return res.hash.toByteArray()
-    }
-
     // Encrypt and store a protobuf asset using a random keypair for the signer
     fun encryptAndStore(
-        asset: Message,
+        asset: Asset,
         encryptPublicKey: PublicKey,
     ): ByteArray {
         val future = osClient.put(
@@ -97,7 +84,26 @@ class AssetUtils (
         return res.hash.toByteArray()
     }
 
-    // TODO: retrieve ONLY from hash and publicKey (require client to decrypt) ... can only be ByteArray
+    // Get a DIME by its hash and public key
+    fun getDIME(hash: ByteArray, publicKey: PublicKey): Encryption.DIME {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return res.dime
+    }
+
+    // Retrieve an encrypted asset as a byte array by its hash and public key
+    fun retrieve(hash: ByteArray, publicKey: PublicKey): ByteArray {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return res.getEncryptedPayload()
+    }
+
+    // Retrieve an encrypted asset as a byte array with its DIME by its hash and public key
+    fun retrieveWithDIME(hash: ByteArray, publicKey: PublicKey): Pair<Encryption.DIME, ByteArray> {
+        val future = osClient.get(hash, publicKey)
+        val res: DIMEInputStream = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
+        return Pair(res.dime, res.getEncryptedPayload())
+    }
 
     // Retrieve an asset as a byte array by its hash and decrypt using the provided key-pair
     fun retrieveAndDecrypt(hash: ByteArray, publicKey: PublicKey, privateKey: PrivateKey): ByteArray {
