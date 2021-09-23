@@ -8,21 +8,25 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
+import org.springframework.http.MediaType
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.ApiInfo
+import springfox.documentation.service.ApiKey
 import springfox.documentation.service.Contact
-import springfox.documentation.service.Parameter
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import tech.figure.asset.OBJECT_MAPPER
+import springfox.documentation.swagger.web.*
 import tech.figure.asset.extensions.info
 import tech.figure.asset.services.AssetOnboardService
 import java.lang.management.ManagementFactory
 
+
 @Configuration
 @EnableConfigurationProperties(
     value = [
-        ObjectStoreProperties::class
+        ObjectStoreProperties::class,
+        DocketProperties::class
     ]
 )
 @Import(BuildProperties::class)
@@ -53,9 +57,9 @@ class AppConfig(
     fun assetOnboardService(objectStoreProperties: ObjectStoreProperties) = AssetOnboardService(objectStoreProperties)
 
     @Bean
-    fun api(): Docket {
+    fun api(docketProperties: DocketProperties): Docket {
 
-        val contact = Contact("Figure", null, null)
+        val contact = Contact("Figure Technologies", "https://figure.tech", null)
 
         val apiInfo = ApiInfo(
             "Figure Tech Asset Onboarding API",
@@ -68,34 +72,18 @@ class AppConfig(
             listOf()
         )
 
-        val params = mutableListOf<Parameter>(
-            // todo x-uuid
-//                ParameterBuilder()
-//                        .name("x-uuid")
-//                        .description("Provenance admin ID")
-//                        .modelRef(ModelRef("uuid"))
-//                        .required(true)
-//                        .parameterType("header")
-//                        .build()
 
-//                ParameterBuilder()
-//                        .name("apikey")
-//                        .description("apikey")
-//                        .modelRef(ModelRef("string"))
-//                        .required(true)
-//                        .parameterType("header")
-//                        .build()
-
-        )
-
-        return Docket(DocumentationType.SWAGGER_2)
+        return Docket(DocumentationType.OAS_30)
             .apiInfo(apiInfo)
-            .host("localhost:8080")
-            .consumes(setOf("application/json"))
-            .produces(setOf("application/json"))
-            .protocols(setOf("http", "https"))
+            .host(docketProperties.host)
+            .consumes(setOf(MediaType.APPLICATION_JSON_VALUE))
+            .produces(setOf(MediaType.APPLICATION_JSON_VALUE))
+            .protocols(docketProperties.protocols)
             .forCodeGeneration(true)
-            .globalOperationParameters(params)
+            .securitySchemes(listOf(
+                    // don't use apikey until we have the ability to bill someone
+                    // ApiKey("Token Access", "apikey", "header")
+            ))
             .select()
             .apis(RequestHandlerSelectors.basePackage("tech.figure.asset.web"))
             .build()
