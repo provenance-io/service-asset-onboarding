@@ -42,7 +42,7 @@ spec:
           enabled: true
         configMap:
           test:
-            ASSET_MANAGER_PUBLIC_KEY: "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAYmiL6eTaB+uj4TO3RjuwVFeY8czNFfYSn3oL7IO8WXo527+jHurag+tbJqerUS08d9EzqV74NQ0n/cqPHSCmg=="
+            ASSET_MANAGER_PUBLIC_KEY: ""
           prod:
             ASSET_MANAGER_PUBLIC_KEY: ""
         readinessProbe:

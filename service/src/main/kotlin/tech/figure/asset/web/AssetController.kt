@@ -2,6 +2,8 @@ package tech.figure.asset.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.figure.extensions.uuid.toUUID
+import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -18,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import tech.figure.asset.Asset
 import tech.figure.asset.config.ServiceKeysProperties
-import tech.figure.asset.extensions.base64ToPublicKey
-import tech.figure.asset.extensions.toUUID
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
@@ -57,13 +57,13 @@ class AssetController(
         logger.info("REST request to onboard asset $scopeId")
 
         // get the public key & client PB address from the headers
-        val publicKey: PublicKey = xPublicKey.base64ToPublicKey()
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(BaseEncoding.base64().decode(xPublicKey))
         val address: String = xAddress
 
         // assemble the list of additional audiences
         val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
         if (permissionAssetManager) {
-            additionalAudiences.add(serviceKeysProperties.assetManager.base64ToPublicKey())
+            additionalAudiences.add(ECUtils.convertBytesToPublicKey(BaseEncoding.base64().decode(serviceKeysProperties.assetManager)))
         }
 
         // encrypt and store the asset to the object-store using the provided public key
