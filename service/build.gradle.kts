@@ -57,7 +57,8 @@ dependencies {
         Dependencies.Kotlin.CoroutinesTest,
         Dependencies.Jupiter.JupiterApi,
         Dependencies.SpringMockk,
-        Dependencies.SpringBoot.StarterTest
+        Dependencies.SpringBoot.StarterTest,
+        Dependencies.Fuel
     ).forEach { testDep ->
         testDep.testImplementation(this)
     }
