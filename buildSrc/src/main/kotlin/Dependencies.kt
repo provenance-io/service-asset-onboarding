@@ -3,6 +3,7 @@ import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.ScriptHandlerScope
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.plugin.use.PluginDependenciesSpec
+import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaAnnotation
 
 object RepositoryLocations {
     const val FigureNexusMirror = "https://nexus.figure.com/repository/mirror"
@@ -26,6 +27,9 @@ object Versions {
     const val KotlinCoroutines = "1.5.0"
     const val KotlinXCli = "0.3.3"
     const val Protobuf = "3.16.0"
+    const val KrotoPlus = "0.6.1"
+    const val JavaAnnotation = "1.3.1"
+    const val ProtoValidation = "0.6.1"
     const val SpringBoot = "2.4.5"
     const val KotlinLogging = "2.0.6"
     const val Retrofit = "2.9.0"
@@ -44,9 +48,9 @@ object Plugins { // please keep this sorted in sections
 
     // 3rd Party
     // val Detekt = PluginSpec("io.gitlab.arturbosch.detekt", Versions.Detekt)
-    val Flyway = PluginSpec("org.flywaydb.flyway", "7.7.0")
     val Idea = PluginSpec("idea")
     val Protobuf = PluginSpec("com.google.protobuf", "0.8.16")
+    val Kroto = PluginSpec("com.github.marcoferrer.kroto-plus", Versions.KrotoPlus)
     val SpringBoot = PluginSpec("org.springframework.boot", Versions.SpringBoot)
     val SpringDependencyManagement = PluginSpec("io.spring.dependency-management", "1.0.11.RELEASE")
 }
@@ -119,10 +123,12 @@ object Dependencies {
         val Core = DependencySpec("io.projectreactor:reactor-core", Versions.Reactor)
     }
 
-    // Protobuf
     object Protobuf {
         val Java = DependencySpec("com.google.protobuf:protobuf-java", Versions.Protobuf)
         val JavaUtil = DependencySpec("com.google.protobuf:protobuf-java-util", Versions.Protobuf)
+        val Kroto = DependencySpec("com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus", Versions.KrotoPlus)
+        val JavaAnnotation = DependencySpec("javax.annotation:javax.annotation-api", Versions.JavaAnnotation)
+        val ProtoValidation = DependencySpec("io.envoyproxy.protoc-gen-validate:protoc-gen-validate", Versions.ProtoValidation)
     }
 
     // Square's Retrofit API client
@@ -158,7 +164,6 @@ object Dependencies {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }
 
-    // Figure
     object Figure {
         val Util = DependencySpec("com.figure:figure-util", Versions.FigureUtil)
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)

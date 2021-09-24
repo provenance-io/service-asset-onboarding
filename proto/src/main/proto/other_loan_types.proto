@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package tech.figure.asset.loan;
+
+//import "tech/figure/util/util.proto";
+//import "tech/figure/finance/financial_account.proto";
+//import "google/protobuf/timestamp.proto";
+//
+//message SLR {
+//  repeated studentloan.StudentLoanDetail student_loan_details = 140;
+//
+//}
+// SLR had this in Party (Person)
+//   repeated studentloan.Education educations = 22;
+//
+//message Heloc {
+//  tech.figure.util.Money credit_limit_amount = 245; // HELOC/MERLOC: if present, indicates asset credit limit. if absent, Loan.amount should be used instead
+//
+//  int32 additional_draw_months = 305 ; // # months from funding that a draw can be made
+//  int32 paid_draw_bonus_months = 306; // # months draw period is extended by if paid off in original draw period
+//
+//  bool static_draw_rate = 750; // HELOC/MERLOC: if true, use interest_rate for any future draws. if false, use current prime rate
+//
+//}
+//
+//message Merloc {
+//  tech.figure.util.Money borrower_draw_reserved_amount = 250; // MERLOC: reserves a portion of the credit limit, only accessible by the borrower (not the project)
+//  ContactInformation project_contact_info = 755; // MERLOC: identifies the merchant / project owner
+//  bool project_draw = 760; // MERLOC: if true, draw was requested by project instead of borrower (default)
+//  repeated asset.Charge charge = 761; // MERLOC: dealer fees, referral fees
+//  tech.figure.util.Money merchant_amount = 763; // MERLOC: the amount to transfer to the merchant - the draw amount minus fees
+//}
+//
+//message Mortgage {
+//  bool escrow_disabled = 234; // Indicates no escrow will be collected for this loan. Will also force validation on all other escrow fields are blank or zero.
+//  tech.figure.util.Money escrow_monthly_amount = 235; // Sum of all monthly escrow amounts paid by the borrower in addition to the monthly payment amount
+//  tech.figure.util.Money pre_paid_escrow_amount = 240; // closing cost: prepaid escrow (paid out at closing to insurance / tax entities) note: initial mortgage data treated this as initial_escrow_amount before that field was added
+//  tech.figure.util.Money initial_escrow_amount = 241; // closing cost: initial/starting escrow balance (held in escrow account by the servicer for future use) note: if missing, treat pre_paid_escrow_amount as initial_escrow_amount
+//  tech.figure.util.Money cashout_amount = 251;
+//  string desktop_underwriter_recommendation = 764; // MORTGAGE: DU Response information
+//
+//}
+//
+//message FigureBankCredit {
+//  tech.figure.finance.FinancialAccount initial_manual_payment_account = 506; // - Optional unless FigureBankCredit, an account the customer can designate their payments initially draw from
+//
+//}
+//
+//message TaxEscrow {
+//  bool escrow_flag = 1; // Indication whether loan is escrowed for taxes
+//  Money escrow_monthly_amount = 2;  // if escrow flag is set, this sets witholding for escrow from monthly payment
+//  string tax_type = 3; // see ExpectedEnumValues.kt - TaxEscrowType
+//  EscrowWithdrawPolicy withdraw_policy = 4;
+//  string tax_year = 5; // initial tax year
+//
+//  ContactInformation contact_info = 15;
+//}
+//
+//// No idea where to put these
+//    bool primary_residence = 705 ;
+//    HomeOwnersAssociation hoa = 715;
+//    repeated Insurance insurance_coverage = 720;
+//    Diligence completed_diligence = 725;
+//    repeated TaxEscrow tax_escrow = 745;
+//
+//
+//    common.Disclosure signed_deed = 730;
+//    Recording recording_info = 735;
+//
+//    string current_living_arrangement = 771;  // see LivingArrangement in ExpectedEnumValues.kt
+//
+//    LoanValidationDates validation_dates = 330;
