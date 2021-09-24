@@ -38,7 +38,7 @@ class AssetController(
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
 
     @CrossOrigin
-    @PostMapping("/{scopeId}")
+    @PostMapping
     @ApiOperation(value = "Onboard an asset (Store asset in EOS and build scope for blockchain submission.)")
     @ApiResponse(
         message = "Returns JSON encoded TX messages for writing scope to Provenance.",
@@ -68,6 +68,7 @@ class AssetController(
         )
     }
 
+    @CrossOrigin
     @GetMapping("/{scopeId}")
     @ApiOperation(value = "Retrieve an asset")
     @ApiResponse(

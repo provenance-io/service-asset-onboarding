@@ -6,10 +6,12 @@ SERVICE_ASSET_ONBOARDING_HOST=localhost:8080
 PUBLIC_KEY=AyxS63kwfSSLbPsqSvVi5APUgmuw9UDwJLvDk3Uo9usL
 ADDRESS=tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc
 
-scope_id=$1
-asset_file=$2
+asset_file=$1
+scope_id=`cat cli/src/test/json/asset1.json| jq '.id.value' | sed -e 's/"//g'`
 
-curl --http1.1 --silent --location --request POST http://${SERVICE_ASSET_ONBOARDING_HOST}/api/v1/asset/${scope_id} \
+echo "Onboarding asset ${scope_id}"
+
+curl --http1.1 --silent --location --request POST http://${SERVICE_ASSET_ONBOARDING_HOST}/api/v1/asset \
   --header "Content-Type: application/json" \
   --header "Accept: application/json" \
   --header "x-public-key: ${PUBLIC_KEY}" \
