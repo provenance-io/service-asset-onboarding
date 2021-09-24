@@ -40,6 +40,11 @@ spec:
           prod: us.gcr.io/figure-production/service-asset-onboarding:latest
         spring:
           enabled: true
+        configMap:
+          test:
+            ASSET_MANAGER_PUBLIC_KEY: "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAYmiL6eTaB+uj4TO3RjuwVFeY8czNFfYSn3oL7IO8WXo527+jHurag+tbJqerUS08d9EzqV74NQ0n/cqPHSCmg=="
+          prod:
+            ASSET_MANAGER_PUBLIC_KEY: ""
         readinessProbe:
           path: /service-asset-onboarding/manage/health
           periodSeconds: 3

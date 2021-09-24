@@ -29,7 +29,8 @@ class AssetOnboardService(
     fun encryptAndStore(
         asset: Asset,
         encryptPublicKey: PublicKey,
-    ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey)
+        additionalAudiences: Set<PublicKey> = emptySet()
+    ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey, additionalAudiences)
 
     // Get a DIME by its hash and public key
     fun getDIME(

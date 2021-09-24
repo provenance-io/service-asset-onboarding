@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import tech.figure.asset.Asset
-import tech.figure.asset.exceptions.MissingPublicKeyException
+import tech.figure.asset.config.ServiceKeysProperties
+import tech.figure.asset.extensions.base64ToPublicKey
 import tech.figure.asset.extensions.toUUID
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
@@ -32,7 +34,8 @@ data class TxBody(
 @RequestMapping("/api/v1/asset")
 @Api(value = "Assets", tags = ["Assets"], description = "Onboard asset endpoints")
 class AssetController(
-    private val assetOnboardService: AssetOnboardService
+    private val assetOnboardService: AssetOnboardService,
+    private val serviceKeysProperties: ServiceKeysProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
@@ -46,6 +49,7 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
+        @RequestParam(defaultValue = "true") permissionAssetManager: Boolean,
         @RequestHeader(name = "x-public-key", required = true) xPublicKey: String,
         @RequestHeader(name = "x-address", required = true) xAddress: String
     ): TxBody {
@@ -53,11 +57,17 @@ class AssetController(
         logger.info("REST request to onboard asset $scopeId")
 
         // get the public key & client PB address from the headers
-        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
+        val publicKey: PublicKey = xPublicKey.base64ToPublicKey()
         val address: String = xAddress
 
+        // assemble the list of additional audiences
+        val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
+        if (permissionAssetManager) {
+            additionalAudiences.add(serviceKeysProperties.assetManager.base64ToPublicKey())
+        }
+
         // encrypt and store the asset to the object-store using the provided public key
-        val hash = assetOnboardService.encryptAndStore(asset, publicKey).toBase64String()
+        val hash = assetOnboardService.encryptAndStore(asset, publicKey, additionalAudiences).toBase64String()
         logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
 
         // create the metadata TX message
@@ -77,22 +87,12 @@ class AssetController(
     )
     fun getAsset(
         @PathVariable scopeId: UUID,
-        @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
-        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?
+        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String
     ): String {
         logger.info("REST request to get asset $scopeId")
 
-        val publicKey: PublicKey
-
         // get the public key & client PB address from the headers
-        if (xAuthJWT != null) {
-            // TODO: decode the JWT and extract the public key
-            throw IllegalStateException("JWT authentication unimplemented")
-        } else if (xPublicKey != null) {
-            publicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
-        } else {
-            throw MissingPublicKeyException()
-        }
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
 
         // TODO: locate hash by scope
 

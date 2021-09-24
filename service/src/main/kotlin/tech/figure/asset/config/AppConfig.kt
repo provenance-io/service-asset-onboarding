@@ -26,13 +26,16 @@ import java.lang.management.ManagementFactory
 @EnableConfigurationProperties(
     value = [
         ObjectStoreProperties::class,
-        DocketProperties::class
+        DocketProperties::class,
+        ServiceKeysProperties::class
     ]
 )
 @Import(BuildProperties::class)
 class AppConfig(
     buildProperties: BuildProperties,
-    objectStoreProperties: ObjectStoreProperties
+    objectStoreProperties: ObjectStoreProperties,
+    docketProperties: DocketProperties,
+    serviceKeysProperties: ServiceKeysProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AppConfig::class.java)
@@ -43,6 +46,8 @@ class AppConfig(
         }
 
         logger.info(objectStoreProperties.toLogMessages())
+        logger.info(docketProperties.toLogMessages())
+        logger.info(serviceKeysProperties.toLogMessages())
 
         ManagementFactory.getRuntimeMXBean().inputArguments.map {
             logger.info("JVM arg: $it")

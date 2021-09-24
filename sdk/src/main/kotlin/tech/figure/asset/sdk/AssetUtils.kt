@@ -58,6 +58,7 @@ class AssetUtils (
         encryptPublicKey: PublicKey,
         signerKey: PublicKey,
         signature: ByteArray,
+        additionalAudiences: Set<PublicKey> = emptySet()
     ): ByteArray {
         val future = osClient.put(
             asset,
@@ -74,11 +75,13 @@ class AssetUtils (
     fun encryptAndStore(
         asset: Asset,
         encryptPublicKey: PublicKey,
+        additionalAudiences: Set<PublicKey> = emptySet()
     ): ByteArray {
         val future = osClient.put(
             asset,
             encryptPublicKey,
-            Pen(ProvenanceKeyGenerator.generateKeyPair(encryptPublicKey))
+            Pen(ProvenanceKeyGenerator.generateKeyPair(encryptPublicKey)),
+            additionalAudiences
         )
         val res: Objects.ObjectResponse = future.get(config.osConfig.timeoutMs, TimeUnit.MILLISECONDS)
         return res.hash.toByteArray()
