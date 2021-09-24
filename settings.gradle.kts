@@ -12,6 +12,8 @@ pluginManagement {
                 password = nexusPass ?: System.getenv("NEXUS_PASS")
             }
         }
+        mavenCentral()
+        maven("https://plugins.gradle.org/m2/")
     }
 }
 

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package tech.figure.util;
+
+option java_multiple_files = true;
+
+import "tech/figure/util/options.proto";
+
+message Address {
+  string street               = 10 [(tech.figure.util.pii) = true];
+  string street2              = 15 [(tech.figure.util.pii) = true];
+  string street3              = 20 [(tech.figure.util.pii) = true];
+  string city                 = 25;
+  string state                = 30; // or Province
+  string country              = 35;
+  string zip                  = 40;
+  string unit_number          = 45;
+  string address_type         = 50; // See AddressExpectedType
+  string ownership            = 55;
+  string owner_legal_name     = 60 [(tech.figure.util.pii) = true];
+  string whole_street_address = 65 [(tech.figure.util.pii) = true];
+}
+
+message PhoneNumber {
+  string number      = 2 [(tech.figure.util.pii) = true];
+  string number_type = 11; // See NumberExpectedType
+}

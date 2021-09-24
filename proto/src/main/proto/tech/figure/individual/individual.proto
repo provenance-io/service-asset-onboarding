@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package tech.figure.individual;
+
+option java_multiple_files = true;
+
+import "tech/figure/util/address.proto";
+import "tech/figure/util/options.proto";
+import "tech/figure/util/util.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+message Name {
+  string first_name  = 2 [(tech.figure.util.pii) = true];
+  string last_name   = 3 [(tech.figure.util.pii) = true];
+  string middle_name = 4 [(tech.figure.util.pii) = true];
+  string prefix      = 5 [(tech.figure.util.pii) = true];
+  string suffix      = 6 [(tech.figure.util.pii) = true];
+}
+
+message Individual {
+  string                id                                       = 1 [(validate.rules).string.uuid = true];
+  string                party_type                               = 9; // See PartyType
+  Name                  name                                     = 10;
+  tech.figure.util.Date dob                                      = 11 [(tech.figure.util.pii) = true];
+  repeated tech.figure.util.PhoneNumber phone_numbers            = 12;
+  repeated tech.figure.util.Address addresses                    = 13;
+  string                            ssn                          = 14 [(tech.figure.util.pii) = true];
+  string                            email                        = 15 [(tech.figure.util.pii) = true];
+  string                            citizenship                  = 16;
+  MaritalStatus                     marital_status               = 17;
+  repeated IncomeSource             income_sources               = 18;
+  tech.figure.util.Money                  stated_yearly_income   = 20; // Annual income as stated by the individual
+  tech.figure.util.Money                  verified_yearly_income = 21; // Annual income as verified through some process
+}
+
+message IncomeSource {
+  string                    employer                                       = 2;
+  tech.figure.util.Money    amount                                         = 3;
+  string                    employment_status                              = 4; // See EmploymentStatus
+  google.protobuf.Timestamp verification_of_employment_completed_timestamp = 5;
+}
+
+enum MaritalStatus {
+  MARITAL_STATUS_UNKNOWN = 0;
+  SINGLE                 = 1 [(tech.figure.util.description) = "Unmarried"];
+  MARRIED                = 2 [(tech.figure.util.description) = "Married / Spouse"];
+  SEPARATED              = 3 [(tech.figure.util.description) = "Separated"];
+  CIVIL_UNION            = 4 [(tech.figure.util.description) = "Civil Union"];
+  DOMESTIC_PARTNERSHIP   = 5 [(tech.figure.util.description) = "Domestic Partnership"];
+  OTHER                  = 6 [(tech.figure.util.description) = "Other"];
+}
+
+message Borrowers {
+  Individual          primary            = 1;
+  repeated Individual additional_parties = 2;
+}

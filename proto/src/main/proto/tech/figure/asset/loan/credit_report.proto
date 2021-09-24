@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package tech.figure.asset.loan;
+
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+message CreditReport { // TODO
+  string id        = 1 [(validate.rules).string.uuid = true];
+  string person_id = 2 [(validate.rules).string.uuid = true];
+
+  google.protobuf.Timestamp report_timestamp = 4;
+}

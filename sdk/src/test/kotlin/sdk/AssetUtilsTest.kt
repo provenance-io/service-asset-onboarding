@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import tech.figure.asset.Asset
+import tech.figure.asset.AssetOuterClassBuilders.Asset as AssetBuilder
 import java.io.ByteArrayInputStream
 
 class AssetUtilsTest {
@@ -40,13 +41,11 @@ class AssetUtilsTest {
         val ENCRYPTED_ASSET_SIZE: Int = 102
     }
 
-    val testAsset: Asset = Asset.newBuilder().also { asset ->
-        asset.id = tech.figure.util.UUID.newBuilder().also { uuid ->
-            uuid.value = UUID.randomUUID().toString()
-        }.build()
-        asset.type = ASSET_TYPE
-        asset.name = ASSET_NAME
-    }.build()
+    val testAsset = AssetBuilder {
+        id = UUID.randomUUID().toString()
+        type = ASSET_TYPE
+        description = ASSET_NAME
+    }
 
     val testScopeId: UUID = UUID.randomUUID()
 
@@ -68,7 +67,7 @@ class AssetUtilsTest {
 
                 Assertions.assertEquals(testAsset.id, decryptedAsset.id)
                 Assertions.assertEquals(testAsset.type, decryptedAsset.type)
-                Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+                Assertions.assertEquals(testAsset.description, decryptedAsset.description)
             }
         }
     }
@@ -81,7 +80,7 @@ class AssetUtilsTest {
 
                 Assertions.assertEquals(testAsset.id, decryptedAsset.id)
                 Assertions.assertEquals(testAsset.type, decryptedAsset.type)
-                Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+                Assertions.assertEquals(testAsset.description, decryptedAsset.description)
             }
         }
     }
@@ -122,7 +121,7 @@ class AssetUtilsTest {
 
                     Assertions.assertEquals(testAsset.id, decryptedAsset.id)
                     Assertions.assertEquals(testAsset.type, decryptedAsset.type)
-                    Assertions.assertEquals(testAsset.name, decryptedAsset.name)
+                    Assertions.assertEquals(testAsset.description, decryptedAsset.description)
                 }
             }
         }
