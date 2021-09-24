@@ -7,11 +7,12 @@ plugins {
 
 allprojects {
     val project = this
-    group = "com.figure.lending"
+    group = "tech.figure.asset"
     version = figureArtifactVersion()
 
     repositories {
         figureNexusMirrorRepository(project)
+        mavenCentral()
     }
 }
 

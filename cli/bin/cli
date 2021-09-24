@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR=$(dirname "$0")
+java -classpath ${DIR}/../build/libs/bcprov-jdk15on-1.68.jar:${DIR}/../build/libs/bcpkix-jdk15on-1.68.jar:${DIR}/../build/libs/cli-1.0-snapshot-all.jar tech.figure.asset.cli.ApplicationKt "$@"
+
+# UberJar/FatJar/OneJar not working due to signing requirement for crypto in bouncycastle
+#java -jar ${DIR}/../build/libs/cli-1.0-snapshot-all.jar "$@"

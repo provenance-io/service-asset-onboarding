@@ -10,5 +10,6 @@ pluginManagement {
                 password = nexusPass ?: System.getenv("NEXUS_PASS")
             }
         }
+        gradlePluginPortal()
     }
 }

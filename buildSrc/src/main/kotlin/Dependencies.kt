@@ -20,10 +20,12 @@ object Versions {
     const val ProvenanceProtobuf = Master
     const val P8eScope = "0.1.0"
     const val StreamData = Master
-    const val WalletPbClient = Master
+    const val FigureUtil = Master
+    const val WalletPbClient = Develop
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
+    const val KotlinXCli = "0.3.3"
     const val Protobuf = "3.16.0"
     const val KrotoPlus = "0.6.1"
     const val JavaAnnotation = "1.3.1"
@@ -32,10 +34,12 @@ object Versions {
     const val KotlinLogging = "2.0.6"
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.2.1"
+    const val Arrow = "0.13.2"
     const val Reactor = "3.4.6"
     const val JunitJupiter = "5.2.0"
     const val Guava = "30.1.1-jre"
     const val Swagger = "1.6.2"
+    const val BouncyCastle = "1.69"
 }
 
 object Plugins { // please keep this sorted in sections
@@ -75,9 +79,17 @@ object Dependencies {
         )
     }
 
+    object KotlinX {
+        val CLI = DependencySpec("org.jetbrains.kotlinx:kotlinx-cli", Versions.KotlinXCli)
+    }
+
     // Spring Boot
     object SpringBoot {
         val Starter = DependencySpec("org.springframework.boot:spring-boot-starter")
+        val StarterWeb = DependencySpec(
+            name = "org.springframework.boot:spring-boot-starter-web",
+            exclude = listOf("org.springframework.boot:spring-boot-starter-tomcat")
+        )
         val StarterWebFlux = DependencySpec(
             name = "org.springframework.boot:spring-boot-starter-webflux",
             exclude = listOf("org.springframework.boot:spring-boot-starter-tomcat")
@@ -87,6 +99,8 @@ object Dependencies {
         val StarterDevTools = DependencySpec("org.springframework.boot:spring-boot-devtools")
         val StarterSecurity = DependencySpec("org.springframework.boot:spring-boot-starter-security")
         val StarterValidation = DependencySpec("org.springframework.boot:spring-boot-starter-validation")
+        val Swagger = DependencySpec(    "io.springfox:springfox-boot-starter", "3.0.0")
+        val SwaggerUI = DependencySpec(    "io.springfox:springfox-swagger-ui", "3.0.0")
 
         val StarterTest =
             DependencySpec(
@@ -96,6 +110,11 @@ object Dependencies {
                     "org.mockito:mockito-core"
                 )
             )
+    }
+
+    // Arrow
+    object Arrow {
+        val Core = DependencySpec("io.arrow-kt:arrow-core", Versions.Arrow)
     }
 
     // Project Reactor
@@ -117,6 +136,10 @@ object Dependencies {
         val Core = DependencySpec("com.squareup.retrofit2:retrofit", Versions.Retrofit)
         val JacksonConverter = DependencySpec("com.squareup.retrofit2:converter-jackson", Versions.Retrofit)
         val ScalarsConverter = DependencySpec("com.squareup.retrofit2:converter-scalars", Versions.Retrofit)
+    }
+
+    object BouncyCastle {
+        val ProvJDK15On = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
     }
 
     object OkHttp {
@@ -142,6 +165,7 @@ object Dependencies {
     }
 
     object Figure {
+        val Util = DependencySpec("com.figure:figure-util", Versions.FigureUtil)
         val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
         object Wallet {
             val PbClient = DependencySpec("com.figure.wallet:pb-client", Versions.WalletPbClient)

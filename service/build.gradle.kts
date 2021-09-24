@@ -1,7 +1,6 @@
 val ktlint: Configuration by configurations.creating
 
 plugins {
-    //Plugins.Detekt.addTo(this)
     Plugins.SpringBoot.addTo(this)
     Plugins.SpringDependencyManagement.addTo(this)
     kotlin("plugin.spring") version Versions.Kotlin
@@ -28,16 +27,23 @@ dependencies {
         Dependencies.Kotlin.CoroutinesReactor,
         Dependencies.SpringBoot.Starter,
         Dependencies.SpringBoot.StarterActuator,
-        Dependencies.SpringBoot.StarterWebFlux,
+        Dependencies.SpringBoot.StarterWeb,
         Dependencies.SpringBoot.StarterJetty,
         Dependencies.SpringBoot.StarterDevTools,
         Dependencies.SpringBoot.StarterSecurity,
         Dependencies.SpringBoot.StarterValidation,
+        Dependencies.SpringBoot.Swagger,
+        Dependencies.SpringBoot.SwaggerUI,
         Dependencies.Swagger.Annotations,
         Dependencies.OkHttp.LoggingInterceptor,
         Dependencies.KotlinLogging,
+        Dependencies.Arrow.Core,
+        Dependencies.P8eScope.Encryption,
+        Dependencies.Provenance.PbcProto,
+        Dependencies.Provenance.Protobuf.PbProtoJava,
         Dependencies.Jackson.KotlinModule,
-        Dependencies.Jackson.Hubspot
+        Dependencies.Jackson.Hubspot,
+        Dependencies.Figure.Util
     ).forEach { dep ->
         dep.implementation(this)
     }
@@ -107,11 +113,3 @@ tasks.register<JavaExec>("ktlintFormat") {
 tasks.bootRun {
     args("--spring.profiles.active=development, local")
 }
-
-
-//detekt {
-//    toolVersion = Versions.Detekt
-//    buildUponDefaultConfig = true
-//    config = files("${rootDir.path}/detekt.yml")
-//    input = files("src/main/kotlin", "src/test/kotlin")
-//}
