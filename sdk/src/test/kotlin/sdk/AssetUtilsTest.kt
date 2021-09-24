@@ -11,6 +11,7 @@ import io.provenance.metadata.v1.PartyType
 import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.ResultStatus
 import io.provenance.scope.encryption.dime.ProvenanceDIME
+import io.provenance.scope.encryption.ecies.ECUtils
 import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
@@ -57,6 +58,13 @@ class AssetUtilsTest {
             timeoutMs = OS_CONFIG_TIMEOUT_MS
         )
     ))
+
+    @Test
+    fun `Generate Keypair`() {
+        val keyPair: KeyPair = ProvenanceKeyGenerator.generateKeyPair()
+        val publicKey = ECUtils.publicKeyEncoded(keyPair.public)
+        println("publicKey=$publicKey")
+    }
 
     @Test
     fun `#encryptAndStore (using random signer) asset can be decrypted to buffer`() {
