@@ -70,7 +70,7 @@ class Application {
 
                     try {
                         hash = assetUtils.encryptAndStore(asset, publicKey).toBase64String()
-                        println("Encrypted and stored asset ${asset.id.value} in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
+                        println("Encrypted and stored asset ${asset.id} in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
                     } catch (t: Throwable) {
                         println("ERROR: Failed to encrypt and store the asset. Reason=${t.message?:t.cause?.message}")
                         System.exit(-1)
