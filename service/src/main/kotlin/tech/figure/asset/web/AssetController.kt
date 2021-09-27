@@ -2,6 +2,7 @@ package tech.figure.asset.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.figure.extensions.uuid.toUUID
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tech.figure.asset.Asset
 import tech.figure.asset.exceptions.MissingPublicKeyException
-import tech.figure.asset.extensions.toUUID
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
@@ -46,8 +46,8 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
-        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = true) xAddress: String
+        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
+        @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
         val scopeId = asset.id
         logger.info("REST request to onboard asset $scopeId")
