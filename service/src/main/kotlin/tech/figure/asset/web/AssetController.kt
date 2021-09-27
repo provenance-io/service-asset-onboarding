@@ -3,18 +3,20 @@ package tech.figure.asset.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.figure.extensions.uuid.toUUID
+import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 import tech.figure.asset.Asset
-import tech.figure.asset.exceptions.MissingPublicKeyException
+import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
-import java.util.UUID
+import java.util.*
 
 data class TxBody(
     val json: ObjectNode,
@@ -25,7 +27,8 @@ data class TxBody(
 @RequestMapping("/api/v1/asset")
 @Api(value = "Assets", tags = ["Assets"], description = "Onboard asset endpoints")
 class AssetController(
-    private val assetOnboardService: AssetOnboardService
+    private val assetOnboardService: AssetOnboardService,
+    private val serviceKeysProperties: ServiceKeysProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
@@ -39,6 +42,7 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
@@ -61,6 +65,7 @@ class AssetController(
     )
     fun storeAssetInEOS(
         @RequestBody asset: Asset,
+        @RequestParam(defaultValue = "true") permissionAssetManager: Boolean,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): String {
@@ -84,22 +89,37 @@ class AssetController(
         return createScopeTx(scopeId, factHash, xAddress)
     }
 
-    private fun storeAsset(asset: Asset, xPublicKey: String, xAddress: String): String {
+    private fun storeAsset(asset: Asset, xPublicKey: String, xAddress: String, permissionAssetManager: Boolean): String {
         val scopeId = asset.id
 
         // get the public key & client PB address from the headers
-        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(BaseEncoding.base64().decode(xPublicKey))
         val address: String = xAddress
 
+        // assemble the list of additional audiences (allow Asset Manager to read data)
+        val additionalAudiences: MutableSet<PublicKey> = mutableSetOf()
+        if (permissionAssetManager) {
+            additionalAudiences.add(
+                ECUtils.convertBytesToPublicKey(
+                    BaseEncoding.base64().decode(serviceKeysProperties.assetManager)
+                )
+            )
+        }
+
         // encrypt and store the asset to the object-store using the provided public key
-        val hash = assetOnboardService.encryptAndStore(asset, publicKey).toBase64String()
+        val hash = assetOnboardService.encryptAndStore(asset, publicKey, additionalAudiences).toBase64String()
         logger.info("Stored asset $scopeId with hash $hash for client $address using key $publicKey")
         return hash
     }
 
-    private fun createScopeTx(scopeId: UUID, factHash: String, xAddress: String) : TxBody {
+    private fun createScopeTx(scopeId: UUID, factHash: String, xAddress: String): TxBody {
         // create the metadata TX message
-        val txBody = assetOnboardService.buildNewScopeMetadataTransaction(xAddress, "AssetRecord", mapOf("Asset" to factHash), scopeId)
+        val txBody = assetOnboardService.buildNewScopeMetadataTransaction(
+            xAddress,
+            "AssetRecord",
+            mapOf("Asset" to factHash),
+            scopeId
+        )
         return TxBody(
             json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
             base64 = txBody.second.toBase64String()
@@ -115,22 +135,12 @@ class AssetController(
     )
     fun getAsset(
         @PathVariable scopeId: UUID,
-        @RequestHeader(name = "x-auth-jwt", required = false) xAuthJWT: String?,
-        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String?
+        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String
     ): String {
         logger.info("REST request to get asset $scopeId")
 
-        val publicKey: PublicKey
-
         // get the public key & client PB address from the headers
-        if (xAuthJWT != null) {
-            // TODO: decode the JWT and extract the public key
-            throw IllegalStateException("JWT authentication unimplemented")
-        } else if (xPublicKey != null) {
-            publicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
-        } else {
-            throw MissingPublicKeyException()
-        }
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
 
         // TODO: locate hash by scope
 
