@@ -42,7 +42,8 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
-        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean,
+        @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
@@ -65,7 +66,8 @@ class AssetController(
     )
     fun storeAssetInEOS(
         @RequestBody asset: Asset,
-        @RequestParam(defaultValue = "true") permissionAssetManager: Boolean,
+        @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): String {
@@ -82,14 +84,48 @@ class AssetController(
     )
     fun submitScope(
         @RequestParam(name = "scope-id", required = true) scopeId: UUID,
-        @RequestParam(name = "fact-has", required = true) factHash: String,
+        @RequestParam(name = "fact-hash", required = true) factHash: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
         logger.info("REST request to create scope for asset $scopeId from hash $factHash")
         return createScopeTx(scopeId, factHash, xAddress)
     }
 
-    private fun storeAsset(asset: Asset, xPublicKey: String, xAddress: String, permissionAssetManager: Boolean): String {
+
+    @CrossOrigin
+    @GetMapping("/{scopeId}")
+    @ApiOperation(value = "Retrieve an asset")
+    @ApiResponse(
+        message = "Returns JSON encoded TX messages for writing scope to Provenance.",
+        code = 200
+    )
+    fun getAsset(
+        @PathVariable scopeId: UUID,
+        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String
+    ): String {
+        logger.info("REST request to get asset $scopeId")
+
+        // get the public key & client PB address from the headers
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
+
+        // TODO: locate hash by scope
+
+        return assetOnboardService.retrieveWithDIME(ByteArray(0) /*TODO*/, publicKey).let { result ->
+            val dime = result.first
+            val encrypted = result.second
+
+            // TODO: return the JSON encoded DIME and the encrypted payload (should we encode the payload in the dime itself? base64?)
+
+            ""
+        }
+    }
+
+    private fun storeAsset(
+        asset: Asset,
+        xPublicKey: String,
+        xAddress: String,
+        permissionAssetManager: Boolean
+    ): String {
         val scopeId = asset.id
 
         // get the public key & client PB address from the headers
@@ -124,34 +160,6 @@ class AssetController(
             json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
             base64 = txBody.second.toBase64String()
         )
-    }
-
-    @CrossOrigin
-    @GetMapping("/{scopeId}")
-    @ApiOperation(value = "Retrieve an asset")
-    @ApiResponse(
-        message = "Returns JSON encoded TX messages for writing scope to Provenance.",
-        code = 200
-    )
-    fun getAsset(
-        @PathVariable scopeId: UUID,
-        @RequestHeader(name = "x-public-key", required = true) xPublicKey: String
-    ): String {
-        logger.info("REST request to get asset $scopeId")
-
-        // get the public key & client PB address from the headers
-        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(ECUtils.decodeString(xPublicKey))
-
-        // TODO: locate hash by scope
-
-        return assetOnboardService.retrieveWithDIME(ByteArray(0) /*TODO*/, publicKey).let { result ->
-            val dime = result.first
-            val encrypted = result.second
-
-            // TODO: return the JSON encoded DIME and the encrypted payload (should we encode the payload in the dime itself? base64?)
-
-            ""
-        }
     }
 
 }

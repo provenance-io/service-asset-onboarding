@@ -1,14 +1,10 @@
 package tech.figure.asset
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.google.protobuf.Any
-import com.hubspot.jackson.datatype.protobuf.ProtobufModule
-import io.envoyproxy.pgv.ReflectiveValidatorIndex
-import io.envoyproxy.pgv.ValidatorIndex
+//import io.envoyproxy.pgv.ReflectiveValidatorIndex
+//import io.envoyproxy.pgv.ValidatorIndex
 import org.junit.jupiter.api.Test
-import tech.figure.asset.extensions.anyModule
-import tech.figure.asset.extensions.configureFigureTech
 import tech.figure.asset.extensions.toJsonString
 import tech.figure.asset.extensions.writeFile
 import tech.figure.asset.loan.*
@@ -82,9 +78,8 @@ class ProtoTest {
         }
     }
 
-//    @Test
+    @Test
     fun test() {
-
 
         val loan = Loan {
             id = randomUuid()
@@ -125,16 +120,12 @@ class ProtoTest {
         }
 
         println("Checking loan validation....")
-        val index: ValidatorIndex = ReflectiveValidatorIndex()
-        index.validatorFor<Loan>(loan.javaClass).assertValid(loan)
-        println("Done with loan validation.")
+//        val index: ValidatorIndex = ReflectiveValidatorIndex()
+//        index.validatorFor<Loan>(loan.javaClass).assertValid(loan)
+//        println("Done with loan validation.")
 
 
     }
 }
 
 fun randomUuid() = UUID.randomUUID().toString()
-
-class MyModule : ProtobufModule() {
-
-}
