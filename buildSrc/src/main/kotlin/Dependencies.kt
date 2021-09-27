@@ -199,6 +199,7 @@ object Dependencies {
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", "1.8.0.1")
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", "3.0.1")
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker:1.7.1")
+    val Fuel = DependencySpec(     "com.github.kittinunf.fuel:fuel:2.0.1" )
 
     object Jupiter {
         val JupiterApi = DependencySpec("org.junit.jupiter:junit-jupiter-api", Versions.JunitJupiter)
