@@ -50,7 +50,7 @@ class AssetController(
         logger.info("REST request to onboard asset $scopeId")
 
         // store in EOS
-        val hash = storeAsset(asset, xPublicKey, xAddress)
+        val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
         // create the metadata TX message
         return createScopeTx(scopeId, hash, xAddress)
@@ -70,7 +70,7 @@ class AssetController(
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): String {
         logger.info("REST request to store asset in EOS $asset.id")
-        return storeAsset(asset, xPublicKey, xAddress)
+        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
     }
 
     @CrossOrigin
