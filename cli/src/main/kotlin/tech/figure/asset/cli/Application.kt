@@ -13,10 +13,12 @@ import tech.figure.asset.Asset
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
+import tech.figure.asset.sdk.SpecificationConfig
 import tech.figure.asset.sdk.extensions.toBase64String
 import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.util.*
 
 class Application {
 
@@ -26,6 +28,9 @@ class Application {
 
         const val DefaultObjectStoreURL = "grpc://localhost:8081"
         const val DefaultObjectStoreTimeout = 30000
+
+        const val DefaultContractSpecId = "18573cf8-ddb9-491e-a4cb-bf2176160a63"
+        const val DefaultScopeSpecId = "997e8228-c37f-4668-9a66-6cfb3b2a23cd"
 
         // tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc
         const val DefaultKeyMnemonic = "jealous bright oyster fluid guide talent crystal minor modify broken stove spoon pen thank action smart enemy chunk ladder soon focus recall elite pulp"
@@ -49,6 +54,7 @@ class Application {
             shouldExecute = true
         }
 
+        @ExperimentalStdlibApi
         fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
             val rawLog = `raw-log`
             val publicKey = ECUtils.convertBytesToPublicKey(key.publicKey().toByteArray())
@@ -63,6 +69,7 @@ class Application {
 
                 // encrypt and store the asset in the object-store
                 var hash = ""
+                var scopeId = ""
                 try {
                     val assetBuilder = Asset.newBuilder()
                     JsonFormat.parser().merge(String(assetBytes, StandardCharsets.UTF_8), assetBuilder)
@@ -70,7 +77,8 @@ class Application {
 
                     try {
                         hash = assetUtils.encryptAndStore(asset, publicKey).toBase64String()
-                        println("Encrypted and stored asset ${asset.id} in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
+                        scopeId = asset.id
+                        println("Encrypted and stored asset $scopeId in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
                     } catch (t: Throwable) {
                         println("ERROR: Failed to encrypt and store the asset. Reason=${t.message?:t.cause?.message}")
                         System.exit(-1)
@@ -81,7 +89,7 @@ class Application {
                 }
 
                 // generate the Provenance metadata TX message for this asset scope
-                assetUtils.buildNewScopeMetadataTransaction(address, "Record", mapOf("Asset" to hash)).let {
+                assetUtils.buildNewScopeMetadataTransaction(UUID.fromString(scopeId), hash, address).let {
                     val scopeId = it.first
                     val txBody = it.second
 
@@ -114,6 +122,48 @@ class Application {
 
     }
 
+    class WriteSpecs : Subcommand("write-specs", "Write the specifications to the blockchain") {
+
+        companion object {
+            var shouldExecute: Boolean = false
+        }
+
+        val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
+
+        override fun execute() {
+            shouldExecute = true
+        }
+
+        fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
+            val rawLog = `raw-log`
+            val address = key.address().getValue()
+
+            assetUtils.buildAssetSpecificationMetadataTransaction(address).let { txBody ->
+                val baseReq = pbClient.baseRequest(
+                    key = key,
+                    txBody = txBody
+                )
+
+                // simulate the TX
+                val gasEstimate = pbClient.estimateTx(baseReq)
+
+                // broadcast the TX
+                println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                    it.txResponse.apply {
+                        println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                        if(rawLog) {
+                            println("LOG $rawLog")
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    @ExperimentalStdlibApi
     fun main(args: Array<String>) {
         val parser = ArgParser("${Application.appName} [${Application.version}]")
 
@@ -123,6 +173,10 @@ class Application {
         // object store settings
         val `object-store-url` by parser.option(ArgType.String, shortName = "o", description = "Object Store URL").default(Application.DefaultObjectStoreURL)
         val `object-store-timeout` by parser.option(ArgType.Int, shortName = "m", description = "Object Store Timeout (ms)").default(Application.DefaultObjectStoreTimeout)
+
+        // asset specification settings
+        val `contract-spec-id` by parser.option(ArgType.String, shortName = "cs", description = "Contract Specification Id").default(Application.DefaultContractSpecId)
+        val `scope-spec-id` by parser.option(ArgType.String, shortName = "ss", description = "Scope Specification Id").default(Application.DefaultScopeSpecId)
 
         // client key settings
         val `key-mnemonic` by parser.option(ArgType.String, shortName = "k", description = "Key Mnemonic").default(Application.DefaultKeyMnemonic)
@@ -135,8 +189,10 @@ class Application {
 
         // commands
         val onboard = Onboard()
+        val writeSpecs = WriteSpecs()
         parser.subcommands(
-            onboard
+            onboard,
+            writeSpecs
         )
 
         // parse the arguments
@@ -149,6 +205,9 @@ class Application {
         val objectStoreUrl = `object-store-url`
         val objectStoreTimeout = `object-store-timeout`.toLong()
 
+        val contractSpecId = `contract-spec-id`
+        val scopeSpecId = `scope-spec-id`
+
         val keyMnemonic = `key-mnemonic`
         val keyRingIndex = `keyring-index`
         val keyIndex = `key-index`
@@ -160,8 +219,12 @@ class Application {
             AssetUtilsConfig(
                 osConfig = ObjectStoreConfig(
                     url = objectStoreUrl,
-                    timeoutMs = objectStoreTimeout
-                )
+                    timeoutMs = objectStoreTimeout,
+                ),
+                specConfig = SpecificationConfig(
+                    contractSpecId = UUID.fromString(contractSpecId),
+                    scopeSpecId = UUID.fromString(scopeSpecId),
+                ),
             )
         )
 
@@ -183,10 +246,14 @@ class Application {
         if (Onboard.shouldExecute) {
             onboard.run(assetUtils, pbClient, key)
         }
+        else if (WriteSpecs.shouldExecute) {
+            writeSpecs.run(assetUtils, pbClient, key)
+        }
     }
 
 }
 
+@ExperimentalStdlibApi
 fun main(args: Array<String>) {
     Application().main(args)
 }

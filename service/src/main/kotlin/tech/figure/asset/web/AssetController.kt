@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
+import io.provenance.scope.encryption.util.getAddress
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -12,6 +13,7 @@ import io.swagger.annotations.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 import tech.figure.asset.Asset
+import tech.figure.asset.config.ProvenanceProperties
 import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.services.AssetOnboardService
@@ -28,11 +30,13 @@ data class TxBody(
 @Api(value = "Assets", tags = ["Assets"], description = "Onboard asset endpoints")
 class AssetController(
     private val assetOnboardService: AssetOnboardService,
+    private val provenanceProperties: ProvenanceProperties,
     private val serviceKeysProperties: ServiceKeysProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
 
+    @ExperimentalStdlibApi
     @CrossOrigin
     @PostMapping
     @ApiOperation(value = "Onboard an asset (Store asset in EOS and build scope for blockchain submission.)")
@@ -54,7 +58,7 @@ class AssetController(
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress)
+        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
     }
 
     @CrossOrigin
@@ -75,6 +79,7 @@ class AssetController(
         return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
     }
 
+    @ExperimentalStdlibApi
     @CrossOrigin
     @PostMapping("/scope")
     @ApiOperation(value = "Create Metadata (scope) transaction for submission to blockchain")
@@ -85,10 +90,11 @@ class AssetController(
     fun submitScope(
         @RequestParam(name = "scope-id", required = true) scopeId: UUID,
         @RequestParam(name = "fact-hash", required = true) factHash: String,
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
         logger.info("REST request to create scope for asset $scopeId from hash $factHash")
-        return createScopeTx(scopeId, factHash, xAddress)
+        return createScopeTx(scopeId, factHash, xAddress, permissionAssetManager)
     }
 
 
@@ -124,7 +130,7 @@ class AssetController(
         asset: Asset,
         xPublicKey: String,
         xAddress: String,
-        permissionAssetManager: Boolean
+        permissionAssetManager: Boolean,
     ): String {
         val scopeId = asset.id
 
@@ -148,14 +154,31 @@ class AssetController(
         return hash
     }
 
-    private fun createScopeTx(scopeId: UUID, factHash: String, xAddress: String): TxBody {
+    @ExperimentalStdlibApi
+    private fun createScopeTx(
+        scopeId: UUID,
+        factHash: String,
+        xAddress: String,
+        permissionAssetManager: Boolean,
+    ): TxBody {
+        // assemble the list of additional audiences (allow Asset Manager to read data)
+        val additionalAudiences: MutableSet<String> = mutableSetOf()
+        if (permissionAssetManager) {
+            additionalAudiences.add(
+                ECUtils.convertBytesToPublicKey(
+                    BaseEncoding.base64().decode(serviceKeysProperties.assetManager)
+                ).getAddress(provenanceProperties.isMainnet)
+            )
+        }
+
         // create the metadata TX message
         val txBody = assetOnboardService.buildNewScopeMetadataTransaction(
+            scopeId,
+            factHash,
             xAddress,
-            "AssetRecord",
-            mapOf("Asset" to factHash),
-            scopeId
+            additionalAudiences,
         )
+
         return TxBody(
             json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
             base64 = txBody.second.toBase64String()
