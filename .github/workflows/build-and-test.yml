@@ -58,7 +58,7 @@ jobs:
       #  run: ./gradlew test --no-daemon
 
       - name: Gradle Publish
-        if: ${{ github.head_ref != 'master' && github.head_ref != 'main' && github.head_ref != 'develop' }}
+        if: ${{ env.BRANCH == 'develop' || env.BRANCH == 'main' }}
         run: ./gradlew publish -PartifactVersion=$DOCKER_BUILD_TAG
 
       - name: Build Image
