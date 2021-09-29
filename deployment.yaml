@@ -42,8 +42,14 @@ spec:
           enabled: true
         configMap:
           test:
-            ASSET_MANAGER_PUBLIC_KEY: ""
+            PROVENANCE_IS_MAINNET: "false"
+            ASSET_CONTRACT_SPEC_ID: "f97ecc5d-c580-478d-be02-6c1b0c32235f"
+            ASSET_SCOPE_SPEC_ID: "551b5eca-921d-4ba7-aded-3966b224f44b"
+            ASSET_MANAGER_PUBLIC_KEY: "BDSR5zvFFuLOMgqRH7MhPmpZzz3KlZL0oVQgbIuD4TCbhHUB2MgETo99sRm7xGJWIWGbBgcilc63mD0zxI6zUCo="
           prod:
+            PROVENANCE_IS_MAINNET: "true"
+            ASSET_CONTRACT_SPEC_ID: ""
+            ASSET_SCOPE_SPEC_ID: ""
             ASSET_MANAGER_PUBLIC_KEY: ""
         readinessProbe:
           path: /service-asset-onboarding/manage/health

@@ -24,6 +24,25 @@ These tools are known to work. You can use others if you wish, but YMMV.
 - Kotlin 1.5.0
 - IntelliJ 2021.x or newer
 
+## TestNet Setup
+
+Build the SDK and CLI app:
+```shell
+$ ./gradlew build -x test
+```
+
+Ensure that the asset onboarding service account has sufficient hash to write the specifications to the blockchain (`250,000,000nhash` should be sufficient).
+
+Write the contract/scope/record specifications to the blockchain:
+```shell
+$ ./cli/bin/cli write-specs \
+    --contract-spec-id ${ASSET_CONTRACT_SPEC_ID} \
+    --scope-spec-id ${ASSET_SCOPE_SPEC_ID} \
+    --key-mnemonic "${ASSET_ONBOARDING_SERVICE_TESTNET_BIP39_KEY_MNEMONIC}" \
+    --chain-id pio-testnet-1 \
+    --node https://XXX.XXX.XXX.XXX:9090
+```
+
 ## Setup
 
 Anyone wanting to onboard assets to Provenance will need a keypair and Provenance account. Generate one and remember it:

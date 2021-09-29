@@ -1,7 +1,6 @@
 {
-  "id": {
-    "value": "bd4595e4-821d-483c-8f64-419bde4aceaa"
-  },
-  "type": "HELOC",
-  "name": "Figure HELOC"
+  "id": "bd4595e4-821d-483c-8f64-419bde4aceaa",
+  "type": "LOAN",
+  "description": "PERSONAL_LOAN LOAN-1234",
+  "kv": {}
 }

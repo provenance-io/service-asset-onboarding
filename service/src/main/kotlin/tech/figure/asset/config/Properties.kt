@@ -14,6 +14,25 @@ class ObjectStoreProperties : LoggableProperties() {
 
 }
 
+@ConfigurationProperties(prefix = "provenance")
+class ProvenanceProperties : LoggableProperties() {
+
+    @NotNull
+    var isMainnet: Boolean = false
+
+}
+
+@ConfigurationProperties(prefix = "asset-spec")
+class AssetSpecificationProperties : LoggableProperties() {
+
+    @NotNull
+    lateinit var contractSpecId: String
+
+    @NotNull
+    lateinit var scopeSpecId: String
+
+}
+
 @ConfigurationProperties(prefix = "docket")
 class DocketProperties : LoggableProperties() {
 

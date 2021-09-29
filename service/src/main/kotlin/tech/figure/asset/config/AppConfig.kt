@@ -26,6 +26,8 @@ import java.lang.management.ManagementFactory
 @EnableConfigurationProperties(
     value = [
         ObjectStoreProperties::class,
+        ProvenanceProperties::class,
+        AssetSpecificationProperties::class,
         DocketProperties::class,
         ServiceKeysProperties::class
     ]
@@ -34,6 +36,8 @@ import java.lang.management.ManagementFactory
 class AppConfig(
     buildProperties: BuildProperties,
     objectStoreProperties: ObjectStoreProperties,
+    provenanceProperties: ProvenanceProperties,
+    assetSpecificationProperties: AssetSpecificationProperties,
     docketProperties: DocketProperties,
     serviceKeysProperties: ServiceKeysProperties
 ) {
@@ -46,6 +50,8 @@ class AppConfig(
         }
 
         logger.info(objectStoreProperties.toLogMessages())
+        logger.info(provenanceProperties.toLogMessages())
+        logger.info(assetSpecificationProperties.toLogMessages())
         logger.info(docketProperties.toLogMessages())
         logger.info(serviceKeysProperties.toLogMessages())
 
@@ -59,7 +65,10 @@ class AppConfig(
     fun mapper(): ObjectMapper = OBJECT_MAPPER
 
     @Bean
-    fun assetOnboardService(objectStoreProperties: ObjectStoreProperties) = AssetOnboardService(objectStoreProperties)
+    fun assetOnboardService(
+        objectStoreProperties: ObjectStoreProperties,
+        assetSpecificationProperties: AssetSpecificationProperties,
+    ) = AssetOnboardService(objectStoreProperties, assetSpecificationProperties)
 
     @Bean
     fun api(docketProperties: DocketProperties): Docket {
@@ -76,7 +85,6 @@ class AppConfig(
             "",
             listOf()
         )
-
 
         return Docket(DocumentationType.OAS_30)
             .apiInfo(apiInfo)
