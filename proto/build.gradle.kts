@@ -1,7 +1,8 @@
 import com.google.protobuf.gradle.*
 
 plugins {
-    id("java")
+    `java-library`
+    `maven-publish`
     Plugins.Protobuf.addTo(this)
     Plugins.Kroto.addTo(this)
 }
@@ -58,6 +59,21 @@ protobuf {
                     option("lang=java")
                 }
             }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        figureNexusFigureRepository(project)
+    }
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = project.group.toString()
+            artifactId = project.name.toString()
+            version = project.version.toString()
+
+            from(components["java"])
         }
     }
 }

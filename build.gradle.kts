@@ -1,8 +1,7 @@
-import kotlin.math.max
-
 plugins {
     kotlin("jvm") version Versions.Kotlin apply false
     id("java")
+    `maven-publish`
 }
 
 allprojects {
@@ -21,6 +20,7 @@ subprojects {
         Plugins.Kotlin.addTo(this)
         Plugins.Idea.addTo(this)
         plugin("java")
+        plugin("maven-publish")
     }
 
     repositories {
@@ -46,4 +46,10 @@ subprojects {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    repositories {
+        figureNexusFigureRepository(project)
+    }
 }

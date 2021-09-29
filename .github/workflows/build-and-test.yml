@@ -57,6 +57,10 @@ jobs:
       #- name: Gradle Unit & Functional Tests
       #  run: ./gradlew test --no-daemon
 
+      - name: Gradle Publish
+        if: ${{ github.head_ref != 'master' && github.head_ref != 'main' && github.head_ref != 'develop' }}
+        run: ./gradlew publish -PartifactVersion=$DOCKER_BUILD_TAG
+
       - name: Build Image
         uses: ./shared-actions/docker-image-action
         with:
