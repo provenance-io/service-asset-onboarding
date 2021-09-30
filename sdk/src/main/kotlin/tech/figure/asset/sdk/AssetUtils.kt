@@ -207,12 +207,14 @@ class AssetUtils (
                 address = owner
                 role = PartyType.PARTY_TYPE_OWNER
             }.build())
+            /*
             addAll(additionalAudiences.map {
                 Party.newBuilder().apply {
                     address = it
                     role = PartyType.PARTY_TYPE_UNSPECIFIED
                 }.build()
             })
+             */
         }
 
         // Build TX message body
@@ -220,9 +222,12 @@ class AssetUtils (
 
             // write-scope
             MsgWriteScopeRequest.newBuilder().apply {
+                scopeUuid = scopeId.toString()
+                specUuid = config.specConfig.scopeSpecId.toString()
                 scopeBuilder
                     .setScopeId(MetadataAddress.forScope(scopeId).bytes.toByteString())
                     .setSpecificationId(MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId).bytes.toByteString())
+                    .setValueOwnerAddress(owner)
                     .addAllOwners(listOf(
                         Party.newBuilder().apply {
                             address = owner
@@ -248,6 +253,7 @@ class AssetUtils (
 
             // write-record
             MsgWriteRecordRequest.newBuilder().apply {
+                contractSpecUuid = config.specConfig.contractSpecId.toString()
                 recordBuilder
                     .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
                     .setSpecificationId(MetadataAddress.forRecordSpecification(config.specConfig.contractSpecId, RecordSpecName).bytes.toByteString())
