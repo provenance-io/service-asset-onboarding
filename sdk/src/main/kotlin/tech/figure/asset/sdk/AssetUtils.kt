@@ -191,7 +191,7 @@ class AssetUtils (
 
     // Builds the Provenance metadata transaction for writing a new scope to the chain
     @ExperimentalStdlibApi
-    fun buildNewScopeMetadataTransaction(scopeId: UUID, scopeHash: String, owner: String, additionalAudiences: Set<String> = emptySet()): Pair<UUID, TxOuterClass.TxBody> {
+    fun buildNewScopeMetadataTransaction(scopeId: UUID, scopeHash: String, owner: String, additionalAudiences: Set<String> = emptySet()): TxOuterClass.TxBody {
         // Generate a session identifier
         val sessionId: UUID = UUID.randomUUID()
 
@@ -216,7 +216,7 @@ class AssetUtils (
         }
 
         // Build TX message body
-        return Pair(scopeId, listOf(
+        return listOf(
 
             // write-scope
             MsgWriteScopeRequest.newBuilder().apply {
@@ -280,7 +280,7 @@ class AssetUtils (
                         .setHash(RecordProcessHash)
             }.addAllSigners(listOf(owner)).build().toAny(),
 
-        ).toTxBody())
+        ).toTxBody()
     }
 
     // TODO: Can we query using the PB client without the private key? If so, let's provide some helpers for looking up

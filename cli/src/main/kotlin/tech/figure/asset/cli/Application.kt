@@ -89,10 +89,7 @@ class Application {
                 }
 
                 // generate the Provenance metadata TX message for this asset scope
-                assetUtils.buildNewScopeMetadataTransaction(UUID.fromString(scopeId), hash, address).let {
-                    val scopeId = it.first
-                    val txBody = it.second
-
+                assetUtils.buildNewScopeMetadataTransaction(UUID.fromString(scopeId), hash, address).let { txBody ->
                     println("Created new scope $scopeId")
 
                     val baseReq = pbClient.baseRequest(
