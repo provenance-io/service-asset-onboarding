@@ -1,6 +1,7 @@
 package tech.figure.asset.services
 
 import com.google.protobuf.Message
+import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
 import tech.figure.asset.Asset
 import tech.figure.asset.config.AssetSpecificationProperties
@@ -9,7 +10,6 @@ import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
 import tech.figure.asset.sdk.SpecificationConfig
-import tech.figure.asset.sdk.extensions.toJson
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
@@ -78,9 +78,6 @@ class AssetOnboardService(
         hash: String,
         owner: String,
         additionalAudiences: Set<String> = emptySet(),
-    ): Pair<String, ByteArray> {
-        val txBody = assetUtils.buildNewScopeMetadataTransaction(scopeId, hash, owner, additionalAudiences).second
-        return Pair(txBody.toJson(), txBody.toByteArray())
-    }
+    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(scopeId, hash, owner, additionalAudiences)
 
 }

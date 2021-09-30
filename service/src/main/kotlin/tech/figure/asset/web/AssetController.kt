@@ -16,13 +16,14 @@ import tech.figure.asset.Asset
 import tech.figure.asset.config.ProvenanceProperties
 import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
+import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
 import java.util.*
 
 data class TxBody(
     val json: ObjectNode,
-    val base64: String
+    val base64: List<String>
 )
 
 @RestController
@@ -180,8 +181,8 @@ class AssetController(
         )
 
         return TxBody(
-            json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
-            base64 = txBody.second.toBase64String()
+            json = ObjectMapper().readValue(txBody.toJson(), ObjectNode::class.java),
+            base64 = txBody.messagesList.map { it.toByteArray().toBase64String() }
         )
     }
 
