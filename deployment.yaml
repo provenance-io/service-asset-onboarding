@@ -26,12 +26,6 @@ spec:
               preserve_host: true
             jwt:
               enabled: false
-            plugins:
-              - plugin: ip-restriction
-                config:
-                  test:
-                    whitelist:
-                      - FIGURE
       deployment:
         business_unit: figure-tech
         business_product: asset-onboarding
