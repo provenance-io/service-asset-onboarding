@@ -20,6 +20,7 @@ import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
 import java.security.PublicKey
 import java.util.*
+import javax.servlet.http.HttpServletResponse
 
 data class TxBody(
     val json: ObjectNode,
@@ -38,7 +39,7 @@ class AssetController(
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
 
     @ExperimentalStdlibApi
-    @CrossOrigin
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
     @PostMapping
     @ApiOperation(value = "Onboard an asset (Store asset in EOS and build scope for blockchain submission.)")
     @ApiResponse(
@@ -50,7 +51,8 @@ class AssetController(
         @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
     ): TxBody {
         val scopeId = asset.id.toUUID()
         logger.info("REST request to onboard asset $scopeId")
@@ -58,11 +60,15 @@ class AssetController(
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
+        // set the response headers
+        response.addHeader("x-asset-id", scopeId.toString())
+        response.addHeader("x-asset-hash", hash)
+
         // create the metadata TX message
         return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
     }
 
-    @CrossOrigin
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
     @PostMapping("/eos")
     @ApiOperation(value = "Store asset in EOS and return asset hash")
     @ApiResponse(
@@ -74,10 +80,15 @@ class AssetController(
         @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
     ): String {
         logger.info("REST request to store asset in EOS $asset.id")
-        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
+        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager).also {
+            // set the response headers
+            response.addHeader("x-asset-id", asset.id)
+            response.addHeader("x-asset-hash", it)
+        }
     }
 
     @ExperimentalStdlibApi
