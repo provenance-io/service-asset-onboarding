@@ -29,7 +29,7 @@ services:
       - 8081:8081
 
   provenance:
-    image: provenanceio/provenance:v1.5.0
+    image: provenanceio/provenance:v1.7.3
     container_name: provenance
     command: bash -c "cp -rn /home/provenance_seed/* /home/provenance && /usr/bin/provenanced -t --home /home/provenance start"
     ports:
