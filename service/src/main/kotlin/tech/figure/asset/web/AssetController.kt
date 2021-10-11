@@ -60,18 +60,18 @@ class AssetController(
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        val scopeId = asset.id.toUUID()
-        logger.info("REST request to onboard asset $scopeId")
+        val assetId = asset.id.toUUID()
+        logger.info("REST request to onboard asset $assetId")
 
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
         // set the response headers
-        response.addHeader("x-asset-id", scopeId.toString())
+        response.addHeader("x-asset-id", assetId.toString())
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
+        return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
     }
 
     @ExperimentalStdlibApi
@@ -84,19 +84,18 @@ class AssetController(
         code = 200
     )
     fun onboardFileNFT(
-        @RequestBody file: MultipartFile,
+        @RequestParam file: MultipartFile,
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        val scopeId = UUID.randomUUID()
-        logger.info("REST request to onboard a file as an asset. Using id:$scopeId file:${file.originalFilename} content-type:${file.contentType}")
+        val assetId = UUID.randomUUID()
+        logger.info("REST request to onboard a file as an asset. Using id:$assetId file:${file.originalFilename} content-type:${file.contentType}")
 
-        logger.info("bytes: ${file.bytes}")
         val asset = Asset {
-            id = scopeId.toString()
+            id = assetId.toString()
             type = FileNFT.ASSET_TYPE
             description = file.name
             putKv(FileNFT.KEY_FILENAME, (file.originalFilename ?: file.name).toProtoAny())
@@ -110,8 +109,12 @@ class AssetController(
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
+        // set the response headers
+        response.addHeader("x-asset-id", assetId.toString())
+        response.addHeader("x-asset-hash", hash)
+
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
+        return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
     }
 
     @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
