@@ -1,27 +1,34 @@
 package tech.figure.asset.services
 
 import com.google.protobuf.Message
+import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
 import tech.figure.asset.Asset
+import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
-import tech.figure.asset.sdk.extensions.toJson
+import tech.figure.asset.sdk.SpecificationConfig
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.util.UUID
 
 class AssetOnboardService(
-    private val objectStoreProperties: ObjectStoreProperties
+    private val objectStoreProperties: ObjectStoreProperties,
+    private val assetSpecificationProperties: AssetSpecificationProperties,
 ) {
 
     val assetUtils: AssetUtils = AssetUtils(
         AssetUtilsConfig(
             osConfig = ObjectStoreConfig(
                 url = objectStoreProperties.url,
-                timeoutMs = objectStoreProperties.timeoutMs
-            )
+                timeoutMs = objectStoreProperties.timeoutMs,
+            ),
+            specConfig = SpecificationConfig(
+                contractSpecId = UUID.fromString(assetSpecificationProperties.contractSpecId),
+                scopeSpecId = UUID.fromString(assetSpecificationProperties.scopeSpecId),
+            ),
         )
     )
 
@@ -65,14 +72,12 @@ class AssetOnboardService(
     ): T = assetUtils.retrieveAndDecrypt<T>(hash, publicKey, privateKey)
 
     // Create a metadata TX message for a new scope onboard
+    @ExperimentalStdlibApi
     fun buildNewScopeMetadataTransaction(
+        scopeId: UUID,
+        hash: String,
         owner: String,
-        recordName: String,
-        scopeInputs: Map<String, String>,
-        scopeId: UUID
-    ): Pair<String, ByteArray> {
-        val txBody = assetUtils.buildNewScopeMetadataTransaction(owner, recordName, scopeInputs, scopeId).second
-        return Pair(txBody.toJson(), txBody.toByteArray())
-    }
+        additionalAudiences: Set<String> = emptySet(),
+    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(scopeId, hash, owner, additionalAudiences)
 
 }

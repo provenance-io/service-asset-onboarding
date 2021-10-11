@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
+import io.provenance.scope.encryption.util.getAddress
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -15,19 +16,20 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import tech.figure.asset.Asset
 import tech.figure.asset.AssetOuterClassBuilders.Asset
+import tech.figure.asset.config.ProvenanceProperties
 import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
+import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
 import java.security.PublicKey
 import java.util.*
-import kotlin.math.log
-
+import javax.servlet.http.HttpServletResponse
 
 data class TxBody(
     val json: ObjectNode,
-    val base64: String
+    val base64: List<String>
 )
 
 
@@ -36,13 +38,14 @@ data class TxBody(
 @Api(value = "Assets", tags = ["Assets"], description = "Onboard asset endpoints")
 class AssetController(
     private val assetOnboardService: AssetOnboardService,
+    private val provenanceProperties: ProvenanceProperties,
     private val serviceKeysProperties: ServiceKeysProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AssetController::class.java)
 
-
-    @CrossOrigin
+    @ExperimentalStdlibApi
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
     @PostMapping
     @ApiOperation(value = "Onboard an asset (Store asset in EOS and build scope for blockchain submission.)")
     @ApiResponse(
@@ -54,7 +57,8 @@ class AssetController(
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
     ): TxBody {
         val scopeId = asset.id.toUUID()
         logger.info("REST request to onboard asset $scopeId")
@@ -62,11 +66,16 @@ class AssetController(
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
+        // set the response headers
+        response.addHeader("x-asset-id", scopeId.toString())
+        response.addHeader("x-asset-hash", hash)
+
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress)
+        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
     }
 
-    @CrossOrigin
+    @ExperimentalStdlibApi
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
     @PostMapping(value=["/file"],
         consumes = [MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
     @ApiOperation(value = "Create an Asset/NFT from a file")
@@ -79,7 +88,8 @@ class AssetController(
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
     ): TxBody {
         val scopeId = UUID.randomUUID()
         logger.info("REST request to onboard a file as an asset. Using id:$scopeId file:${file.originalFilename} content-type:${file.contentType}")
@@ -101,10 +111,10 @@ class AssetController(
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress)
+        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
     }
 
-    @CrossOrigin
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
     @PostMapping("/eos")
     @ApiOperation(value = "Store asset in EOS and return asset hash")
     @ApiResponse(
@@ -116,12 +126,18 @@ class AssetController(
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
     ): String {
         logger.info("REST request to store asset in EOS $asset.id")
-        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
+        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager).also {
+            // set the response headers
+            response.addHeader("x-asset-id", asset.id)
+            response.addHeader("x-asset-hash", it)
+        }
     }
 
+    @ExperimentalStdlibApi
     @CrossOrigin
     @PostMapping("/scope")
     @ApiOperation(value = "Create Metadata (scope) transaction for submission to blockchain")
@@ -132,10 +148,11 @@ class AssetController(
     fun submitScope(
         @RequestParam(name = "scope-id", required = true) scopeId: UUID,
         @RequestParam(name = "fact-hash", required = true) factHash: String,
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-address", required = false) xAddress: String
     ): TxBody {
         logger.info("REST request to create scope for asset $scopeId from hash $factHash")
-        return createScopeTx(scopeId, factHash, xAddress)
+        return createScopeTx(scopeId, factHash, xAddress, permissionAssetManager)
     }
 
 
@@ -171,7 +188,7 @@ class AssetController(
         asset: Asset,
         xPublicKey: String,
         xAddress: String,
-        permissionAssetManager: Boolean
+        permissionAssetManager: Boolean,
     ): String {
         val scopeId = asset.id
 
@@ -195,17 +212,34 @@ class AssetController(
         return hash
     }
 
-    private fun createScopeTx(scopeId: UUID, factHash: String, xAddress: String): TxBody {
+    @ExperimentalStdlibApi
+    private fun createScopeTx(
+        scopeId: UUID,
+        factHash: String,
+        xAddress: String,
+        permissionAssetManager: Boolean,
+    ): TxBody {
+        // assemble the list of additional audiences (allow Asset Manager to read data)
+        val additionalAudiences: MutableSet<String> = mutableSetOf()
+        if (permissionAssetManager) {
+            additionalAudiences.add(
+                ECUtils.convertBytesToPublicKey(
+                    BaseEncoding.base64().decode(serviceKeysProperties.assetManager)
+                ).getAddress(provenanceProperties.isMainnet)
+            )
+        }
+
         // create the metadata TX message
         val txBody = assetOnboardService.buildNewScopeMetadataTransaction(
+            scopeId,
+            factHash,
             xAddress,
-            "AssetRecord",
-            mapOf("Asset" to factHash),
-            scopeId
+            additionalAudiences,
         )
+
         return TxBody(
-            json = ObjectMapper().readValue(txBody.first, ObjectNode::class.java),
-            base64 = txBody.second.toBase64String()
+            json = ObjectMapper().readValue(txBody.toJson(), ObjectNode::class.java),
+            base64 = txBody.messagesList.map { it.toByteArray().toBase64String() }
         )
     }
 

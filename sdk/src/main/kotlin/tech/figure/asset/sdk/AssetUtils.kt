@@ -2,11 +2,8 @@ package tech.figure.asset.sdk
 
 import com.figure.wallet.pbclient.extension.toAny
 import com.figure.wallet.pbclient.extension.toTxBody
-import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
-import io.provenance.metadata.v1.AuditFields
-import io.provenance.metadata.v1.ContractSpecification
 import io.provenance.metadata.v1.DefinitionType
 import io.provenance.metadata.v1.InputSpecification
 import io.provenance.metadata.v1.MsgWriteContractSpecificationRequest
@@ -17,17 +14,10 @@ import io.provenance.metadata.v1.MsgWriteScopeSpecificationRequest
 import io.provenance.metadata.v1.MsgWriteSessionRequest
 import io.provenance.metadata.v1.Party
 import io.provenance.metadata.v1.PartyType
-import io.provenance.metadata.v1.Process
-import io.provenance.metadata.v1.Record
 import io.provenance.metadata.v1.RecordInput
 import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.RecordOutput
-import io.provenance.metadata.v1.RecordSpecification
 import io.provenance.metadata.v1.ResultStatus
-import io.provenance.metadata.v1.Scope
-import io.provenance.metadata.v1.ScopeSpecification
-import io.provenance.metadata.v1.Session
-import io.provenance.metadata.v1.SessionIdComponents
 import io.provenance.objectstore.proto.Objects
 import io.provenance.scope.objectstore.client.OsClient
 import io.provenance.scope.encryption.crypto.Pen
@@ -36,6 +26,7 @@ import io.provenance.scope.encryption.ecies.ProvenanceKeyGenerator
 import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
+import io.provenance.scope.util.toByteString
 import tech.figure.asset.Asset
 import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import java.net.URI
@@ -45,9 +36,35 @@ import java.util.concurrent.TimeUnit
 import java.util.UUID
 import kotlin.reflect.full.staticFunctions
 
+data class RecordInputSpec(
+    val name: String,
+    val typeName: String,
+    val hash: String,
+)
+
 class AssetUtils (
     val config: AssetUtilsConfig,
 ) {
+
+    companion object {
+        // Contract specification
+        const val ContractSpecClassName = "tech.figure.asset.OnboardAsset"
+        const val ContractSpecSourceHash = "AB43F752EBE5DC3E52EA2A9242136C35CD5C73C6E4EFCD44A70C32F8E43DC26F" // sha356(ContractSpecClassName)
+
+        // Record specification
+        const val RecordSpecName = "Asset"
+        const val RecordSpecTypeName = "tech.figure.asset.Asset"
+        val RecordSpecInputs = listOf(RecordInputSpec(
+            name = "AssetHash",
+            typeName = "String",
+            hash = "4B6A6C36E8B2622334C244B46799A47DBEAAF94E9D5B7637BC12A3A4988A62C0", // sha356(RecordSpecInputs.name)
+        ))
+
+        // Record process
+        const val RecordProcessName = "OnboardAssetProcess"
+        const val RecordProcessMethod = "OnboardAsset"
+        const val RecordProcessHash = "32D60974A2B2E9A9D9E93D9956E3A7D2BD226E1511D64D1EA39F86CBED62CE78" // sha356(RecordProcessMethod)
+    }
 
     val osClient: OsClient = OsClient(URI.create(config.osConfig.url), config.osConfig.timeoutMs)
 
@@ -123,154 +140,153 @@ class AssetUtils (
         return parser.call(decryptedBytes) as T
     }
 
-    // Builds the Provenance metadata transaction for writing a new scope to the chain
-    fun buildNewScopeMetadataTransaction(owner: String, recordName: String, scopeInputs: Map<String, String>, scopeId: UUID = UUID.randomUUID()): Pair<UUID, TxOuterClass.TxBody> {
-        // Create a new contract specification
-        val contractSpecId: UUID = UUID.randomUUID()
-        val newContractSpec: ContractSpecification = ContractSpecification.newBuilder().apply {
-            specificationId = ByteString.copyFrom(MetadataAddress.forContractSpecification(contractSpecId).bytes)
-            hash = "dummyContractSpecHash" // TODO?
-            className = "dummyContractSpecClassName"  // TODO?
-            //description =
-            addAllOwnerAddresses(listOf(owner))
-            addAllPartiesInvolved(listOf(
-                PartyType.PARTY_TYPE_OWNER
-            ))
-        }.build()
+    // Builds the Provenance metadata transaction for writing contract/scope/record specifications to the chain
+    fun buildAssetSpecificationMetadataTransaction(owner: String): TxOuterClass.TxBody {
+        return listOf(
 
-        // Create a new scope specification
-        val scopeSpecId: UUID = UUID.randomUUID()
-        val newScopeSpec: ScopeSpecification = ScopeSpecification.newBuilder().apply {
-            addAllContractSpecIds(listOf(ByteString.copyFrom(MetadataAddress.forContractSpecification(contractSpecId).bytes)))
-            addAllOwnerAddresses(listOf(owner))
-            addAllPartiesInvolved(listOf(
-                PartyType.PARTY_TYPE_OWNER
-            ))
-        }.build()
-
-        // Generate a scope session identifier
-        val scopeSessionId: UUID = UUID.randomUUID()
-
-        // Create a new record specification
-        val newRecordSpecification: RecordSpecification = RecordSpecification.newBuilder().apply {
-            name = recordName
-            specificationId = ByteString.copyFrom(MetadataAddress.forRecordSpecification(contractSpecId, recordName).bytes)
-            typeName = "${recordName}Type"
-            resultType = DefinitionType.DEFINITION_TYPE_RECORD // TODO?
-            addAllResponsibleParties(listOf(
-                PartyType.PARTY_TYPE_OWNER
-            ))
-            scopeInputs.forEach { (inputName, inputHash) ->
-                addInputs(InputSpecification.newBuilder().apply {
-                    name = inputName
-                    typeName = "${inputName}Type"
-                    hash = "dummyRecordSpecHash" // TODO?
-                }.build())
-            }
-        }.build()
-
-        // Create the new scope
-        val newScope: Scope = Scope.newBuilder().apply {
-            valueOwnerAddress = owner
-            addAllOwners(listOf(
-                Party.newBuilder().apply {
-                    address = owner
-                    role = PartyType.PARTY_TYPE_OWNER
-                }.build()
-            ))
-        }.build()
-
-        // Build TX message body
-        return Pair(scopeId, listOf(
             // write-contract-specification
             MsgWriteContractSpecificationRequest.newBuilder().apply {
-                specUuid = contractSpecId.toString()
-                specification = newContractSpec
-                addAllSigners(listOf(owner))
-            }.build().toAny(),
+                specificationBuilder
+                    .setSpecificationId(MetadataAddress.forContractSpecification(config.specConfig.contractSpecId).bytes.toByteString())
+                    .setClassName(ContractSpecClassName)
+                    .setHash(ContractSpecSourceHash)
+                    .addAllOwnerAddresses(listOf(owner))
+                    .addAllPartiesInvolved(listOf(
+                        PartyType.PARTY_TYPE_OWNER
+                    ))
+            }.addAllSigners(listOf(owner)).build().toAny(),
 
             // write-scope-specification
             MsgWriteScopeSpecificationRequest.newBuilder().apply {
-                specUuid = scopeSpecId.toString()
-                specification = newScopeSpec
-                addAllSigners(listOf(owner))
-            }.build().toAny(),
+                specificationBuilder
+                    .setSpecificationId(MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId).bytes.toByteString())
+                    .addAllContractSpecIds(listOf(
+                        MetadataAddress.forContractSpecification(config.specConfig.contractSpecId).bytes.toByteString()
+                    ))
+                    .addAllOwnerAddresses(listOf(owner))
+                    .addAllPartiesInvolved(listOf(
+                        PartyType.PARTY_TYPE_OWNER
+                    ))
+            }.addAllSigners(listOf(owner)).build().toAny(),
+
+            // write-record-specification
+            MsgWriteRecordSpecificationRequest.newBuilder().apply {
+                specificationBuilder
+                    .setName(RecordSpecName)
+                    .setTypeName(RecordSpecTypeName)
+                    .setSpecificationId(MetadataAddress.forRecordSpecification(config.specConfig.contractSpecId, RecordSpecName).bytes.toByteString())
+                    .setResultType(DefinitionType.DEFINITION_TYPE_RECORD)
+                    .addAllResponsibleParties(listOf(
+                        PartyType.PARTY_TYPE_OWNER
+                    ))
+                    .addAllInputs(RecordSpecInputs.map { InputSpecification.newBuilder().apply {
+                        name = it.name
+                        typeName = it.typeName
+                        hash = it.hash
+                    }.build() })
+            }.addAllSigners(listOf(owner)).build().toAny(),
+
+        ).toTxBody()
+    }
+
+    // Builds the Provenance metadata transaction for writing a new scope to the chain
+    @ExperimentalStdlibApi
+    fun buildNewScopeMetadataTransaction(scopeId: UUID, scopeHash: String, owner: String, additionalAudiences: Set<String> = emptySet()): TxOuterClass.TxBody {
+        // Generate a session identifier
+        val sessionId: UUID = UUID.randomUUID()
+
+        // Create the set of all audiences (including the owner)
+        val allAudiences: Set<String> = buildSet(additionalAudiences.size + 1) {
+            add(owner)
+            addAll(additionalAudiences)
+        }
+
+        // Create the list of all parties (including the owner)
+        val allParties: List<Party> = buildList(additionalAudiences.size + 1) {
+            add(Party.newBuilder().apply {
+                address = owner
+                role = PartyType.PARTY_TYPE_OWNER
+            }.build())
+            /*
+            addAll(additionalAudiences.map {
+                Party.newBuilder().apply {
+                    address = it
+                    role = PartyType.PARTY_TYPE_UNSPECIFIED
+                }.build()
+            })
+             */
+        }
+
+        // Build TX message body
+        return listOf(
 
             // write-scope
             MsgWriteScopeRequest.newBuilder().apply {
                 scopeUuid = scopeId.toString()
-                specUuid = scopeSpecId.toString()
-                scope = newScope
-                addAllSigners(listOf(owner))
-            }.build().toAny(),
-
-            // write-session
-            MsgWriteSessionRequest.newBuilder().apply {
-                //specUuid =
-                sessionIdComponents = SessionIdComponents.newBuilder().apply {
-                    scopeUuid = scopeId.toString()
-                    sessionUuid = scopeSessionId.toString()
-                }.build()
-                addAllSigners(listOf(owner))
-                session = Session.newBuilder().apply {
-                    sessionId =  ByteString.copyFrom(MetadataAddress.forSession(scopeId, scopeSessionId).bytes)
-                    specificationId = ByteString.copyFrom(MetadataAddress.forContractSpecification(contractSpecId).bytes)
-                    addAllParties(listOf(
+                specUuid = config.specConfig.scopeSpecId.toString()
+                scopeBuilder
+                    .setScopeId(MetadataAddress.forScope(scopeId).bytes.toByteString())
+                    .setSpecificationId(MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId).bytes.toByteString())
+                    .setValueOwnerAddress(owner)
+                    .addAllOwners(listOf(
                         Party.newBuilder().apply {
                             address = owner
                             role = PartyType.PARTY_TYPE_OWNER
                         }.build()
                     ))
-                    audit = AuditFields.newBuilder().apply {
-                        createdBy = owner
-                        updatedBy = owner
-                        version = 1 // TODO?
-                        //message =
-                    }.build()
-                }.build()
-            }.build().toAny(),
+                    .addAllDataAccess(allAudiences)
+            }.addAllSigners(listOf(owner)).build().toAny(),
 
-            // write-record-specification
-            MsgWriteRecordSpecificationRequest.newBuilder().apply {
-                contractSpecUuid = contractSpecId.toString()
-                specification = newRecordSpecification
-                addAllSigners(listOf(owner))
-            }.build().toAny(),
+            // write-session
+            MsgWriteSessionRequest.newBuilder().apply {
+                sessionIdComponentsBuilder
+                    .setScopeUuid(scopeId.toString())
+                    .setSessionUuid(sessionId.toString())
+                sessionBuilder
+                    .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
+                    .setSpecificationId(MetadataAddress.forContractSpecification(config.specConfig.contractSpecId).bytes.toByteString())
+                    .addAllParties(allParties)
+                    .auditBuilder
+                        .setCreatedBy(owner)
+                        .setUpdatedBy(owner)
+            }.addAllSigners(listOf(owner)).build().toAny(),
 
             // write-record
             MsgWriteRecordRequest.newBuilder().apply {
-                contractSpecUuid = contractSpecId.toString()
-                addAllParties(listOf(
-                    Party.newBuilder().apply {
-                        address = owner
-                        role = PartyType.PARTY_TYPE_OWNER
-                    }.build()
-                ))
-                addAllSigners(listOf(owner))
-                record = Record.newBuilder().apply {
-                    sessionId = ByteString.copyFrom(MetadataAddress.forSession(scopeId, scopeSessionId).bytes)
-                    //specificationId =
-                    name = recordName
-                    process = Process.newBuilder().apply {
-                        name = "dummyProcessName" // TODO?
-                        hash = "dummyProcessHash" // TODO?
-                        method = "dummyProcessMethod" // TODO?
-                    }.build()
-                    scopeInputs.forEach { (inputName, inputHash) ->
-                        addInputs(RecordInput.newBuilder().apply {
-                            name = inputName
-                            typeName = "${inputName}Type"
-                            hash = inputHash
+                contractSpecUuid = config.specConfig.contractSpecId.toString()
+                recordBuilder
+                    .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
+                    .setSpecificationId(MetadataAddress.forRecordSpecification(config.specConfig.contractSpecId, RecordSpecName).bytes.toByteString())
+                    .setName(RecordSpecName)
+                    .addAllInputs(RecordSpecInputs.map {
+                        RecordInput.newBuilder().apply {
+                            name = it.name
+                            typeName = it.typeName
+                            hash = if (it.name == "AssetHash") {
+                                scopeHash
+                            } else {
+                                ""
+                            }
                             status = RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED
-                        }.build())
-                        addOutputs(RecordOutput.newBuilder().apply {
-                            hash = inputHash // TODO?
-                            status = ResultStatus.RESULT_STATUS_PASS // TODO?
-                        }.build())
-                    }
-                }.build()
-            }.build().toAny()
-        ).toTxBody())
+                        }.build()
+                    })
+                    .addAllOutputs(RecordSpecInputs.map {
+                        RecordOutput.newBuilder().apply {
+                            hash = if (it.name == "AssetHash") {
+                                scopeHash
+                            } else {
+                                ""
+                            }
+                            status = ResultStatus.RESULT_STATUS_PASS
+                        }.build()
+                    })
+                    .processBuilder
+                        .setName(RecordProcessName)
+                        .setMethod(RecordProcessMethod)
+                        .setHash(RecordProcessHash)
+            }.addAllSigners(listOf(owner)).build().toAny(),
+
+        ).toTxBody()
     }
 
     // TODO: Can we query using the PB client without the private key? If so, let's provide some helpers for looking up
