@@ -11,13 +11,18 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import tech.figure.asset.Asset
+import tech.figure.asset.AssetOuterClassBuilders.Asset
 import tech.figure.asset.config.ProvenanceProperties
 import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
+import tech.figure.proto.util.FileNFT
+import tech.figure.proto.util.toProtoAny
 import java.security.PublicKey
 import java.util.*
 import javax.servlet.http.HttpServletResponse
@@ -26,6 +31,7 @@ data class TxBody(
     val json: ObjectNode,
     val base64: List<String>
 )
+
 
 @RestController
 @RequestMapping("/api/v1/asset")
@@ -48,24 +54,67 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
-        @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        val scopeId = asset.id.toUUID()
-        logger.info("REST request to onboard asset $scopeId")
+        val assetId = asset.id.toUUID()
+        logger.info("REST request to onboard asset $assetId")
 
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
 
         // set the response headers
-        response.addHeader("x-asset-id", scopeId.toString())
+        response.addHeader("x-asset-id", assetId.toString())
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(scopeId, hash, xAddress, permissionAssetManager)
+        return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
+    }
+
+    @ExperimentalStdlibApi
+    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
+    @PostMapping(value=["/file"],
+        consumes = [MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
+    @ApiOperation(value = "Create an Asset/NFT from a file")
+    @ApiResponse(
+        message = "Returns JSON encoded TX messages for writing scope to Provenance.",
+        code = 200
+    )
+    fun onboardFileNFT(
+        @RequestParam file: MultipartFile,
+        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
+        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
+    ): TxBody {
+        val assetId = UUID.randomUUID()
+        logger.info("REST request to onboard a file as an asset. Using id:$assetId file:${file.originalFilename} content-type:${file.contentType}")
+
+        val asset = Asset {
+            id = assetId.toString()
+            type = FileNFT.ASSET_TYPE
+            description = file.name
+            putKv(FileNFT.KEY_FILENAME, (file.originalFilename ?: file.name).toProtoAny())
+            putKv(FileNFT.KEY_SIZE, file.size.toProtoAny())
+            putKv(FileNFT.KEY_BYTES, file.bytes.toProtoAny())
+            file.contentType?.let {
+                putKv(FileNFT.KEY_CONTENT_TYPE, it.toProtoAny())
+            }
+        }
+
+        // store in EOS
+        val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
+
+        // set the response headers
+        response.addHeader("x-asset-id", assetId.toString())
+        response.addHeader("x-asset-hash", hash)
+
+        // create the metadata TX message
+        return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
     }
 
     @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
@@ -77,7 +126,7 @@ class AssetController(
     )
     fun storeAssetInEOS(
         @RequestBody asset: Asset,
-        @ApiParam( value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,

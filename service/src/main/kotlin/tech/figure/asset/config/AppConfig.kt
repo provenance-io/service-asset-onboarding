@@ -89,7 +89,7 @@ class AppConfig(
         return Docket(DocumentationType.OAS_30)
             .apiInfo(apiInfo)
             .host(docketProperties.host)
-            .consumes(setOf(MediaType.APPLICATION_JSON_VALUE))
+            .consumes(setOf(MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE))
             .produces(setOf(MediaType.APPLICATION_JSON_VALUE))
             .protocols(docketProperties.protocols)
             .forCodeGeneration(true)
