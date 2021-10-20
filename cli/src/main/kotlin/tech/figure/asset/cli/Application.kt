@@ -1,12 +1,27 @@
 package tech.figure.asset.cli
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.figure.wallet.account.InMemoryKeyHolder
 import com.figure.wallet.account.Key
 import com.figure.wallet.pbclient.client.GrpcClient
 import com.figure.wallet.pbclient.client.GrpcClientOpts
+import com.figure.wallet.pbclient.extension.toAny
+import com.figure.wallet.pbclient.extension.toTxBody
 import com.google.common.io.BaseEncoding
+import com.google.protobuf.ByteString
 import com.google.protobuf.util.JsonFormat
+import com.hubspot.jackson.datatype.protobuf.ProtobufModule
 import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastMode
+import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.attribute.v1.AttributeType
+import io.provenance.attribute.v1.MsgAddAttributeRequest
+import io.provenance.name.v1.MsgBindNameRequest
+import io.provenance.name.v1.NameRecord
 import io.provenance.scope.encryption.ecies.ECUtils
 import kotlinx.cli.*
 import tech.figure.asset.Asset
@@ -19,6 +34,11 @@ import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.*
+
+// TODO: move to a common lib
+data class TermsOfServiceAcceptance(
+    val version: String
+)
 
 class Application {
 
@@ -39,6 +59,10 @@ class Application {
 
         const val DefaultProvenanceChainId = "chain-local"
         const val DefaultProvenanceNode = "https://localhost:9090"
+
+        const val DefaultRootNamespace = "pb"
+        const val DefaultTOSBaseName = "tos"
+        const val DefaultFigureTechTOSRestrictedName = "figure-tech"
     }
 
     class Onboard : Subcommand("onboard", "Onboard an asset") {
@@ -135,6 +159,8 @@ class Application {
             val rawLog = `raw-log`
             val address = key.address().getValue()
 
+            println("Requestor key address $address")
+
             assetUtils.buildAssetSpecificationMetadataTransaction(address).let { txBody ->
                 val baseReq = pbClient.baseRequest(
                     key = key,
@@ -156,6 +182,159 @@ class Application {
                 }
             }
 
+        }
+
+    }
+
+    class BindNames : Subcommand("bind-names", "Bind names on the blockchain") {
+
+        companion object {
+            var shouldExecute: Boolean = false
+        }
+
+        val `root-name` by option(ArgType.String, shortName = "rn", description = "Root Namespace").default(Application.DefaultRootNamespace)
+        val `tos-base-name` by option(ArgType.String, shortName = "tn", description = "Terms of Service Base Name").default(Application.DefaultTOSBaseName)
+        val `ft-tos-restricted-name` by option(ArgType.String, shortName = "fn", description = "Figure Tech Terms of Service Restricted Name").default(Application.DefaultFigureTechTOSRestrictedName)
+
+        val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
+
+        override fun execute() {
+            shouldExecute = true
+        }
+
+        fun run(pbClient: GrpcClient, key: Key) {
+            val rootName = `root-name`
+            val tosName = `tos-base-name`
+            val figureTechName = `ft-tos-restricted-name`
+            val rawLog = `raw-log`
+            val address = key.address().getValue()
+
+            println("Requestor key address $address")
+
+            println("Binding name ${figureTechName}.${tosName}.${rootName}")
+
+            // figure-tech.tos.pb
+            buildBindNamesTransaction(address, figureTechName, tosName, rootName).let { txBody ->
+                val baseReq = pbClient.baseRequest(
+                    key = key,
+                    txBody = txBody
+                )
+
+                // simulate the TX
+                val gasEstimate = pbClient.estimateTx(baseReq)
+
+                // broadcast the TX
+                println("Broadcasting bind name TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                    it.txResponse.apply {
+                        println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                        if(rawLog) {
+                            println("LOG $rawLog")
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private fun buildBindNamesTransaction(owner: String, ftTosName: String, tosName: String, root: String): TxOuterClass.TxBody {
+            return listOf(
+
+                // bind-name `$tosName.$root`
+                MsgBindNameRequest.newBuilder().apply {
+                    parent = NameRecord.newBuilder().apply {
+                        name = root
+                        address = owner
+                    }.build()
+                    record = NameRecord.newBuilder().apply {
+                        name = tosName
+                        address = owner
+                    }.build()
+                }.build().toAny(),
+
+                // bind-name `$ftTosName.$tosName.$root`
+                MsgBindNameRequest.newBuilder().apply {
+                    parent = NameRecord.newBuilder().apply {
+                        name = "${tosName}.${root}"
+                        address = owner
+                    }.build()
+                    record = NameRecord.newBuilder().apply {
+                        name = ftTosName
+                        address = owner
+                    }.build()
+                }.build().toAny(),
+
+            ).toTxBody()
+        }
+
+    }
+
+    class AcceptTOS : Subcommand("accept-tos", "Accept a service provider's TOS for an account") {
+
+        companion object {
+            var shouldExecute: Boolean = false
+        }
+
+        val account by option(ArgType.String, shortName = "a", description = "Account Address").required()
+        val `tos-version` by option(ArgType.String, shortName = "tv", description = "Terms of Service Version").required()
+        val `root-name` by option(ArgType.String, shortName = "rn", description = "Root Namespace").default(Application.DefaultRootNamespace)
+        val `tos-base-name` by option(ArgType.String, shortName = "tn", description = "Terms of Service Base Name").default(Application.DefaultTOSBaseName)
+        val `ft-tos-restricted-name` by option(ArgType.String, shortName = "fn", description = "Figure Tech Terms of Service Restricted Name").default(Application.DefaultFigureTechTOSRestrictedName)
+
+        val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
+
+        override fun execute() {
+            shouldExecute = true
+        }
+
+        fun run(pbClient: GrpcClient, key: Key, objectMapper: ObjectMapper) {
+            val tosVersion = `tos-version`
+            val rootName = `root-name`
+            val tosName = `tos-base-name`
+            val figureTechName = `ft-tos-restricted-name`
+            val rawLog = `raw-log`
+            val address = key.address().getValue()
+
+            println("Requestor key address $address")
+
+            // TODO: at some point, move this functionality to a common lib?
+
+            buildAddAttributeTransaction(address, account, "${figureTechName}.${tosName}.${rootName}", tosVersion, objectMapper).let { txBody ->
+                val baseReq = pbClient.baseRequest(
+                    key = key,
+                    txBody = txBody
+                )
+
+                // simulate the TX
+                val gasEstimate = pbClient.estimateTx(baseReq)
+
+                // broadcast the TX
+                println("Broadcasting add attribute TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                    it.txResponse.apply {
+                        println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                        if(rawLog) {
+                            println("LOG $rawLog")
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private fun buildAddAttributeTransaction(owner: String, address: String, name: String, version: String, objectMapper: ObjectMapper): TxOuterClass.TxBody {
+            return listOf(
+
+                // add-attribute `$ftTosName.$tosName.$root`
+                MsgAddAttributeRequest.newBuilder().apply {
+                    this.owner = owner
+                    account = address
+                    attributeType = AttributeType.ATTRIBUTE_TYPE_JSON
+                    this.name = name
+                    value = ByteString.copyFrom(objectMapper.writeValueAsBytes(TermsOfServiceAcceptance(version)))
+                }.build().toAny(),
+
+            ).toTxBody()
         }
 
     }
@@ -187,9 +366,13 @@ class Application {
         // commands
         val onboard = Onboard()
         val writeSpecs = WriteSpecs()
+        val bindNames = BindNames()
+        val acceptTos = AcceptTOS()
         parser.subcommands(
             onboard,
-            writeSpecs
+            writeSpecs,
+            bindNames,
+            acceptTos
         )
 
         // parse the arguments
@@ -210,6 +393,9 @@ class Application {
         val keyIndex = `key-index`
 
         val chainId = `chain-id`
+
+        // create the object mapper
+        val objectMapper = ObjectMapper().configureProvenance()
 
         // create the asset utils
         val assetUtils: AssetUtils = AssetUtils(
@@ -246,6 +432,12 @@ class Application {
         else if (WriteSpecs.shouldExecute) {
             writeSpecs.run(assetUtils, pbClient, key)
         }
+        else if (BindNames.shouldExecute) {
+            bindNames.run(pbClient, key)
+        }
+        else if (AcceptTOS.shouldExecute) {
+            acceptTos.run(pbClient, key, objectMapper)
+        }
     }
 
 }
@@ -254,3 +446,10 @@ class Application {
 fun main(args: Array<String>) {
     Application().main(args)
 }
+
+fun ObjectMapper.configureProvenance(): ObjectMapper = registerKotlinModule()
+    .registerModule(JavaTimeModule())
+    .registerModule(ProtobufModule())
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

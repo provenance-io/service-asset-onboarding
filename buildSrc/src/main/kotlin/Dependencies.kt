@@ -148,6 +148,14 @@ object Dependencies {
     }
 
     object Jackson {
+        val Databind = DependencySpec(
+            "com.fasterxml.jackson.core:jackson-databind",
+            "2.12.+"
+        )
+        val Datatype = DependencySpec(
+            "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+            "2.12.+"
+        )
         val KotlinModule = DependencySpec(
             "com.fasterxml.jackson.module:jackson-module-kotlin",
             "2.12.+"
