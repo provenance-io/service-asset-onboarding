@@ -46,10 +46,14 @@ spec:
             ASSET_CONTRACT_SPEC_ID: "f97ecc5d-c580-478d-be02-6c1b0c32235f"
             ASSET_SCOPE_SPEC_ID: "551b5eca-921d-4ba7-aded-3966b224f44b"
             ASSET_MANAGER_PUBLIC_KEY: "BDSR5zvFFuLOMgqRH7MhPmpZzz3KlZL0oVQgbIuD4TCbhHUB2MgETo99sRm7xGJWIWGbBgcilc63mD0zxI6zUCo="
+            LOAN_STATE_CONTRACT_SPEC_ID: "63a8bb4c-c6e0-4cb5-993b-b134c4b5cbbb"
+            LOAN_STATE_SCOPE_SPEC_ID: "2eeada14-07cb-45fe-af6d-fdc48b627817"
           prod:
             PROVENANCE_IS_MAINNET: "true"
-            ASSET_CONTRACT_SPEC_ID: ""
-            ASSET_SCOPE_SPEC_ID: ""
+            ASSET_CONTRACT_SPEC_ID: "33bc3ec3-7623-476a-9713-b6efd47e3b74"
+            ASSET_SCOPE_SPEC_ID: "1ae489e2-9c42-4d5d-aba9-b9e07de2f87e"
+            LOAN_STATE_CONTRACT_SPEC_ID: "23089739-4fd7-4c70-8e32-a6f0500ef4c1"
+            LOAN_STATE_SCOPE_SPEC_ID: "2148d958-2b92-440b-b7ff-ed0263583090"
             ASSET_MANAGER_PUBLIC_KEY: "BOWm7T9YcvJNqwi60haIQHoAj8YlyLguirg83cdo3tx3hUqSBMcwZdrLn6gCCYCcF2CtEZBTvFgYc2CmMCU5NQg="
         readinessProbe:
           path: /service-asset-onboarding/manage/health

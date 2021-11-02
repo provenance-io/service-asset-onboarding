@@ -25,11 +25,9 @@ import io.provenance.name.v1.NameRecord
 import io.provenance.scope.encryption.ecies.ECUtils
 import kotlinx.cli.*
 import tech.figure.asset.Asset
-import tech.figure.asset.sdk.AssetUtils
-import tech.figure.asset.sdk.AssetUtilsConfig
-import tech.figure.asset.sdk.ObjectStoreConfig
-import tech.figure.asset.sdk.SpecificationConfig
+import tech.figure.asset.sdk.*
 import tech.figure.asset.sdk.extensions.toBase64String
+import tech.figure.asset.sdk.extensions.toJson
 import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -143,11 +141,10 @@ class Application {
 
     }
 
-    class WriteSpecs : Subcommand("write-specs", "Write the specifications to the blockchain") {
+    class WriteSpecs(private val type: String = "asset") : Subcommand("write-specs-$type", "Write the $type specifications to the blockchain") {
 
-        companion object {
-            var shouldExecute: Boolean = false
-        }
+        var shouldExecute: Boolean = false
+
 
         val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
 
@@ -155,33 +152,41 @@ class Application {
             shouldExecute = true
         }
 
-        fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
+        fun run(assetUtils: AssetUtils, loanServicingUtils: LoanServicingUtils, pbClient: GrpcClient, key: Key) {
             val rawLog = `raw-log`
             val address = key.address().getValue()
 
+
+            val txBody = if(type == "asset") {
+                assetUtils.buildAssetSpecificationMetadataTransaction(address)
+            } else if (type == "loan-state") {
+                loanServicingUtils.buildAssetSpecificationMetadataTransaction(address)
+            } else {
+                throw IllegalArgumentException("write-specs is misconfigured for type $type")
+            }
+
+            println(txBody.toJson() + "\n")
+
             println("Requestor key address $address")
 
-            assetUtils.buildAssetSpecificationMetadataTransaction(address).let { txBody ->
-                val baseReq = pbClient.baseRequest(
-                    key = key,
-                    txBody = txBody
-                )
+            val baseReq = pbClient.baseRequest(
+                key = key,
+                txBody = txBody
+            )
 
-                // simulate the TX
-                val gasEstimate = pbClient.estimateTx(baseReq)
+            // simulate the TX
+            val gasEstimate = pbClient.estimateTx(baseReq)
 
-                // broadcast the TX
-                println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
-                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
-                    it.txResponse.apply {
-                        println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
-                        if(rawLog) {
-                            println("LOG $rawLog")
-                        }
+            // broadcast the TX
+            println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+            pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                it.txResponse.apply {
+                    println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+                    if(rawLog) {
+                        println("LOG $rawLog")
                     }
                 }
             }
-
         }
 
     }
@@ -365,12 +370,14 @@ class Application {
 
         // commands
         val onboard = Onboard()
-        val writeSpecs = WriteSpecs()
+        val writeSpecsAsset = WriteSpecs("asset")
+        val writeSpecsLoanState = WriteSpecs("loan-state")
         val bindNames = BindNames()
         val acceptTos = AcceptTOS()
         parser.subcommands(
             onboard,
-            writeSpecs,
+            writeSpecsAsset,
+            writeSpecsLoanState,
             bindNames,
             acceptTos
         )
@@ -398,18 +405,18 @@ class Application {
         val objectMapper = ObjectMapper().configureProvenance()
 
         // create the asset utils
-        val assetUtils: AssetUtils = AssetUtils(
-            AssetUtilsConfig(
-                osConfig = ObjectStoreConfig(
-                    url = objectStoreUrl,
-                    timeoutMs = objectStoreTimeout,
-                ),
-                specConfig = SpecificationConfig(
-                    contractSpecId = UUID.fromString(contractSpecId),
-                    scopeSpecId = UUID.fromString(scopeSpecId),
-                ),
-            )
+        val assetUtilsConfig = AssetUtilsConfig(
+            osConfig = ObjectStoreConfig(
+                url = objectStoreUrl,
+                timeoutMs = objectStoreTimeout,
+            ),
+            specConfig = SpecificationConfig(
+                contractSpecId = UUID.fromString(contractSpecId),
+                scopeSpecId = UUID.fromString(scopeSpecId),
+            ),
         )
+        val assetUtils: AssetUtils = AssetUtils(assetUtilsConfig)
+        val loanServicingUtils: LoanServicingUtils = LoanServicingUtils(assetUtilsConfig)
 
         // import the HD wallet from the mnemonic
         val key = InMemoryKeyHolder
@@ -429,8 +436,11 @@ class Application {
         if (Onboard.shouldExecute) {
             onboard.run(assetUtils, pbClient, key)
         }
-        else if (WriteSpecs.shouldExecute) {
-            writeSpecs.run(assetUtils, pbClient, key)
+        else if (writeSpecsAsset.shouldExecute) {
+            writeSpecsAsset.run(assetUtils, loanServicingUtils, pbClient, key)
+        }
+        else if (writeSpecsLoanState.shouldExecute) {
+            writeSpecsLoanState.run(assetUtils, loanServicingUtils, pbClient, key)
         }
         else if (BindNames.shouldExecute) {
             bindNames.run(pbClient, key)

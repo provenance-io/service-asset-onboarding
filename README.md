@@ -43,6 +43,18 @@ $ ./cli/bin/cli write-specs \
     --node https://XXX.XXX.XXX.XXX:9090
 ```
 
+### for Loan State
+
+```
+./gradlew build
+./dc.sh up
+./dc.sh local_specs
+
+Requestor key address tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc
+Broadcasting metadata TX (estimated gas: 83208, estimated fees: 198139050 nhash)...
+TX (height: 0, txhash: 888F9E7BED315F81DC878D9BA7AB3310EE55EC7111033F4075ED7ADBE3B177E1, code: 4, gasWanted: 104010, gasUsed: 53800)
+```
+
 ## Setup
 
 Anyone wanting to onboard assets to Provenance will need a keypair and Provenance account. Generate one and remember it:
