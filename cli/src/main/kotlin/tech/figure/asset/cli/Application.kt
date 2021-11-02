@@ -27,6 +27,7 @@ import kotlinx.cli.*
 import tech.figure.asset.Asset
 import tech.figure.asset.sdk.*
 import tech.figure.asset.sdk.extensions.toBase64String
+import tech.figure.asset.sdk.extensions.toJson
 import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -155,7 +156,6 @@ class Application {
             val rawLog = `raw-log`
             val address = key.address().getValue()
 
-            println("Requestor key address $address")
 
             val txBody = if(type == "asset") {
                 assetUtils.buildAssetSpecificationMetadataTransaction(address)
@@ -164,6 +164,10 @@ class Application {
             } else {
                 throw IllegalArgumentException("write-specs is misconfigured for type $type")
             }
+
+            println(txBody.toJson() + "\n")
+
+            println("Requestor key address $address")
 
             val baseReq = pbClient.baseRequest(
                 key = key,

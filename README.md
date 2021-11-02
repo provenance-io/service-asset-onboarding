@@ -46,6 +46,8 @@ $ ./cli/bin/cli write-specs \
 ### for Loan State
 
 ```
+./gradlew build
+./dc.sh up
 ./dc.sh local_specs
 
 Requestor key address tp1mryqzguyelef5dae7k6l22tnls93cvrc60tjdc
