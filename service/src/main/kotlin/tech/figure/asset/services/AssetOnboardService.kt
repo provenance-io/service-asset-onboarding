@@ -32,12 +32,12 @@ class AssetOnboardService(
         )
     )
 
-    // Encrypt and store a protobuf asset using a random keypair for the signer
+    // Encrypt and store a protobuf message using a random keypair for the signer
     fun encryptAndStore(
-        asset: Asset,
+        message: Message,
         encryptPublicKey: PublicKey,
         additionalAudiences: Set<PublicKey> = emptySet()
-    ): ByteArray = assetUtils.encryptAndStore(asset, encryptPublicKey, additionalAudiences)
+    ): ByteArray = assetUtils.encryptAndStore(message, encryptPublicKey, additionalAudiences)
 
     // Get a DIME by its hash and public key
     fun getDIME(

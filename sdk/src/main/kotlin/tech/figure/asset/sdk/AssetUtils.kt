@@ -88,14 +88,14 @@ class AssetUtils (
     }
      */
 
-    // Encrypt and store a protobuf asset using a random keypair for the signer
+    // Encrypt and store a protobuf message using a random keypair for the signer
     fun encryptAndStore(
-        asset: Asset,
+        message: Message,
         encryptPublicKey: PublicKey,
         additionalAudiences: Set<PublicKey> = emptySet()
     ): ByteArray {
         val future = osClient.put(
-            asset,
+            message,
             encryptPublicKey,
             Pen(ProvenanceKeyGenerator.generateKeyPair(encryptPublicKey)),
             additionalAudiences
