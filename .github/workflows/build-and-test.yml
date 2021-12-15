@@ -38,12 +38,9 @@ jobs:
           prod_cluster: figure-tech-prod
           
       - name: Overwrite Build Tag
-        env:
-          AUTH: ${{ secrets.GCP_AUTH_JSON }}
-        run: |
-          echo "DOCKER_BUILD_TAG=$BRANCH-"$( \
-          curl -u "_json_key:$AUTH" --silent https://$GCR_HOST/v2/figure-$DEPLOYMENT/$REPO/tags/list | \
-          jq "[ .tags[] | capture( \"(?<b>$BRANCH)-(?<n>\\\\d+)\" ).n | tonumber ] | max + 1") >> $GITHUB_ENV
+        uses: ./shared-actions/docker-build-tag-from-registry
+        with:
+          gcp_auth_json: ${{ secrets.GCP_AUTH_JSON }}
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
