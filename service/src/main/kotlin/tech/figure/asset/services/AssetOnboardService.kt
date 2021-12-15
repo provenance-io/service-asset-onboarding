@@ -3,7 +3,7 @@ package tech.figure.asset.services
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
-import tech.figure.asset.Asset
+import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils

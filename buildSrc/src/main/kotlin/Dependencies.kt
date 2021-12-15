@@ -187,6 +187,7 @@ object Dependencies {
             "io.provenance:core-coroutines-support",
             Versions.ProvenanceCore
         )
+        val AssetModel = DependencySpec("io.provenance:metadata-asset-model", "1.0.0-SNAPSHOT")
         val PbcProto = DependencySpec("io.provenance.pbc:pbc-proto", Versions.ProvenancePbc)
         object Protobuf {
             val PbProtoJava = DependencySpec("io.provenance.protobuf:pb-proto-java", Versions.ProvenanceProtobuf)

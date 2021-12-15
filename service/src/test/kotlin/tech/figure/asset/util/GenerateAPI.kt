@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
 import org.springframework.test.context.TestPropertySource
 import tech.figure.asset.Application
-import tech.figure.asset.AssetOuterClassBuilders.Asset
+import tech.figure.asset.v1beta1.AssetOuterClassBuilders.Asset
 import tech.figure.asset.OBJECT_MAPPER
 import tech.figure.asset.extensions.writeFile
 import tech.figure.asset.loan.*

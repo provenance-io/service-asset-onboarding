@@ -26,6 +26,9 @@ subprojects {
     repositories {
         figureNexusMirrorRepository(project)
         mavenCentral()
+        flatDir {
+            dirs("${project.projectDir}/../lib")
+        }
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

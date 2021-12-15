@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import tech.figure.asset.Asset
-import tech.figure.asset.AssetOuterClassBuilders.Asset
+import tech.figure.asset.v1beta1.Asset
+import tech.figure.asset.v1beta1.AssetOuterClassBuilders.Asset
 import tech.figure.asset.config.ProvenanceProperties
 import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String

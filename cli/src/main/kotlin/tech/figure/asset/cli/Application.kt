@@ -24,7 +24,7 @@ import io.provenance.name.v1.MsgBindNameRequest
 import io.provenance.name.v1.NameRecord
 import io.provenance.scope.encryption.ecies.ECUtils
 import kotlinx.cli.*
-import tech.figure.asset.Asset
+import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.sdk.*
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.sdk.extensions.toJson
@@ -99,7 +99,7 @@ class Application {
 
                     try {
                         hash = assetUtils.encryptAndStore(asset, publicKey).toBase64String()
-                        scopeId = asset.id
+                        scopeId = asset.id.value
                         println("Encrypted and stored asset $scopeId in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
                     } catch (t: Throwable) {
                         println("ERROR: Failed to encrypt and store the asset. Reason=${t.message?:t.cause?.message}")

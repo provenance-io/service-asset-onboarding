@@ -15,7 +15,6 @@ dependencyManagement {
 dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
 
-    implementation(project(":proto"))
     implementation(project(":sdk"))
 
     listOf(
@@ -39,6 +38,7 @@ dependencies {
         Dependencies.KotlinLogging,
         Dependencies.Arrow.Core,
         Dependencies.P8eScope.Encryption,
+        Dependencies.Provenance.AssetModel,
         Dependencies.Provenance.PbcProto,
         Dependencies.Provenance.Protobuf.PbProtoJava,
         Dependencies.Jackson.KotlinModule,

@@ -27,7 +27,7 @@ import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString
-import tech.figure.asset.Asset
+import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import java.net.URI
 import java.security.PrivateKey
@@ -53,7 +53,7 @@ class AssetUtils (
 
         // Record specification
         const val RecordSpecName = "Asset"
-        const val RecordSpecTypeName = "tech.figure.asset.Asset"
+        const val RecordSpecTypeName = "tech.figure.asset.v1beta1.Asset"
         val RecordSpecInputs = listOf(RecordInputSpec(
             name = "AssetHash",
             typeName = "String",

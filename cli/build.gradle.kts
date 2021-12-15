@@ -24,6 +24,7 @@ dependencies {
         Dependencies.P8eScope.Encryption,
         Dependencies.Protobuf.JavaUtil,
         Dependencies.Provenance.PbcProto,
+        Dependencies.Provenance.AssetModel,
         Dependencies.Provenance.Protobuf.PbProtoJava
     ).forEach { dep ->
         dep.implementation(this)

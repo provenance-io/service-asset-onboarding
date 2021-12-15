@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":proto"))
 
     listOf(
         Dependencies.Figure.Wallet.PbClient,
@@ -18,6 +17,7 @@ dependencies {
         Dependencies.P8eScope.Util,
         Dependencies.Protobuf.Java,
         Dependencies.Protobuf.JavaUtil,
+        Dependencies.Provenance.AssetModel,
         Dependencies.Provenance.PbcProto,
         Dependencies.Provenance.Protobuf.PbProtoJava
     ).forEach { dep ->

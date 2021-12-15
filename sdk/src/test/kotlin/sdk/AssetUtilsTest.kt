@@ -22,8 +22,8 @@ import java.util.UUID
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import tech.figure.asset.Asset
-import tech.figure.asset.AssetOuterClassBuilders.Asset as AssetBuilder
+import tech.figure.asset.v1beta1.Asset
+import tech.figure.asset.v1beta1.AssetOuterClassBuilders.Asset as AssetBuilder
 import java.io.ByteArrayInputStream
 
 class AssetUtilsTest {
@@ -43,7 +43,7 @@ class AssetUtilsTest {
     }
 
     val testAsset = AssetBuilder {
-        id = UUID.randomUUID().toString()
+        idBuilder.value = UUID.randomUUID().toString()
         type = ASSET_TYPE
         description = ASSET_NAME
     }
