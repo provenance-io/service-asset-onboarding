@@ -60,7 +60,7 @@ class AssetController(
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        val assetId = asset.id.toUUID()
+        val assetId = asset.id.value.toUUID()
         logger.info("REST request to onboard asset $assetId")
 
         // store in EOS
@@ -95,7 +95,7 @@ class AssetController(
         logger.info("REST request to onboard a file as an asset. Using id:$assetId file:${file.originalFilename} content-type:${file.contentType}")
 
         val asset = Asset {
-            id = assetId.toString()
+            idBuilder.value = assetId.toString()
             type = FileNFT.ASSET_TYPE
             description = file.name
             putKv(FileNFT.KEY_FILENAME, (file.originalFilename ?: file.name).toProtoAny())
@@ -135,7 +135,7 @@ class AssetController(
         logger.info("REST request to store asset in EOS $asset.id")
         return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager).also {
             // set the response headers
-            response.addHeader("x-asset-id", asset.id)
+            response.addHeader("x-asset-id", asset.id.value)
             response.addHeader("x-asset-hash", it)
         }
     }

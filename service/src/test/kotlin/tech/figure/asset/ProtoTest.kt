@@ -26,7 +26,7 @@ class ProtoTest {
             id = loan.id
             type = "LOAN"
             description = "${loan.meta.loanType} ${loan.meta.loanNumber}"
-            putKv("loan", Any.pack(loan))
+            putKv("loan", Any.pack(loan, ""))
         }
 
 

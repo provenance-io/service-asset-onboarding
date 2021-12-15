@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
-import io.provenance.proto.portfolio.ServicingData
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.provenance.scope.encryption.util.getAddress
 import io.swagger.annotations.Api
@@ -27,6 +26,7 @@ import tech.figure.asset.config.ServiceKeysProperties
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.sdk.extensions.toJson
 import tech.figure.asset.services.AssetOnboardService
+import tech.figure.servicing.v1beta1.LoanStateOuterClass.LoanState
 
 @RestController
 @RequestMapping("/api/v1/servicing")
@@ -48,28 +48,28 @@ class ServicingController(
         code = 200
     )
     fun onboard(
-        @RequestBody loanState: ServicingData.LoanState,
+        @RequestBody loanState: LoanState,
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        logger.info("REST request to onboard loan state: ${loanState.loanUuid}")
+        logger.info("REST request to onboard loan state: ${loanState.loanId.value}")
 
         // store in EOS
         val hash = storeAsset(loanState, xPublicKey, xAddress, permissionAssetManager)
 
         // set the response headers
-        response.addHeader("x-asset-id", loanState.loanUuid)
+        response.addHeader("x-asset-id", loanState.loanId.value)
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(loanState.loanUuid.toUUID(), hash, xAddress, permissionAssetManager)
+        return createScopeTx(loanState.loanId.value.toUUID(), hash, xAddress, permissionAssetManager)
     }
 
     private fun storeAsset(
-        loanState: ServicingData.LoanState,
+        loanState: LoanState,
         xPublicKey: String,
         xAddress: String,
         permissionAssetManager: Boolean,
@@ -91,7 +91,7 @@ class ServicingController(
 
         // encrypt and store the asset to the object-store using the provided public key
         val hash = assetOnboardService.encryptAndStore(loanState, publicKey, additionalAudiences).toBase64String()
-        logger.info("Stored loan state ${loanState.loanUuid} with hash $hash for client $address using key $publicKey")
+        logger.info("Stored loan state ${loanState.loanId.value} with hash $hash for client $address using key $publicKey")
         return hash
     }
 
