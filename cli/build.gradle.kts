@@ -6,7 +6,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":proto"))
     implementation(project(":sdk"))
 
     listOf(

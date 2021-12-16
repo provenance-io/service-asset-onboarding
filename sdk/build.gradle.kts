@@ -5,6 +5,9 @@ plugins {
 
 dependencies {
 
+    api("io.envoyproxy.protoc-gen-validate:pgv-java-stub:0.6.2")
+    api("com.google.protobuf:protobuf-java:${Versions.Protobuf}")
+
     listOf(
         Dependencies.Figure.Wallet.PbClient,
         Dependencies.GoogleGuava,

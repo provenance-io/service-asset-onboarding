@@ -26,7 +26,7 @@ object Versions {
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
     const val KotlinXCli = "0.3.3"
-    const val Protobuf = "3.16.0"
+    const val Protobuf = "3.19.1"
     const val KrotoPlus = "0.6.1"
     const val JavaAnnotation = "1.3.1"
     const val ProtoValidation = "0.6.1"
