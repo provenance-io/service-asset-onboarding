@@ -9,6 +9,8 @@ allprojects {
     group = "tech.figure.asset"
     version = figureArtifactVersion()
 
+    println("Project version is: $version")
+
     repositories {
         figureNexusMirrorRepository(project)
         mavenCentral()
