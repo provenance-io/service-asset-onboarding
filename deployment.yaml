@@ -36,8 +36,8 @@ spec:
           test: 1
           prod: 1
         image:
-          test: us.gcr.io/figure-development/service-asset-onboarding:latest
-          prod: us.gcr.io/figure-production/service-asset-onboarding:latest
+          test: us-east1-docker.pkg.dev/figure-development/figure-docker-repo/service-asset-onboarding:latest
+          prod: us-east1-docker.pkg.dev/figure-production/figure-docker-repo/service-asset-onboarding:latest
         spring:
           enabled: true
         configMap:
