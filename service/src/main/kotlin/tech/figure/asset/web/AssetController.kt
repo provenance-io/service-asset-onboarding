@@ -117,47 +117,6 @@ class AssetController(
         return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
     }
 
-    @CrossOrigin(exposedHeaders = [ "x-asset-id", "x-asset-hash" ])
-    @PostMapping("/eos")
-    @ApiOperation(value = "Store asset in EOS and return asset hash")
-    @ApiResponse(
-        message = "Returns hash (checksum) of asset stored in EOS.",
-        code = 200
-    )
-    fun storeAssetInEOS(
-        @RequestBody asset: Asset,
-        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
-        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
-        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
-        @RequestHeader(name = "x-address", required = false) xAddress: String,
-        response: HttpServletResponse
-    ): String {
-        logger.info("REST request to store asset in EOS $asset.id")
-        return storeAsset(asset, xPublicKey, xAddress, permissionAssetManager).also {
-            // set the response headers
-            response.addHeader("x-asset-id", asset.id.value)
-            response.addHeader("x-asset-hash", it)
-        }
-    }
-
-    @ExperimentalStdlibApi
-    @CrossOrigin
-    @PostMapping("/scope")
-    @ApiOperation(value = "Create Metadata (scope) transaction for submission to blockchain")
-    @ApiResponse(
-        message = "Returns JSON encoded TX messages for writing scope to Provenance.",
-        code = 200
-    )
-    fun submitScope(
-        @RequestParam(name = "scope-id", required = true) scopeId: UUID,
-        @RequestParam(name = "fact-hash", required = true) factHash: String,
-        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
-        @RequestHeader(name = "x-address", required = false) xAddress: String
-    ): TxBody {
-        logger.info("REST request to create scope for asset $scopeId from hash $factHash")
-        return createScopeTx(scopeId, factHash, xAddress, permissionAssetManager)
-    }
-
 
     @CrossOrigin
     @GetMapping("/{scopeId}")
