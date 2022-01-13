@@ -26,6 +26,20 @@ spec:
               preserve_host: true
             jwt:
               enabled: false
+            plugins:
+              - plugin: key-auth
+                config:
+                  test:
+                  prod:
+                    key_names:
+                      - apikey
+                    run_on_preflight: true
+              - plugin: acl
+                config:
+                  test:
+                  prod:
+                    whitelist:
+                      - asset-onboarding
       deployment:
         business_unit: figure-tech
         business_product: asset-onboarding
