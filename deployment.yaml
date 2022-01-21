@@ -29,15 +29,11 @@ spec:
             plugins:
               - plugin: key-auth
                 config:
-                  test:
-                  prod:
                     key_names:
                       - apikey
                     run_on_preflight: true
               - plugin: acl
                 config:
-                  test:
-                  prod:
                     whitelist:
                       - asset-onboarding
       deployment:
