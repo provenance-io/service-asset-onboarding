@@ -34,7 +34,7 @@ spec:
                     run_on_preflight: true
               - plugin: acl
                 config:
-                    whitelist:
+                    allow:
                       - asset-onboarding
       deployment:
         business_unit: figure-tech
