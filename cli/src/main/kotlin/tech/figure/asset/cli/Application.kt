@@ -123,7 +123,7 @@ class Application {
                     val gasEstimate = pbClient.estimateTx(baseReq)
 
                     // broadcast the TX
-                    println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                    println("Broadcasting metadata TX (estimated gas: ${gasEstimate})...")
                     pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
                         it.txResponse.apply {
                             println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
@@ -178,7 +178,7 @@ class Application {
             val gasEstimate = pbClient.estimateTx(baseReq)
 
             // broadcast the TX
-            println("Broadcasting metadata TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+            println("Broadcasting metadata TX (estimated gas: ${gasEstimate})...")
             pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
                 it.txResponse.apply {
                     println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
@@ -229,7 +229,7 @@ class Application {
                 val gasEstimate = pbClient.estimateTx(baseReq)
 
                 // broadcast the TX
-                println("Broadcasting bind name TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                println("Broadcasting bind name TX (estimated gas: ${gasEstimate})...")
                 pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
                     it.txResponse.apply {
                         println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
@@ -314,7 +314,7 @@ class Application {
                 val gasEstimate = pbClient.estimateTx(baseReq)
 
                 // broadcast the TX
-                println("Broadcasting add attribute TX (estimated gas: ${gasEstimate.estimate}, estimated fees: ${gasEstimate.fees} nhash)...")
+                println("Broadcasting add attribute TX (estimated gas: ${gasEstimate})...")
                 pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
                     it.txResponse.apply {
                         println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
