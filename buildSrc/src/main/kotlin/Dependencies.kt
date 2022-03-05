@@ -18,6 +18,8 @@ object Versions {
     const val ProvenanceCore = Master
     const val ProvenancePbc = Master
     const val ProvenanceProtobuf = Master
+    const val ProvenanceClient = "1.0.5"
+    const val ProvenanceHdWallet = "0.1.15"
     const val P8eScope = "0.1.0"
     const val StreamData = Master
     const val FigureUtil = Master
@@ -131,13 +133,6 @@ object Dependencies {
         val ProtoValidation = DependencySpec("io.envoyproxy.protoc-gen-validate:protoc-gen-validate", Versions.ProtoValidation)
     }
 
-    // Square's Retrofit API client
-    object Retrofit {
-        val Core = DependencySpec("com.squareup.retrofit2:retrofit", Versions.Retrofit)
-        val JacksonConverter = DependencySpec("com.squareup.retrofit2:converter-jackson", Versions.Retrofit)
-        val ScalarsConverter = DependencySpec("com.squareup.retrofit2:converter-scalars", Versions.Retrofit)
-    }
-
     object BouncyCastle {
         val ProvJDK15On = DependencySpec("org.bouncycastle:bcprov-jdk15on", Versions.BouncyCastle)
     }
@@ -192,6 +187,34 @@ object Dependencies {
         object Protobuf {
             val PbProtoJava = DependencySpec("io.provenance.protobuf:pb-proto-java", Versions.ProvenanceProtobuf)
         }
+        object Client {
+            val GrpcClientKotlin = DependencySpec("io.provenance.client:pb-grpc-client-kotlin", Versions.ProvenanceClient)
+        }
+        object HdWallet {
+            val HdWallet = DependencySpec("io.provenance.hdwallet:hdwallet", Versions.ProvenanceHdWallet)
+            val HdWalletBase58 = DependencySpec("io.provenance.hdwallet:hdwallet-base58", Versions.ProvenanceHdWallet)
+            val HdWalletBech32 = DependencySpec("io.provenance.hdwallet:hdwallet-bech32", Versions.ProvenanceHdWallet)
+            val HdWalletBip32 = DependencySpec("io.provenance.hdwallet:hdwallet-bip32", Versions.ProvenanceHdWallet)
+            val HdWalletBip39 = DependencySpec("io.provenance.hdwallet:hdwallet-bip39", Versions.ProvenanceHdWallet)
+            val HdWalletBip44 = DependencySpec("io.provenance.hdwallet:hdwallet-bip44", Versions.ProvenanceHdWallet)
+            val HdWalletEc = DependencySpec("io.provenance.hdwallet:hdwallet-ec", Versions.ProvenanceHdWallet)
+            val HdWalletSigner = DependencySpec("io.provenance.hdwallet:hdwallet-signer", Versions.ProvenanceHdWallet)
+            val HdWalletCommon = DependencySpec("io.provenance.hdwallet:hdwallet-common", Versions.ProvenanceHdWallet)
+        }
+    }
+
+    // Square's Retrofit API client
+    object Retrofit {
+        val Core = DependencySpec("com.squareup.retrofit2:retrofit", Versions.Retrofit, exclude = listOf("com.squareup.okhttp3:okhttp"))
+        val JacksonConverter = DependencySpec(
+            "com.squareup.retrofit2:converter-jackson",
+            Versions.Retrofit,
+            exclude = listOf(
+                "com.fasterxml.jackson.core:jackson-databind",
+                "com.squareup.retrofit2:retrofit"
+            )
+        )
+        val ScalarsConverter = DependencySpec("com.squareup.retrofit2:converter-scalars", Versions.Retrofit)
     }
 
     object P8eScope {

@@ -8,6 +8,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.figure.wallet.account.InMemoryKeyHolder
 import com.figure.wallet.account.Key
+import cosmos.crypto.secp256k1.Keys
+import io.provenance.client.grpc.BaseReqSigner
+import io.provenance.client.grpc.GasEstimationMethod
+import io.provenance.client.grpc.PbClient
+import io.provenance.client.grpc.Signer
+import io.provenance.client.wallet.NetworkType
+import io.provenance.hdwallet.bip39.MnemonicWords
+import io.provenance.hdwallet.wallet.Account
+import io.provenance.hdwallet.wallet.Wallet
 import com.figure.wallet.pbclient.client.GrpcClient
 import com.figure.wallet.pbclient.client.GrpcClientOpts
 import com.figure.wallet.pbclient.extension.toAny
@@ -24,6 +33,17 @@ import io.provenance.name.v1.MsgBindNameRequest
 import io.provenance.name.v1.NameRecord
 import io.provenance.scope.encryption.ecies.ECUtils
 import kotlinx.cli.*
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import retrofit2.Retrofit
+import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.create
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.sdk.*
 import tech.figure.asset.sdk.extensions.toBase64String
@@ -31,12 +51,20 @@ import tech.figure.asset.sdk.extensions.toJson
 import java.io.File
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.time.Duration
 import java.util.*
 
 // TODO: move to a common lib
 data class TermsOfServiceAcceptance(
     val version: String
 )
+
+fun ObjectMapper.configureFigureTech(): ObjectMapper = registerKotlinModule()
+    .registerModule(JavaTimeModule())
+    .registerModule(ProtobufModule())
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
 class Application {
 
@@ -57,6 +85,7 @@ class Application {
 
         const val DefaultProvenanceChainId = "chain-local"
         const val DefaultProvenanceNode = "https://localhost:9090"
+        const val DefaultAssetOnboardUri = "http://localhost:8080"
 
         const val DefaultRootNamespace = "pb"
         const val DefaultTOSBaseName = "tos"
@@ -71,16 +100,29 @@ class Application {
 
         val input by argument(ArgType.String, description = "Input asset file")
         val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
+        val `onboard-uri` by option(ArgType.String, shortName = "u", description = "Asset Onboard API URI").default(Application.DefaultAssetOnboardUri)
 
         override fun execute() {
             shouldExecute = true
         }
 
         @ExperimentalStdlibApi
-        fun run(assetUtils: AssetUtils, pbClient: GrpcClient, key: Key) {
+        fun run(pbClient: PbClient, account: Account) {
             val rawLog = `raw-log`
-            val publicKey = ECUtils.convertBytesToPublicKey(key.publicKey().toByteArray())
-            val address = key.address().getValue()
+            val onboardUri = `onboard-uri`
+
+            val address = account.address.value
+            val signer = object : Signer {
+                override fun address(): String = address
+
+                override fun pubKey(): Keys.PubKey =
+                    Keys.PubKey
+                        .newBuilder()
+                        .setKey(ByteString.copyFrom(account.keyPair.publicKey.compressed()))
+                        .build()
+
+                override fun sign(data: ByteArray): ByteArray = account.sign(data)
+            }
 
             println("Requestor key address $address")
 
@@ -89,6 +131,58 @@ class Application {
                 // load the asset from the input file
                 val assetBytes: ByteArray = inputFile.readBytes()
 
+                val isAsset = try {
+                    val assetBuilder = Asset.newBuilder()
+                    JsonFormat.parser().merge(String(assetBytes, StandardCharsets.UTF_8), assetBuilder)
+                    val asset: Asset = assetBuilder.build()
+                    true
+                } catch (t: Throwable) {
+                    false
+                }
+
+                val objectMapper = ObjectMapper().configureFigureTech()
+
+                val httpClient = OkHttpClient.Builder()
+                    .callTimeout(Duration.ofSeconds(60))
+                    .connectTimeout(Duration.ofSeconds(60))
+                    .readTimeout(Duration.ofSeconds(60))
+                    .writeTimeout(Duration.ofSeconds(60))
+                    .build()
+
+                val assetOnboardApi = Retrofit.Builder()
+                    .baseUrl(onboardUri + "/")
+                    .client(httpClient)
+                    .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+                    .build()
+                    .create<AssetOnboardApi>()
+
+                val publicKey = BaseEncoding.base64().encode(account.keyPair.publicKey.compressed())
+                println("Requestor public key $publicKey")
+
+                val response = when (isAsset) {
+                    true -> onboardAsset(assetOnboardApi, assetBytes, publicKey, signer.address())
+                    false -> onboardNFT(assetOnboardApi, inputFile, publicKey, signer.address())
+                }
+                when (response.code()) {
+                    200 -> {
+                        response.body()!!.base64.forEach { tx ->
+                            println("$tx")
+                        }
+                        System.exit(-1)
+                    }
+                    else -> {
+                        println("Error: REST request failed: ${response.code()}")
+                        System.exit(-1)
+                    }
+                }
+            } else {
+                println("ERROR: File `${input}` does not exist")
+                System.exit(-1)
+            }
+
+            /*
+            val inputFile = File(input)
+            if (inputFile.exists()) {
                 // encrypt and store the asset in the object-store
                 var hash = ""
                 var scopeId = ""
@@ -137,6 +231,29 @@ class Application {
                 println("ERROR: File `${input}` does not exist")
                 System.exit(-1)
             }
+             */
+        }
+
+        fun onboardAsset(assetOnboardApi: AssetOnboardApi, assetBytes: ByteArray, publicKey: String, address: String) = runBlocking {
+            println("Onboarding asset...")
+            assetOnboardApi.onboardAsset(
+                xPublicKey = publicKey,
+                xAddress = address,
+                body = String(assetBytes, StandardCharsets.UTF_8)
+            )
+        }
+
+        fun onboardNFT(assetOnboardApi: AssetOnboardApi, file: File, publicKey: String, address: String) = runBlocking {
+            println("Onboarding NFT...")
+            assetOnboardApi.onboardNFT(
+                xPublicKey = publicKey,
+                xAddress = address,
+                file = MultipartBody.Part.createFormData(
+                    "file",
+                    file.name,
+                    RequestBody.create("application/octet-stream".toMediaTypeOrNull()!!, file)
+                )
+            )
         }
 
     }
@@ -145,19 +262,29 @@ class Application {
 
         var shouldExecute: Boolean = false
 
-
         val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
 
         override fun execute() {
             shouldExecute = true
         }
 
-        fun run(assetUtils: AssetUtils, loanServicingUtils: LoanServicingUtils, pbClient: GrpcClient, key: Key) {
+        fun run(assetUtils: AssetUtils, loanServicingUtils: LoanServicingUtils, pbClient: PbClient, account: Account) {
             val rawLog = `raw-log`
-            val address = key.address().getValue()
 
+            val address = account.address.value
+            val signer = object : Signer {
+                override fun address(): String = address
 
-            val txBody = if(type == "asset") {
+                override fun pubKey(): Keys.PubKey =
+                    Keys.PubKey
+                        .newBuilder()
+                        .setKey(ByteString.copyFrom(account.keyPair.publicKey.compressed()))
+                        .build()
+
+                override fun sign(data: ByteArray): ByteArray = account.sign(data)
+            }
+
+            val txBody = if (type == "asset") {
                 assetUtils.buildAssetSpecificationMetadataTransaction(address)
             } else if (type == "loan-state") {
                 loanServicingUtils.buildAssetSpecificationMetadataTransaction(address)
@@ -165,26 +292,19 @@ class Application {
                 throw IllegalArgumentException("write-specs is misconfigured for type $type")
             }
 
-            println(txBody.toJson() + "\n")
-
             println("Requestor key address $address")
+            if (rawLog) {
+                println(txBody.toJson() + "\n")
+            }
 
-            val baseReq = pbClient.baseRequest(
-                key = key,
-                txBody = txBody
-            )
-
-            // simulate the TX
-            val gasEstimate = pbClient.estimateTx(baseReq)
-
-            // broadcast the TX
-            println("Broadcasting metadata TX (estimated gas: ${gasEstimate})...")
-            pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+            pbClient.estimateAndBroadcastTx(
+                txBody = txBody,
+                signers = listOf(BaseReqSigner(signer)),
+                mode = BroadcastMode.BROADCAST_MODE_SYNC,
+                gasAdjustment = 1.5
+            ).also {
                 it.txResponse.apply {
                     println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
-                    if(rawLog) {
-                        println("LOG $rawLog")
-                    }
                 }
             }
         }
@@ -207,35 +327,42 @@ class Application {
             shouldExecute = true
         }
 
-        fun run(pbClient: GrpcClient, key: Key) {
+        fun run(pbClient: PbClient, account: Account) {
             val rootName = `root-name`
             val tosName = `tos-base-name`
             val figureTechName = `ft-tos-restricted-name`
             val rawLog = `raw-log`
-            val address = key.address().getValue()
+
+            val address = account.address.value
+            val signer = object : Signer {
+                override fun address(): String = address
+
+                override fun pubKey(): Keys.PubKey =
+                    Keys.PubKey
+                        .newBuilder()
+                        .setKey(ByteString.copyFrom(account.keyPair.publicKey.compressed()))
+                        .build()
+
+                override fun sign(data: ByteArray): ByteArray = account.sign(data)
+            }
 
             println("Requestor key address $address")
-
             println("Binding name ${figureTechName}.${tosName}.${rootName}")
 
             // figure-tech.tos.pb
             buildBindNamesTransaction(address, figureTechName, tosName, rootName).let { txBody ->
-                val baseReq = pbClient.baseRequest(
-                    key = key,
-                    txBody = txBody
-                )
+                if (rawLog) {
+                    println(txBody.toJson() + "\n")
+                }
 
-                // simulate the TX
-                val gasEstimate = pbClient.estimateTx(baseReq)
-
-                // broadcast the TX
-                println("Broadcasting bind name TX (estimated gas: ${gasEstimate})...")
-                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                pbClient.estimateAndBroadcastTx(
+                    txBody = txBody,
+                    signers = listOf(BaseReqSigner(signer)),
+                    mode = BroadcastMode.BROADCAST_MODE_SYNC,
+                    gasAdjustment = 1.5
+                ).also {
                     it.txResponse.apply {
                         println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
-                        if(rawLog) {
-                            println("LOG $rawLog")
-                        }
                     }
                 }
             }
@@ -292,35 +419,42 @@ class Application {
             shouldExecute = true
         }
 
-        fun run(pbClient: GrpcClient, key: Key, objectMapper: ObjectMapper) {
+        fun run(pbClient: PbClient, account: Account, objectMapper: ObjectMapper) {
             val tosVersion = `tos-version`
             val rootName = `root-name`
             val tosName = `tos-base-name`
             val figureTechName = `ft-tos-restricted-name`
             val rawLog = `raw-log`
-            val address = key.address().getValue()
+
+            val address = account.address.value
+            val signer = object : Signer {
+                override fun address(): String = address
+
+                override fun pubKey(): Keys.PubKey =
+                    Keys.PubKey
+                        .newBuilder()
+                        .setKey(ByteString.copyFrom(account.keyPair.publicKey.compressed()))
+                        .build()
+
+                override fun sign(data: ByteArray): ByteArray = account.sign(data)
+            }
 
             println("Requestor key address $address")
 
             // TODO: at some point, move this functionality to a common lib?
+            buildAddAttributeTransaction(address, address, "${figureTechName}.${tosName}.${rootName}", tosVersion, objectMapper).let { txBody ->
+                if (rawLog) {
+                    println(txBody.toJson() + "\n")
+                }
 
-            buildAddAttributeTransaction(address, account, "${figureTechName}.${tosName}.${rootName}", tosVersion, objectMapper).let { txBody ->
-                val baseReq = pbClient.baseRequest(
-                    key = key,
-                    txBody = txBody
-                )
-
-                // simulate the TX
-                val gasEstimate = pbClient.estimateTx(baseReq)
-
-                // broadcast the TX
-                println("Broadcasting add attribute TX (estimated gas: ${gasEstimate})...")
-                pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
+                pbClient.estimateAndBroadcastTx(
+                    txBody = txBody,
+                    signers = listOf(BaseReqSigner(signer)),
+                    mode = BroadcastMode.BROADCAST_MODE_SYNC,
+                    gasAdjustment = 1.5
+                ).also {
                     it.txResponse.apply {
                         println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
-                        if(rawLog) {
-                            println("LOG $rawLog")
-                        }
                     }
                 }
             }
@@ -419,34 +553,42 @@ class Application {
         val loanServicingUtils: LoanServicingUtils = LoanServicingUtils(assetUtilsConfig)
 
         // import the HD wallet from the mnemonic
-        val key = InMemoryKeyHolder
-            .fromMnemonic(keyMnemonic, !testnet)
-            .keyring(keyRingIndex)
-            .key(keyIndex)
+        val wallet = Wallet.fromMnemonic(
+            hrp = NetworkType.TESTNET.prefix,
+            passphrase = "",
+            mnemonicWords = MnemonicWords.of(keyMnemonic),
+            testnet = testnet
+        )
+
+        // get the account
+        val accountPath = when (testnet) {
+            true -> "m/44'/1'/0'/$keyRingIndex/$keyIndex'"
+            false -> "m/505'/1'/0'/$keyRingIndex/$keyIndex"
+        }
+        val account: Account = wallet[accountPath]
 
         // create the provenance client
-        val pbClient = GrpcClient(
-            GrpcClientOpts(
-                chainId = chainId,
-                channelUri = URI(node)
-            )
+        val pbClient = PbClient(
+            chainId,
+            URI(node),
+            GasEstimationMethod.MSG_FEE_CALCULATION
         )
 
         // run the specified command
         if (Onboard.shouldExecute) {
-            onboard.run(assetUtils, pbClient, key)
+            onboard.run(/*assetUtils,*/ pbClient, account /*key*/)
         }
         else if (writeSpecsAsset.shouldExecute) {
-            writeSpecsAsset.run(assetUtils, loanServicingUtils, pbClient, key)
+            writeSpecsAsset.run(assetUtils, loanServicingUtils, pbClient, account /*key*/)
         }
         else if (writeSpecsLoanState.shouldExecute) {
-            writeSpecsLoanState.run(assetUtils, loanServicingUtils, pbClient, key)
+            writeSpecsLoanState.run(assetUtils, loanServicingUtils, pbClient, account /*key*/)
         }
         else if (BindNames.shouldExecute) {
-            bindNames.run(pbClient, key)
+            bindNames.run(pbClient, account /*key*/)
         }
         else if (AcceptTOS.shouldExecute) {
-            acceptTos.run(pbClient, key, objectMapper)
+            acceptTos.run(pbClient, account /*key*/, objectMapper)
         }
     }
 

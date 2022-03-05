@@ -2,12 +2,12 @@
 
 function up {
   docker volume prune -f
-  docker-compose -f service/docker/dependencies.yaml up --build -d
+  docker-compose -p asset-onboarding -f service/docker/dependencies.yaml up --build -d
   docker ps -a
 }
 
 function down {
-  docker-compose -f service/docker/dependencies.yaml down
+  docker-compose -p asset-onboarding -f service/docker/dependencies.yaml down
 }
 
 function bounce {

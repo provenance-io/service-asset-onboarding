@@ -22,9 +22,16 @@ dependencies {
         Dependencies.KotlinLogging,
         Dependencies.P8eScope.Encryption,
         Dependencies.Protobuf.JavaUtil,
+        Dependencies.Provenance.HdWallet.HdWallet,
+        Dependencies.Provenance.HdWallet.HdWalletBip39,
         Dependencies.Provenance.PbcProto,
         Dependencies.Provenance.AssetModel,
-        Dependencies.Provenance.Protobuf.PbProtoJava
+        Dependencies.Provenance.Protobuf.PbProtoJava,
+        Dependencies.Provenance.Client.GrpcClientKotlin,
+        Dependencies.OkHttp.Core,
+        Dependencies.OkHttp.LoggingInterceptor,
+        Dependencies.Retrofit.Core,
+        Dependencies.Retrofit.JacksonConverter
     ).forEach { dep ->
         dep.implementation(this)
     }
