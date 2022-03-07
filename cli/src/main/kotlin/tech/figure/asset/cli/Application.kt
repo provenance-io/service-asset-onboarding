@@ -6,9 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.figure.wallet.account.InMemoryKeyHolder
-import com.figure.wallet.account.Key
+import com.figure.wallet.pbclient.extension.toAny
+import com.figure.wallet.pbclient.extension.toTxBody
+import com.google.common.io.BaseEncoding
+import com.google.protobuf.Any
+import com.google.protobuf.ByteString
+import com.google.protobuf.util.JsonFormat
+import com.hubspot.jackson.datatype.protobuf.ProtobufModule
 import cosmos.crypto.secp256k1.Keys
+import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastMode
+import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.BaseReqSigner
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
@@ -17,27 +24,18 @@ import io.provenance.client.wallet.NetworkType
 import io.provenance.hdwallet.bip39.MnemonicWords
 import io.provenance.hdwallet.wallet.Account
 import io.provenance.hdwallet.wallet.Wallet
-import com.figure.wallet.pbclient.client.GrpcClient
-import com.figure.wallet.pbclient.client.GrpcClientOpts
-import com.figure.wallet.pbclient.extension.toAny
-import com.figure.wallet.pbclient.extension.toTxBody
-import com.google.common.io.BaseEncoding
-import com.google.protobuf.ByteString
-import com.google.protobuf.util.JsonFormat
-import com.hubspot.jackson.datatype.protobuf.ProtobufModule
-import cosmos.tx.v1beta1.ServiceOuterClass.BroadcastMode
-import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.attribute.v1.AttributeType
 import io.provenance.attribute.v1.MsgAddAttributeRequest
 import io.provenance.name.v1.MsgBindNameRequest
 import io.provenance.name.v1.NameRecord
-import io.provenance.scope.encryption.ecies.ECUtils
+import java.io.File
+import java.net.URI
+import java.nio.charset.StandardCharsets
+import java.time.Duration
+import java.util.*
 import kotlinx.cli.*
 import kotlinx.coroutines.runBlocking
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -48,11 +46,6 @@ import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.sdk.*
 import tech.figure.asset.sdk.extensions.toBase64String
 import tech.figure.asset.sdk.extensions.toJson
-import java.io.File
-import java.net.URI
-import java.nio.charset.StandardCharsets
-import java.time.Duration
-import java.util.*
 
 // TODO: move to a common lib
 data class TermsOfServiceAcceptance(
@@ -72,6 +65,9 @@ class Application {
         const val appName = "Asset Onboard CLI"
         const val version = "0.0.1"
 
+        const val TestnetExplorerUri = "https://explorer.test.provenance.io"
+        const val MainnetExplorerUri = "https://explorer.provenance.io"
+
         const val DefaultObjectStoreURL = "grpc://localhost:8081"
         const val DefaultObjectStoreTimeout = 30000
 
@@ -85,7 +81,9 @@ class Application {
 
         const val DefaultProvenanceChainId = "chain-local"
         const val DefaultProvenanceNode = "https://localhost:9090"
+
         const val DefaultAssetOnboardUri = "http://localhost:8080"
+        const val DefaultApiKey = ""
 
         const val DefaultRootNamespace = "pb"
         const val DefaultTOSBaseName = "tos"
@@ -101,15 +99,22 @@ class Application {
         val input by argument(ArgType.String, description = "Input asset file")
         val `raw-log` by option(ArgType.Boolean, shortName = "l", description = "Output TX raw log").default(false)
         val `onboard-uri` by option(ArgType.String, shortName = "u", description = "Asset Onboard API URI").default(Application.DefaultAssetOnboardUri)
+        val `api-key` by option(ArgType.String, shortName = "a", description = "Asset Onboard API key").default(Application.DefaultApiKey)
 
         override fun execute() {
             shouldExecute = true
         }
 
         @ExperimentalStdlibApi
-        fun run(pbClient: PbClient, account: Account) {
+        fun run(pbClient: PbClient, account: Account, isTestnet: Boolean) {
             val rawLog = `raw-log`
             val onboardUri = `onboard-uri`
+            val apiKey = `api-key`
+
+            //val scopeSpec = BaseEncoding.base64().encode(MetadataAddress.forScopeSpecification(UUID.fromString(DefaultScopeSpecId)).bytes)
+            //val scopeSpec = MetadataAddress.forScopeSpecification(UUID.fromString(DefaultScopeSpecId))
+            //println("scopeSpec=${scopeSpec}")
+            //return
 
             val address = account.address.value
             val signer = object : Signer {
@@ -160,14 +165,42 @@ class Application {
                 println("Requestor public key $publicKey")
 
                 val response = when (isAsset) {
-                    true -> onboardAsset(assetOnboardApi, assetBytes, publicKey, signer.address())
-                    false -> onboardNFT(assetOnboardApi, inputFile, publicKey, signer.address())
+                    true -> onboardAsset(assetOnboardApi, apiKey, assetBytes, publicKey, signer.address())
+                    false -> onboardNFT(assetOnboardApi, apiKey, inputFile, publicKey, signer.address())
                 }
                 when (response.code()) {
                     200 -> {
-                        response.body()!!.base64.forEach { tx ->
-                            println("$tx")
+                        //println(response.body()!!.json)
+                        val txBody = TxOuterClass.TxBody.newBuilder().also {
+                            response.body()!!.base64.forEach { tx ->
+                                //println("$tx")
+                                it.addMessages(Any.parseFrom(BaseEncoding.base64().decode(tx)))
+                            }
+                        }.build()
+
+                        if (rawLog) {
+                            println(txBody.toJson() + "\n")
                         }
+
+                        pbClient.estimateAndBroadcastTx(
+                            txBody = txBody,
+                            signers = listOf(BaseReqSigner(signer)),
+                            mode = BroadcastMode.BROADCAST_MODE_SYNC,
+                            gasAdjustment = 1.5
+                        ).also {
+                            it.txResponse.apply {
+                                println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
+
+                                val explorerUri = when(isTestnet) {
+                                    true -> TestnetExplorerUri
+                                    false -> MainnetExplorerUri
+                                }
+                                println("--------")
+                                println("View transaction on Provenance explorer here:")
+                                println("${explorerUri}/tx/$txhash")
+                            }
+                        }
+
                         System.exit(-1)
                     }
                     else -> {
@@ -179,73 +212,22 @@ class Application {
                 println("ERROR: File `${input}` does not exist")
                 System.exit(-1)
             }
-
-            /*
-            val inputFile = File(input)
-            if (inputFile.exists()) {
-                // encrypt and store the asset in the object-store
-                var hash = ""
-                var scopeId = ""
-                try {
-                    val assetBuilder = Asset.newBuilder()
-                    JsonFormat.parser().merge(String(assetBytes, StandardCharsets.UTF_8), assetBuilder)
-                    val asset: Asset = assetBuilder.build()
-
-                    try {
-                        hash = assetUtils.encryptAndStore(asset, publicKey).toBase64String()
-                        scopeId = asset.id.value
-                        println("Encrypted and stored asset $scopeId in object store with hash $hash for publicKey ${BaseEncoding.base64().encode(key.publicKey().toByteArray())}")
-                    } catch (t: Throwable) {
-                        println("ERROR: Failed to encrypt and store the asset. Reason=${t.message?:t.cause?.message}")
-                        System.exit(-1)
-                    }
-                } catch (t: Throwable) {
-                    println("ERROR: File `${input}` does not contain an asset protobuf and blobs are not allowed.")
-                    System.exit(-1)
-                }
-
-                // generate the Provenance metadata TX message for this asset scope
-                assetUtils.buildNewScopeMetadataTransaction(UUID.fromString(scopeId), hash, address).let { txBody ->
-                    println("Created new scope $scopeId")
-
-                    val baseReq = pbClient.baseRequest(
-                        key = key,
-                        txBody = txBody
-                    )
-
-                    // simulate the TX
-                    val gasEstimate = pbClient.estimateTx(baseReq)
-
-                    // broadcast the TX
-                    println("Broadcasting metadata TX (estimated gas: ${gasEstimate})...")
-                    pbClient.broadcastTx(baseReq, gasEstimate, BroadcastMode.BROADCAST_MODE_BLOCK).also {
-                        it.txResponse.apply {
-                            println("TX (height: $height, txhash: $txhash, code: $code, gasWanted: $gasWanted, gasUsed: $gasUsed)")
-                            if(rawLog) {
-                                println("LOG $rawLog")
-                            }
-                        }
-                    }
-                }
-            } else {
-                println("ERROR: File `${input}` does not exist")
-                System.exit(-1)
-            }
-             */
         }
 
-        fun onboardAsset(assetOnboardApi: AssetOnboardApi, assetBytes: ByteArray, publicKey: String, address: String) = runBlocking {
+        fun onboardAsset(assetOnboardApi: AssetOnboardApi, apiKey: String?, assetBytes: ByteArray, publicKey: String, address: String) = runBlocking {
             println("Onboarding asset...")
             assetOnboardApi.onboardAsset(
+                apiKey = apiKey,
                 xPublicKey = publicKey,
                 xAddress = address,
                 body = String(assetBytes, StandardCharsets.UTF_8)
             )
         }
 
-        fun onboardNFT(assetOnboardApi: AssetOnboardApi, file: File, publicKey: String, address: String) = runBlocking {
+        fun onboardNFT(assetOnboardApi: AssetOnboardApi, apiKey: String?, file: File, publicKey: String, address: String) = runBlocking {
             println("Onboarding NFT...")
             assetOnboardApi.onboardNFT(
+                apiKey = apiKey,
                 xPublicKey = publicKey,
                 xAddress = address,
                 file = MultipartBody.Part.createFormData(
@@ -576,19 +558,19 @@ class Application {
 
         // run the specified command
         if (Onboard.shouldExecute) {
-            onboard.run(/*assetUtils,*/ pbClient, account /*key*/)
+            onboard.run(pbClient, account, testnet)
         }
         else if (writeSpecsAsset.shouldExecute) {
-            writeSpecsAsset.run(assetUtils, loanServicingUtils, pbClient, account /*key*/)
+            writeSpecsAsset.run(assetUtils, loanServicingUtils, pbClient, account)
         }
         else if (writeSpecsLoanState.shouldExecute) {
-            writeSpecsLoanState.run(assetUtils, loanServicingUtils, pbClient, account /*key*/)
+            writeSpecsLoanState.run(assetUtils, loanServicingUtils, pbClient, account)
         }
         else if (BindNames.shouldExecute) {
-            bindNames.run(pbClient, account /*key*/)
+            bindNames.run(pbClient, account)
         }
         else if (AcceptTOS.shouldExecute) {
-            acceptTos.run(pbClient, account /*key*/, objectMapper)
+            acceptTos.run(pbClient, account, objectMapper)
         }
     }
 

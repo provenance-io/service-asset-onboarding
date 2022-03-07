@@ -20,6 +20,7 @@ interface AssetOnboardApi  {
     @Headers("Content-Type: application/json")
     @POST("api/v1/asset")
     suspend fun onboardAsset(
+        @Header("apikey") apiKey: String? = null,
         @Header("x-public-key") xPublicKey: String,
         @Header("x-address") xAddress: String,
         @Body body: String
@@ -28,6 +29,7 @@ interface AssetOnboardApi  {
     @Multipart
     @POST("api/v1/asset/file")
     suspend fun onboardNFT(
+        @Header("apikey") apiKey: String? = null,
         @Header("x-public-key") xPublicKey: String,
         @Header("x-address") xAddress: String,
         @Part file: MultipartBody.Part
