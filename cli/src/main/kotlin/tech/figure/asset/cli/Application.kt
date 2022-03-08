@@ -39,6 +39,7 @@ import okhttp3.OkHttpClient
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.create
@@ -147,7 +148,17 @@ class Application {
 
                 val objectMapper = ObjectMapper().configureFigureTech()
 
+                val httpLogger: HttpLoggingInterceptor.Logger = object : HttpLoggingInterceptor.Logger {
+                    override fun log(message: String) = println(message)
+                }
+
                 val httpClient = OkHttpClient.Builder()
+                    .addInterceptor(HttpLoggingInterceptor(httpLogger).apply {
+                        level = when(rawLog) {
+                            true -> HttpLoggingInterceptor.Level.BODY
+                            false -> HttpLoggingInterceptor.Level.NONE
+                        }
+                    })
                     .callTimeout(Duration.ofSeconds(60))
                     .connectTimeout(Duration.ofSeconds(60))
                     .readTimeout(Duration.ofSeconds(60))
