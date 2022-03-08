@@ -20,6 +20,7 @@ object Versions {
     const val ProvenanceProtobuf = Master
     const val ProvenanceClient = "1.0.5"
     const val ProvenanceHdWallet = "0.1.15"
+    const val AssetModel = "0.1.2"
     const val P8eScope = "0.1.0"
     const val StreamData = Master
     const val FigureUtil = Master
@@ -182,7 +183,7 @@ object Dependencies {
             "io.provenance:core-coroutines-support",
             Versions.ProvenanceCore
         )
-        val AssetModel = DependencySpec("io.provenance:metadata-asset-model", "1.0.0-SNAPSHOT")
+        val AssetModel = DependencySpec("io.provenance.model:metadata-asset-model", Versions.AssetModel)
         val PbcProto = DependencySpec("io.provenance.pbc:pbc-proto", Versions.ProvenancePbc)
         object Protobuf {
             val PbProtoJava = DependencySpec("io.provenance.protobuf:pb-proto-java", Versions.ProvenanceProtobuf)
