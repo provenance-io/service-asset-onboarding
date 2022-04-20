@@ -1,6 +1,7 @@
 package tech.figure.asset.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.net.URI
 import javax.validation.constraints.NotNull
 
 @ConfigurationProperties(prefix = "object-store")
@@ -19,6 +20,15 @@ class ProvenanceProperties : LoggableProperties() {
 
     @NotNull
     var isMainnet: Boolean = false
+
+    @NotNull
+    lateinit var chainId: String
+
+    @NotNull
+    lateinit var channelUri: URI
+
+    @NotNull
+    lateinit var assetClassificationContractName: String
 
 }
 

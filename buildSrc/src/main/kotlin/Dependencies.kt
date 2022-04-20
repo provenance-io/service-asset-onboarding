@@ -12,6 +12,7 @@ object RepositoryLocations {
 
 object Versions {
     // Branch targets for internal deps
+    const val Main = "main-+"
     const val Master = "master-+"
     const val Develop = "develop-+"
 
@@ -237,6 +238,10 @@ object Dependencies {
     object Jupiter {
         val JupiterApi = DependencySpec("org.junit.jupiter:junit-jupiter-api", Versions.JunitJupiter)
         val JupiterEngine = DependencySpec("org.junit.jupiter:junit-jupiter-engine", Versions.JunitJupiter)
+    }
+
+    object AssetClassification {
+        val Client = DependencySpec("com.figure.classification.asset:client", Versions.Main)
     }
 }
 

@@ -1,5 +1,6 @@
 package tech.figure.asset.services
 
+import com.figure.classification.asset.client.client.base.ACClient
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
@@ -15,6 +16,7 @@ import java.security.PublicKey
 import java.util.UUID
 
 class AssetOnboardService(
+    private val acClient: ACClient,
     private val objectStoreProperties: ObjectStoreProperties,
     private val assetSpecificationProperties: AssetSpecificationProperties,
 ) {
@@ -77,7 +79,15 @@ class AssetOnboardService(
         scopeId: UUID,
         hash: String,
         owner: String,
+        assetType: String? = null,
         additionalAudiences: Set<String> = emptySet(),
-    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(scopeId, hash, owner, additionalAudiences)
+    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(
+        scopeId = scopeId,
+        // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
+        scopeSpecAddress = assetType?.let { acClient.queryAssetDefinitionByAssetType(it).scopeSpecAddress },
+        scopeHash = hash,
+        owner = owner,
+        additionalAudiences = additionalAudiences
+    )
 
 }
