@@ -2,9 +2,6 @@ package tech.figure.asset.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.figure.classification.asset.client.client.base.ACClient
-import com.figure.classification.asset.client.domain.model.AssetDefinition
-import com.figure.classification.asset.client.domain.model.QueryAssetDefinitionsResponse
 import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils

@@ -114,10 +114,10 @@ class ServicingController(
 
         // create the metadata TX message
         val txBody = assetOnboardService.buildNewScopeMetadataTransaction(
-            scopeId,
-            factHash,
-            xAddress,
-            additionalAudiences,
+            scopeId = scopeId,
+            hash = factHash,
+            owner = xAddress,
+            additionalAudiences = additionalAudiences,
         )
 
         return TxBody(

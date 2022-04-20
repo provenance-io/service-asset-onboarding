@@ -4,7 +4,7 @@ import com.figure.classification.asset.client.client.base.ACClient
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
-import tech.figure.asset.v1beta1.Asset
+import org.slf4j.LoggerFactory
 import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
@@ -20,6 +20,8 @@ class AssetOnboardService(
     private val objectStoreProperties: ObjectStoreProperties,
     private val assetSpecificationProperties: AssetSpecificationProperties,
 ) {
+
+    private val logger = LoggerFactory.getLogger(AssetOnboardService::class.java)
 
     val assetUtils: AssetUtils = AssetUtils(
         AssetUtilsConfig(
@@ -84,7 +86,11 @@ class AssetOnboardService(
     ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(
         scopeId = scopeId,
         // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
-        scopeSpecAddress = assetType?.let { acClient.queryAssetDefinitionByAssetType(it).scopeSpecAddress },
+        scopeSpecAddress = assetType?.let { type ->
+            acClient.queryAssetDefinitionByAssetType(type)
+                .also { def -> logger.info("Found asset definition for type [${def.assetType}] with scope spec address [${def.scopeSpecAddress}]") }
+                .scopeSpecAddress
+        },
         scopeHash = hash,
         owner = owner,
         additionalAudiences = additionalAudiences
