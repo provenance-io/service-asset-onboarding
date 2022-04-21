@@ -27,7 +27,6 @@ import io.provenance.scope.encryption.model.DirectKeyRef
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString
-import tech.figure.asset.sdk.extensions.elvis
 import tech.figure.asset.sdk.extensions.getEncryptedPayload
 import java.net.URI
 import java.security.PrivateKey
@@ -223,24 +222,22 @@ class AssetUtils (
              */
         }
 
+        // If a scope spec address was provided, use that value. Otherwise, default out to the
+        // configuration's scope spec id
+        val scopeSpecMetadataAddress = scopeSpecAddress
+            ?.let(MetadataAddress::fromBech32)
+            ?: MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId)
+
         // Build TX message body
         return listOf(
 
             // write-scope
             MsgWriteScopeRequest.newBuilder().apply {
                 scopeUuid = scopeId.toString()
-                specUuid = config.specConfig.scopeSpecId.toString()
+                specUuid = scopeSpecMetadataAddress.getPrimaryUuid().toString()
                 scopeBuilder
                     .setScopeId(MetadataAddress.forScope(scopeId).bytes.toByteString())
-                    .setSpecificationId(
-                        // If a scope spec address was provided, use that value. Otherwise, default out to the
-                        // configuration's scope spec id
-                        scopeSpecAddress
-                            ?.let(MetadataAddress::fromBech32)
-                            .elvis { MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId) }
-                            .bytes
-                            .toByteString()
-                    )
+                    .setSpecificationId(scopeSpecMetadataAddress.bytes.toByteString())
                     .setValueOwnerAddress(owner)
                     .addAllOwners(listOf(
                         Party.newBuilder().apply {
