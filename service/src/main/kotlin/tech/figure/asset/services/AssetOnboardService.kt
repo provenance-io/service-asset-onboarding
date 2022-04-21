@@ -87,7 +87,10 @@ class AssetOnboardService(
         scopeId = scopeId,
         // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
         scopeSpecAddress = assetType?.let { type ->
-            acClient.queryAssetDefinitionByAssetType(type)
+            acClient
+                // All entries into the classification smart contract are lowercase. Coerce the provided value to ensure
+                // casing doesn't cause false negatives
+                .queryAssetDefinitionByAssetType(type.lowercase())
                 .also { def -> logger.info("Found asset definition for type [${def.assetType}] with scope spec address [${def.scopeSpecAddress}]") }
                 .scopeSpecAddress
         },
