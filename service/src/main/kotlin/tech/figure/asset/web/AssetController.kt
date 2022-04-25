@@ -63,7 +63,7 @@ class AssetController(
         response: HttpServletResponse
     ): TxBody {
         val assetId = asset.id.value.toUUID()
-        logger.info("REST request to onboard asset $assetId with type $type")
+        logger.info("REST request to onboard asset $assetId${if (type != null) " and type $type" else ""}")
 
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
