@@ -195,7 +195,7 @@ class AssetUtils (
         scopeHash: String,
         owner: String,
         scopeSpecAddress: String? = null,
-        additionalAudiences: Set<String> = emptySet()
+        additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
         // Generate a session identifier
         val sessionId: UUID = UUID.randomUUID()

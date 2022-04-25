@@ -55,7 +55,7 @@ class AssetController(
     fun onboard(
         @RequestBody asset: Asset,
         @ApiParam(value = "Asset type being onboarded", example = "heloc")
-        @RequestParam(required = true) type: String,
+        @RequestParam(required = false) type: String?,
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
@@ -73,7 +73,13 @@ class AssetController(
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(assetId, hash, xAddress, permissionAssetManager, type)
+        return createScopeTx(
+            scopeId = assetId,
+            factHash = hash,
+            xAddress = xAddress,
+            permissionAssetManager = permissionAssetManager,
+            assetType = type,
+        )
     }
 
     @ExperimentalStdlibApi
