@@ -4,6 +4,7 @@ import com.figure.classification.asset.client.client.base.ACClient
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.PbClient
+import io.provenance.metadata.v1.ContractSpecificationRequest
 import io.provenance.metadata.v1.ScopeSpecificationRequest
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory
 import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.exceptions.ContractSpecNotFoundException
+import tech.figure.asset.exceptions.RecordSpecNotFoundException
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
@@ -22,8 +24,8 @@ import java.util.UUID
 class AssetOnboardService(
     private val acClient: ACClient,
     private val pbClient: PbClient,
-    private val objectStoreProperties: ObjectStoreProperties,
-    private val assetSpecificationProperties: AssetSpecificationProperties,
+    objectStoreProperties: ObjectStoreProperties,
+    assetSpecificationProperties: AssetSpecificationProperties,
 ) {
 
     private val logger = LoggerFactory.getLogger(AssetOnboardService::class.java)
@@ -89,7 +91,7 @@ class AssetOnboardService(
         assetType: String? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
-        val (scopeSpecAddress, contractSpecAddress) = assetType?.let { type ->
+        val (scopeSpecAddress, contractSpecAddress, recordName) = assetType?.let { type ->
             acClient
                 // All entries into the classification smart contract are lowercase. Coerce the provided value to ensure
                 // casing doesn't cause false negatives
@@ -97,14 +99,16 @@ class AssetOnboardService(
                 .also { def -> logger.info("Found asset definition for type [${def.assetType}] with scope spec address [${def.scopeSpecAddress}]") }
                 .scopeSpecAddress
         }?.let {
-            it to it.getContractSpecAddress()
-        } ?: (null to null)
+            val contractSpecAddress = it.getContractSpecAddress()
+            listOf(it, contractSpecAddress, contractSpecAddress.getRecordName())
+        } ?: listOf(null, null, null)
 
         return assetUtils.buildNewScopeMetadataTransaction(
             scopeId = scopeId,
             // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
             scopeSpecAddress = scopeSpecAddress,
             contractSpecAddress = contractSpecAddress,
+            recordName = recordName,
             scopeHash = hash,
             owner = owner,
             additionalAudiences = additionalAudiences
@@ -117,4 +121,10 @@ class AssetOnboardService(
         ?.toByteArray()
         ?.let(MetadataAddress::fromBytes)
         ?.toString() ?: throw ContractSpecNotFoundException("Could not resolve a contract spec address associated with scope spec address $this")
+
+    private fun String.getRecordName(): String = pbClient.metadataClient.contractSpecification(
+        ContractSpecificationRequest.newBuilder().setSpecificationId(this).setIncludeRecordSpecs(true).build()).recordSpecificationsList
+        .firstOrNull()
+        ?.specification
+        ?.name ?: throw RecordSpecNotFoundException("Could not resolve a record spec associated with contract spec address $this")
 }

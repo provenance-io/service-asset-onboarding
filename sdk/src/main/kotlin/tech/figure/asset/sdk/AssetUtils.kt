@@ -196,6 +196,7 @@ class AssetUtils (
         owner: String,
         scopeSpecAddress: String? = null,
         contractSpecAddress: String? = null,
+        recordName: String? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
         // Generate a session identifier
@@ -234,6 +235,10 @@ class AssetUtils (
         val contractSpecMetadataAddress = contractSpecAddress
             ?.let(MetadataAddress::fromBech32)
             ?: MetadataAddress.forContractSpecification(config.specConfig.contractSpecId)
+
+        // If a record spec name was provided, use that value. Otherwise, default out to the
+        // default record name
+        val resolvedRecordSpecName = recordName ?: RecordSpecName
 
         // Build TX message body
         return listOf(
@@ -274,8 +279,8 @@ class AssetUtils (
                 contractSpecUuid = contractSpecMetadataAddress.getPrimaryUuid().toString()
                 recordBuilder
                     .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
-                    .setSpecificationId(MetadataAddress.forRecordSpecification(contractSpecMetadataAddress.getPrimaryUuid(), RecordSpecName).bytes.toByteString())
-                    .setName(RecordSpecName)
+                    .setSpecificationId(MetadataAddress.forRecordSpecification(contractSpecMetadataAddress.getPrimaryUuid(), resolvedRecordSpecName).bytes.toByteString())
+                    .setName(resolvedRecordSpecName)
                     .addAllInputs(RecordSpecInputs.map {
                         RecordInput.newBuilder().apply {
                             name = it.name
