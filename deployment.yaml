@@ -54,7 +54,7 @@ spec:
           test:
             PROVENANCE_IS_MAINNET: "false"
             PROVENANCE_CHAIN_ID: "pio-testnet-1"
-            PROVENANCE_CHANNEL_URI: "grpc://192.168.12.251:9090"
+            PROVENANCE_CHANNEL_URI: "grpc://34.148.39.82:9090"
             PROVENANCE_ASSET_CLASSIFICATION_CONTRACT_NAME: "testassets.pb"
             ASSET_CONTRACT_SPEC_ID: "f97ecc5d-c580-478d-be02-6c1b0c32235f"
             ASSET_SCOPE_SPEC_ID: "551b5eca-921d-4ba7-aded-3966b224f44b"
@@ -64,7 +64,7 @@ spec:
           prod:
             PROVENANCE_IS_MAINNET: "true"
             PROVENANCE_CHAIN_ID: "pio-mainnet-1"
-            PROVENANCE_CHANNEL_URI: "grpc://192.168.12.250:9090"
+            PROVENANCE_CHANNEL_URI: "grpc://34.148.50.57:9090"
             PROVENANCE_ASSET_CLASSIFICATION_CONTRACT_NAME: "asset"
             ASSET_CONTRACT_SPEC_ID: "33bc3ec3-7623-476a-9713-b6efd47e3b74"
             ASSET_SCOPE_SPEC_ID: "1ae489e2-9c42-4d5d-aba9-b9e07de2f87e"
