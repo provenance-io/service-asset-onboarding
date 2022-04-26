@@ -12,6 +12,9 @@ dependencyManagement {
     applyMavenExclusions(false)
 }
 
+// Standardize Spring's dependency management for jackson versions to a higher version than allotted by the manager
+ext["jackson.version"] = "2.12.+"
+
 dependencies {
     ktlint(Dependencies.Ktlint.toDependencyNotation())
 
@@ -43,7 +46,8 @@ dependencies {
         Dependencies.Provenance.Protobuf.PbProtoJava,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Jackson.Hubspot,
-        Dependencies.Figure.Util
+        Dependencies.Figure.Util,
+        Dependencies.AssetClassification.Client,
     ).forEach { dep ->
         dep.implementation(this)
     }

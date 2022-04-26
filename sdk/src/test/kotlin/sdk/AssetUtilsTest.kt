@@ -219,7 +219,6 @@ class AssetUtilsTest {
                         session.audit.also { audit ->
                             Assertions.assertEquals(testKeyPair.public.getAddress(false), audit.createdBy)
                             Assertions.assertEquals(testKeyPair.public.getAddress(false), audit.updatedBy)
-                            Assertions.assertEquals(1, audit.version)
                         }
                     }
 
@@ -233,7 +232,7 @@ class AssetUtilsTest {
                 // 2: MsgWriteRecordRequest
                 result.getMessages(2).unpack(MsgWriteRecordRequest::class.java).also { writeRecord ->
                     // the contract spec id is set
-                    Assertions.assertEquals(testContractSpecId, writeRecord.contractSpecUuid)
+                    Assertions.assertEquals(testContractSpecId, UUID.fromString(writeRecord.contractSpecUuid))
 
                     // the record is set
                     writeRecord.record.also { record ->
@@ -289,6 +288,30 @@ class AssetUtilsTest {
                     }
                 }
             }
+        }
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun `#buildNewScopeMetadataTransaction with provided spec address`() {
+        runBlockingTest {
+            val scopeHash = ""
+            // Address generated randomly with the provenanced tool and random uuid: 800ea884-c1c6-11ec-a437-d7326db68487
+            val specAddress = "scopespec1qjqqa2yyc8rprm9yxltnymdksjrszkrh4f"
+            val expectedSpecUuid = UUID.fromString("800ea884-c1c6-11ec-a437-d7326db68487")
+            val result = assetUtils.buildNewScopeMetadataTransaction(
+                scopeId = testScopeId,
+                scopeHash = scopeHash,
+                owner = testKeyPair.public.getAddress(mainNet = false),
+                scopeSpecAddress = specAddress,
+            )
+            // Sanity check: All three messages should be generated (MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest)
+            Assertions.assertEquals(3, result.messagesCount)
+            val writeScopeRequest = result.getMessages(0).unpack(MsgWriteScopeRequest::class.java)
+            // Verify that the provided spec address was properly established as the spec uuid
+            Assertions.assertEquals(expectedSpecUuid, UUID.fromString(writeScopeRequest.specUuid))
+            // Verify that the provided spec address was properly established as the scope's specificationId
+            Assertions.assertArrayEquals(MetadataAddress.forScopeSpecification(expectedSpecUuid).bytes, writeScopeRequest.scope.specificationId.toByteArray())
         }
     }
 

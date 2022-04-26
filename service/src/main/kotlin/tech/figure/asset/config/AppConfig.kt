@@ -1,6 +1,10 @@
 package tech.figure.asset.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.figure.classification.asset.client.client.base.ACClient
+import com.figure.classification.asset.client.client.base.ContractIdentifier
+import io.provenance.client.grpc.GasEstimationMethod
+import io.provenance.client.grpc.PbClient
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.info.BuildProperties
@@ -65,10 +69,24 @@ class AppConfig(
     fun mapper(): ObjectMapper = OBJECT_MAPPER
 
     @Bean
+    fun aCClient(
+        provenanceProperties: ProvenanceProperties,
+    ): ACClient = ACClient.getDefault(
+        contractIdentifier = ContractIdentifier.Name(provenanceProperties.assetClassificationContractName),
+        pbClient = PbClient(
+            chainId = provenanceProperties.chainId,
+            channelUri = provenanceProperties.channelUri,
+            gasEstimationMethod = GasEstimationMethod.MSG_FEE_CALCULATION,
+        ),
+        objectMapper = OBJECT_MAPPER,
+    )
+
+    @Bean
     fun assetOnboardService(
+        acClient: ACClient,
         objectStoreProperties: ObjectStoreProperties,
         assetSpecificationProperties: AssetSpecificationProperties,
-    ) = AssetOnboardService(objectStoreProperties, assetSpecificationProperties)
+    ) = AssetOnboardService(acClient, objectStoreProperties, assetSpecificationProperties)
 
     @Bean
     fun api(docketProperties: DocketProperties): Docket {

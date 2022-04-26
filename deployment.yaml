@@ -53,6 +53,9 @@ spec:
         configMap:
           test:
             PROVENANCE_IS_MAINNET: "false"
+            PROVENANCE_CHAIN_ID: "pio-testnet-1"
+            PROVENANCE_CHANNEL_URI: "grpc://192.168.12.251:9090"
+            PROVENANCE_ASSET_CLASSIFICATION_CONTRACT_NAME: "testassets.pb"
             ASSET_CONTRACT_SPEC_ID: "f97ecc5d-c580-478d-be02-6c1b0c32235f"
             ASSET_SCOPE_SPEC_ID: "551b5eca-921d-4ba7-aded-3966b224f44b"
             ASSET_MANAGER_PUBLIC_KEY: "BDSR5zvFFuLOMgqRH7MhPmpZzz3KlZL0oVQgbIuD4TCbhHUB2MgETo99sRm7xGJWIWGbBgcilc63mD0zxI6zUCo="
@@ -60,6 +63,9 @@ spec:
             LOAN_STATE_SCOPE_SPEC_ID: "2eeada14-07cb-45fe-af6d-fdc48b627817"
           prod:
             PROVENANCE_IS_MAINNET: "true"
+            PROVENANCE_CHAIN_ID: "pio-mainnet-1"
+            PROVENANCE_CHANNEL_URI: "grpc://192.168.12.250:9090"
+            PROVENANCE_ASSET_CLASSIFICATION_CONTRACT_NAME: "asset"
             ASSET_CONTRACT_SPEC_ID: "33bc3ec3-7623-476a-9713-b6efd47e3b74"
             ASSET_SCOPE_SPEC_ID: "1ae489e2-9c42-4d5d-aba9-b9e07de2f87e"
             LOAN_STATE_CONTRACT_SPEC_ID: "23089739-4fd7-4c70-8e32-a6f0500ef4c1"

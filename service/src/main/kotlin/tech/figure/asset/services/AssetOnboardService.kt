@@ -1,9 +1,10 @@
 package tech.figure.asset.services
 
+import com.figure.classification.asset.client.client.base.ACClient
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.scope.encryption.proto.Encryption
-import tech.figure.asset.v1beta1.Asset
+import org.slf4j.LoggerFactory
 import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
 import tech.figure.asset.sdk.AssetUtils
@@ -15,9 +16,12 @@ import java.security.PublicKey
 import java.util.UUID
 
 class AssetOnboardService(
+    private val acClient: ACClient,
     private val objectStoreProperties: ObjectStoreProperties,
     private val assetSpecificationProperties: AssetSpecificationProperties,
 ) {
+
+    private val logger = LoggerFactory.getLogger(AssetOnboardService::class.java)
 
     val assetUtils: AssetUtils = AssetUtils(
         AssetUtilsConfig(
@@ -77,7 +81,22 @@ class AssetOnboardService(
         scopeId: UUID,
         hash: String,
         owner: String,
+        assetType: String? = null,
         additionalAudiences: Set<String> = emptySet(),
-    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(scopeId, hash, owner, additionalAudiences)
+    ): TxOuterClass.TxBody = assetUtils.buildNewScopeMetadataTransaction(
+        scopeId = scopeId,
+        // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
+        scopeSpecAddress = assetType?.let { type ->
+            acClient
+                // All entries into the classification smart contract are lowercase. Coerce the provided value to ensure
+                // casing doesn't cause false negatives
+                .queryAssetDefinitionByAssetType(type.lowercase())
+                .also { def -> logger.info("Found asset definition for type [${def.assetType}] with scope spec address [${def.scopeSpecAddress}]") }
+                .scopeSpecAddress
+        },
+        scopeHash = hash,
+        owner = owner,
+        additionalAudiences = additionalAudiences
+    )
 
 }

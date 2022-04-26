@@ -54,6 +54,8 @@ class AssetController(
     )
     fun onboard(
         @RequestBody asset: Asset,
+        @ApiParam(value = "Asset type being onboarded", example = "heloc")
+        @RequestParam(required = false) type: String?,
         @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
@@ -61,7 +63,7 @@ class AssetController(
         response: HttpServletResponse
     ): TxBody {
         val assetId = asset.id.value.toUUID()
-        logger.info("REST request to onboard asset $assetId")
+        logger.info("REST request to onboard asset $assetId${if (type != null) " and type $type" else ""}")
 
         // store in EOS
         val hash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
@@ -71,7 +73,13 @@ class AssetController(
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
+        return createScopeTx(
+            scopeId = assetId,
+            factHash = hash,
+            xAddress = xAddress,
+            permissionAssetManager = permissionAssetManager,
+            assetType = type,
+        )
     }
 
     @ExperimentalStdlibApi
@@ -180,6 +188,7 @@ class AssetController(
         factHash: String,
         xAddress: String,
         permissionAssetManager: Boolean,
+        assetType: String? = null,
     ): TxBody {
         // assemble the list of additional audiences (allow Asset Manager to read data)
         val additionalAudiences: MutableSet<String> = mutableSetOf()
@@ -193,10 +202,11 @@ class AssetController(
 
         // create the metadata TX message
         val txBody = assetOnboardService.buildNewScopeMetadataTransaction(
-            scopeId,
-            factHash,
-            xAddress,
-            additionalAudiences,
+            scopeId = scopeId,
+            hash = factHash,
+            owner = xAddress,
+            assetType = assetType,
+            additionalAudiences = additionalAudiences,
         )
 
         return TxBody(
