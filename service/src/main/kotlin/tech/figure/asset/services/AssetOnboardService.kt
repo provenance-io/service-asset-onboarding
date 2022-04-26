@@ -10,6 +10,7 @@ import io.provenance.scope.util.MetadataAddress
 import org.slf4j.LoggerFactory
 import tech.figure.asset.config.AssetSpecificationProperties
 import tech.figure.asset.config.ObjectStoreProperties
+import tech.figure.asset.exceptions.ContractSpecNotFoundException
 import tech.figure.asset.sdk.AssetUtils
 import tech.figure.asset.sdk.AssetUtilsConfig
 import tech.figure.asset.sdk.ObjectStoreConfig
@@ -110,10 +111,10 @@ class AssetOnboardService(
         )
     }
 
-    private fun String.getContractSpecAddress(): String? = pbClient.metadataClient
+    private fun String.getContractSpecAddress(): String = pbClient.metadataClient
         .scopeSpecification(ScopeSpecificationRequest.newBuilder().setSpecificationId(this).build())
         .scopeSpecification.specification.contractSpecIdsList.firstOrNull()
         ?.toByteArray()
         ?.let(MetadataAddress::fromBytes)
-        ?.toString()
+        ?.toString() ?: throw ContractSpecNotFoundException("Could not resolve a contract spec address associated with scope spec address $this")
 }
