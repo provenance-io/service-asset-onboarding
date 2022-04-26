@@ -195,6 +195,7 @@ class AssetUtils (
         scopeHash: String,
         owner: String,
         scopeSpecAddress: String? = null,
+        contractSpecAddress: String? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
         // Generate a session identifier
@@ -228,6 +229,12 @@ class AssetUtils (
             ?.let(MetadataAddress::fromBech32)
             ?: MetadataAddress.forScopeSpecification(config.specConfig.scopeSpecId)
 
+        // If a contract spec address was provided, use that value. Otherwise, default out to the
+        // configuration's scope spec id
+        val contractSpecMetadataAddress = contractSpecAddress
+            ?.let(MetadataAddress::fromBech32)
+            ?: MetadataAddress.forContractSpecification(config.specConfig.contractSpecId)
+
         // Build TX message body
         return listOf(
 
@@ -255,7 +262,7 @@ class AssetUtils (
                     .setSessionUuid(sessionId.toString())
                 sessionBuilder
                     .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
-                    .setSpecificationId(MetadataAddress.forContractSpecification(config.specConfig.contractSpecId).bytes.toByteString())
+                    .setSpecificationId(contractSpecMetadataAddress.bytes.toByteString())
                     .addAllParties(allParties)
                     .auditBuilder
                         .setCreatedBy(owner)
@@ -264,10 +271,10 @@ class AssetUtils (
 
             // write-record
             MsgWriteRecordRequest.newBuilder().apply {
-                contractSpecUuid = config.specConfig.contractSpecId.toString()
+                contractSpecUuid = contractSpecMetadataAddress.getPrimaryUuid().toString()
                 recordBuilder
                     .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
-                    .setSpecificationId(MetadataAddress.forRecordSpecification(config.specConfig.contractSpecId, RecordSpecName).bytes.toByteString())
+                    .setSpecificationId(MetadataAddress.forRecordSpecification(contractSpecMetadataAddress.getPrimaryUuid(), RecordSpecName).bytes.toByteString())
                     .setName(RecordSpecName)
                     .addAllInputs(RecordSpecInputs.map {
                         RecordInput.newBuilder().apply {

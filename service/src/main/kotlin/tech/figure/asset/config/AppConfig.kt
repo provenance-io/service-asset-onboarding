@@ -69,24 +69,31 @@ class AppConfig(
     fun mapper(): ObjectMapper = OBJECT_MAPPER
 
     @Bean
+    fun pbClient(
+        provenanceProperties: ProvenanceProperties
+    ): PbClient = PbClient(
+        chainId = provenanceProperties.chainId,
+        channelUri = provenanceProperties.channelUri,
+        gasEstimationMethod = GasEstimationMethod.MSG_FEE_CALCULATION,
+    )
+
+    @Bean
     fun aCClient(
         provenanceProperties: ProvenanceProperties,
+        pbClient: PbClient
     ): ACClient = ACClient.getDefault(
         contractIdentifier = ContractIdentifier.Name(provenanceProperties.assetClassificationContractName),
-        pbClient = PbClient(
-            chainId = provenanceProperties.chainId,
-            channelUri = provenanceProperties.channelUri,
-            gasEstimationMethod = GasEstimationMethod.MSG_FEE_CALCULATION,
-        ),
+        pbClient = pbClient,
         objectMapper = OBJECT_MAPPER,
     )
 
     @Bean
     fun assetOnboardService(
         acClient: ACClient,
+        pbClient: PbClient,
         objectStoreProperties: ObjectStoreProperties,
         assetSpecificationProperties: AssetSpecificationProperties,
-    ) = AssetOnboardService(acClient, objectStoreProperties, assetSpecificationProperties)
+    ) = AssetOnboardService(acClient, pbClient, objectStoreProperties, assetSpecificationProperties)
 
     @Bean
     fun api(docketProperties: DocketProperties): Docket {
