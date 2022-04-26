@@ -76,7 +76,7 @@ class ServicingController(
     ): String {
 
         // get the public key & client PB address from the headers
-        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(BaseEncoding.base64Url().decode(xPublicKey))
+        val publicKey: PublicKey = ECUtils.convertBytesToPublicKey(BaseEncoding.base64().decode(xPublicKey))
         val address: String = xAddress
 
         // assemble the list of additional audiences (allow Asset Manager to read data)
