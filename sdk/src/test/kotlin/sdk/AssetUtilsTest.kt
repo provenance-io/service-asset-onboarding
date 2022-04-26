@@ -293,25 +293,39 @@ class AssetUtilsTest {
 
     @ExperimentalStdlibApi
     @Test
-    fun `#buildNewScopeMetadataTransaction with provided spec address`() {
+    fun `#buildNewScopeMetadataTransaction with provided spec addresses`() {
         runBlockingTest {
             val scopeHash = ""
             // Address generated randomly with the provenanced tool and random uuid: 800ea884-c1c6-11ec-a437-d7326db68487
             val specAddress = "scopespec1qjqqa2yyc8rprm9yxltnymdksjrszkrh4f"
             val expectedSpecUuid = UUID.fromString("800ea884-c1c6-11ec-a437-d7326db68487")
+            val contractSpecAddress = "contractspec1q0fctw7rdygy4v5y08j2mqlxs2qqq6hk8z"
+            val expectedContractSpecUuid = UUID.fromString("d385bbc3-6910-4ab2-8479-e4ad83e68280")
             val result = assetUtils.buildNewScopeMetadataTransaction(
                 scopeId = testScopeId,
                 scopeHash = scopeHash,
                 owner = testKeyPair.public.getAddress(mainNet = false),
                 scopeSpecAddress = specAddress,
+                contractSpecAddress = contractSpecAddress,
             )
             // Sanity check: All three messages should be generated (MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest)
             Assertions.assertEquals(3, result.messagesCount)
             val writeScopeRequest = result.getMessages(0).unpack(MsgWriteScopeRequest::class.java)
+            val writeSessionRequest = result.getMessages(1).unpack(MsgWriteSessionRequest::class.java)
+            val writeRecordRequest = result.getMessages(2).unpack(MsgWriteRecordRequest::class.java)
             // Verify that the provided spec address was properly established as the spec uuid
             Assertions.assertEquals(expectedSpecUuid, UUID.fromString(writeScopeRequest.specUuid))
             // Verify that the provided spec address was properly established as the scope's specificationId
             Assertions.assertArrayEquals(MetadataAddress.forScopeSpecification(expectedSpecUuid).bytes, writeScopeRequest.scope.specificationId.toByteArray())
+            // Verify that the provided contract spec address was properly established as the contract spec id in the write session request
+            Assertions.assertEquals(contractSpecAddress, writeSessionRequest.session.specificationId.toByteArray().let(MetadataAddress::fromBytes).toString())
+            // Verify that the provided contract spec address was properly established as the contract spec uuid in the write record request
+            Assertions.assertEquals(expectedContractSpecUuid, UUID.fromString(writeRecordRequest.contractSpecUuid))
+            // Verify that the provided contract spec address was properly used to establish the record spec address
+            Assertions.assertEquals(
+                MetadataAddress.forRecordSpecification(expectedContractSpecUuid, AssetUtils.RecordSpecName).toString(),
+                writeRecordRequest.record.specificationId.toByteArray().let(MetadataAddress::fromBytes).toString()
+            )
         }
     }
 
