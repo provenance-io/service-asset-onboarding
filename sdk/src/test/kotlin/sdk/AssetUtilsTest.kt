@@ -301,12 +301,14 @@ class AssetUtilsTest {
             val expectedSpecUuid = UUID.fromString("800ea884-c1c6-11ec-a437-d7326db68487")
             val contractSpecAddress = "contractspec1q0fctw7rdygy4v5y08j2mqlxs2qqq6hk8z"
             val expectedContractSpecUuid = UUID.fromString("d385bbc3-6910-4ab2-8479-e4ad83e68280")
+            val recordName = "totallyGreatRecord"
             val result = assetUtils.buildNewScopeMetadataTransaction(
                 scopeId = testScopeId,
                 scopeHash = scopeHash,
                 owner = testKeyPair.public.getAddress(mainNet = false),
                 scopeSpecAddress = specAddress,
                 contractSpecAddress = contractSpecAddress,
+                recordName = recordName,
             )
             // Sanity check: All three messages should be generated (MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest)
             Assertions.assertEquals(3, result.messagesCount)
@@ -321,11 +323,13 @@ class AssetUtilsTest {
             Assertions.assertEquals(contractSpecAddress, writeSessionRequest.session.specificationId.toByteArray().let(MetadataAddress::fromBytes).toString())
             // Verify that the provided contract spec address was properly established as the contract spec uuid in the write record request
             Assertions.assertEquals(expectedContractSpecUuid, UUID.fromString(writeRecordRequest.contractSpecUuid))
-            // Verify that the provided contract spec address was properly used to establish the record spec address
+            // Verify that the provided contract spec address and record name was properly used to establish the record spec address
             Assertions.assertEquals(
-                MetadataAddress.forRecordSpecification(expectedContractSpecUuid, AssetUtils.RecordSpecName).toString(),
+                MetadataAddress.forRecordSpecification(expectedContractSpecUuid, recordName).toString(),
                 writeRecordRequest.record.specificationId.toByteArray().let(MetadataAddress::fromBytes).toString()
             )
+            // Verify that the provided record name is set properly in the write record request
+            Assertions.assertEquals(recordName, writeRecordRequest.record.name)
         }
     }
 
