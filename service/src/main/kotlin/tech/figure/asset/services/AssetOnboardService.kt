@@ -5,6 +5,7 @@ import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
 import io.provenance.client.grpc.PbClient
 import io.provenance.metadata.v1.ContractSpecificationRequest
+import io.provenance.metadata.v1.RecordSpecification
 import io.provenance.metadata.v1.ScopeSpecificationRequest
 import io.provenance.scope.encryption.proto.Encryption
 import io.provenance.scope.util.MetadataAddress
@@ -91,7 +92,7 @@ class AssetOnboardService(
         assetType: String? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
-        val (scopeSpecAddress, contractSpecAddress, recordName) = assetType?.let { type ->
+        val (scopeSpecAddress, contractSpecAddress, recordSpec) = assetType?.let { type ->
             acClient
                 // All entries into the classification smart contract are lowercase. Coerce the provided value to ensure
                 // casing doesn't cause false negatives
@@ -100,15 +101,15 @@ class AssetOnboardService(
                 .scopeSpecAddress
         }?.let {
             val contractSpecAddress = it.getContractSpecAddress()
-            listOf(it, contractSpecAddress, contractSpecAddress.getRecordName())
-        } ?: listOf(null, null, null)
+            Triple(it, contractSpecAddress, contractSpecAddress.getFirstRecordSpec())
+        } ?: Triple(null, null, null)
 
         return assetUtils.buildNewScopeMetadataTransaction(
             scopeId = scopeId,
             // Query the Asset Classification Smart contract for a scope specification address for the given asset type.
             scopeSpecAddress = scopeSpecAddress,
             contractSpecAddress = contractSpecAddress,
-            recordName = recordName,
+            recordSpec = recordSpec,
             scopeHash = hash,
             owner = owner,
             additionalAudiences = additionalAudiences
@@ -122,9 +123,9 @@ class AssetOnboardService(
         ?.let(MetadataAddress::fromBytes)
         ?.toString() ?: throw ContractSpecNotFoundException("Could not resolve a contract spec address associated with scope spec address $this")
 
-    private fun String.getRecordName(): String = pbClient.metadataClient.contractSpecification(
+    private fun String.getFirstRecordSpec(): RecordSpecification = pbClient.metadataClient.contractSpecification(
         ContractSpecificationRequest.newBuilder().setSpecificationId(this).setIncludeRecordSpecs(true).build()).recordSpecificationsList
         .firstOrNull()
         ?.specification
-        ?.name ?: throw RecordSpecNotFoundException("Could not resolve a record spec associated with contract spec address $this")
+        ?: throw RecordSpecNotFoundException("Could not resolve a record spec associated with contract spec address $this")
 }
