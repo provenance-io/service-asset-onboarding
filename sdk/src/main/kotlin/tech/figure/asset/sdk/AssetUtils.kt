@@ -250,6 +250,7 @@ class AssetUtils (
                 } else {
                     ""
                 })
+                .setStatus(RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED)
                 .build()
         } ?: RecordSpecInputs.map {
             RecordInput.newBuilder().apply {
