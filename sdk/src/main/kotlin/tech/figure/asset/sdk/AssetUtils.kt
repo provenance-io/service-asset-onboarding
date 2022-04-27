@@ -17,6 +17,7 @@ import io.provenance.metadata.v1.PartyType
 import io.provenance.metadata.v1.RecordInput
 import io.provenance.metadata.v1.RecordInputStatus
 import io.provenance.metadata.v1.RecordOutput
+import io.provenance.metadata.v1.RecordSpecification
 import io.provenance.metadata.v1.ResultStatus
 import io.provenance.objectstore.proto.Objects
 import io.provenance.scope.objectstore.client.OsClient
@@ -196,7 +197,7 @@ class AssetUtils (
         owner: String,
         scopeSpecAddress: String? = null,
         contractSpecAddress: String? = null,
-        recordName: String? = null,
+        recordSpec: RecordSpecification? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
         // Generate a session identifier
@@ -238,7 +239,49 @@ class AssetUtils (
 
         // If a record spec name was provided, use that value. Otherwise, default out to the
         // default record name
-        val resolvedRecordSpecName = recordName ?: RecordSpecName
+        val resolvedRecordSpecName = recordSpec?.name ?: RecordSpecName
+
+        val recordInputs = recordSpec?.inputsList?.map { input ->
+            RecordInput.newBuilder()
+                .setName(input.name)
+                .setTypeName(input.typeName)
+                .setHash(if (input.name == recordSpec.name) { // all record specs should have one input with the name of the spec
+                    scopeHash
+                } else {
+                    ""
+                })
+                .build()
+        } ?: RecordSpecInputs.map {
+            RecordInput.newBuilder().apply {
+                name = it.name
+                typeName = it.typeName
+                hash = if (it.name == "AssetHash") {
+                    scopeHash
+                } else {
+                    ""
+                }
+                status = RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED
+            }.build()
+        }
+
+        val recordOutputs = recordSpec?.inputsList?.map { input ->
+            RecordOutput.newBuilder()
+                .setHash(if (input.name == recordSpec.name) { // all record specs should have one input with the name of the spec
+                    scopeHash
+                } else {
+                    ""
+                }).setStatus(ResultStatus.RESULT_STATUS_PASS)
+                .build()
+        } ?: RecordSpecInputs.map {
+            RecordOutput.newBuilder().apply {
+                hash = if (it.name == "AssetHash") {
+                    scopeHash
+                } else {
+                    ""
+                }
+                status = ResultStatus.RESULT_STATUS_PASS
+            }.build()
+        }
 
         // Build TX message body
         return listOf(
@@ -281,28 +324,8 @@ class AssetUtils (
                     .setSessionId(MetadataAddress.forSession(scopeId, sessionId).bytes.toByteString())
                     .setSpecificationId(MetadataAddress.forRecordSpecification(contractSpecMetadataAddress.getPrimaryUuid(), resolvedRecordSpecName).bytes.toByteString())
                     .setName(resolvedRecordSpecName)
-                    .addAllInputs(RecordSpecInputs.map {
-                        RecordInput.newBuilder().apply {
-                            name = it.name
-                            typeName = it.typeName
-                            hash = if (it.name == "AssetHash") {
-                                scopeHash
-                            } else {
-                                ""
-                            }
-                            status = RecordInputStatus.RECORD_INPUT_STATUS_PROPOSED
-                        }.build()
-                    })
-                    .addAllOutputs(RecordSpecInputs.map {
-                        RecordOutput.newBuilder().apply {
-                            hash = if (it.name == "AssetHash") {
-                                scopeHash
-                            } else {
-                                ""
-                            }
-                            status = ResultStatus.RESULT_STATUS_PASS
-                        }.build()
-                    })
+                    .addAllInputs(recordInputs)
+                    .addAllOutputs(recordOutputs)
                     .processBuilder
                         .setName(RecordProcessName)
                         .setMethod(RecordProcessMethod)
