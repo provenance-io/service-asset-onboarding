@@ -123,7 +123,7 @@ class AssetOnboardService(
         ?.let(MetadataAddress::fromBytes)
         ?.toString() ?: throw ContractSpecNotFoundException("Could not resolve a contract spec address associated with scope spec address $this")
 
-    private fun String.getRecordSpecs(): RecordSpecification = pbClient.metadataClient.contractSpecification(
+    private fun String.getFirstRecordSpec(): RecordSpecification = pbClient.metadataClient.contractSpecification(
         ContractSpecificationRequest.newBuilder().setSpecificationId(this).setIncludeRecordSpecs(true).build()).recordSpecificationsList
         .firstOrNull()
         ?.specification
