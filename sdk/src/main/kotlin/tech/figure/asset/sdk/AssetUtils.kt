@@ -1,9 +1,9 @@
 package tech.figure.asset.sdk
 
-import com.figure.wallet.pbclient.extension.toAny
-import com.figure.wallet.pbclient.extension.toTxBody
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.client.protobuf.extensions.toAny
+import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.metadata.v1.DefinitionType
 import io.provenance.metadata.v1.InputSpecification
 import io.provenance.metadata.v1.MsgWriteContractSpecificationRequest

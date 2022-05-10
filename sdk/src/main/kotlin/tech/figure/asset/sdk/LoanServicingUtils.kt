@@ -1,8 +1,8 @@
 package tech.figure.asset.sdk
 
-import com.figure.wallet.pbclient.extension.toAny
-import com.figure.wallet.pbclient.extension.toTxBody
 import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.client.protobuf.extensions.toAny
+import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.metadata.v1.*
 import io.provenance.scope.util.MetadataAddress
 import io.provenance.scope.util.toByteString

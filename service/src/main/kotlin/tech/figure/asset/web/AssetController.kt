@@ -2,10 +2,10 @@ package tech.figure.asset.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.provenance.scope.encryption.util.getAddress
+import io.provenance.scope.util.toUuid
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -62,7 +62,7 @@ class AssetController(
         @RequestHeader(name = "x-address", required = false) xAddress: String,
         response: HttpServletResponse
     ): TxBody {
-        val assetId = asset.id.value.toUUID()
+        val assetId = asset.id.value.toUuid()
         logger.info("REST request to onboard asset $assetId${if (type != null) " and type $type" else ""}")
 
         // store in EOS

@@ -7,12 +7,11 @@ plugins {
 allprojects {
     val project = this
     group = "tech.figure.asset"
-    version = figureArtifactVersion()
+    version = deriveArtifactVersion()
 
     println("Project version is: $version")
 
     repositories {
-        figureNexusMirrorRepository(project)
         mavenCentral()
     }
 }
@@ -26,7 +25,6 @@ subprojects {
     }
 
     repositories {
-        figureNexusMirrorRepository(project)
         mavenCentral()
         flatDir {
             dirs("${project.projectDir}/../lib")

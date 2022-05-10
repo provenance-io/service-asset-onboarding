@@ -1,8 +1,8 @@
 package tech.figure.asset.services
 
-import com.figure.classification.asset.client.client.base.ACClient
 import com.google.protobuf.Message
 import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.classification.asset.client.client.base.ACClient
 import io.provenance.client.grpc.PbClient
 import io.provenance.metadata.v1.ContractSpecificationRequest
 import io.provenance.metadata.v1.RecordSpecification

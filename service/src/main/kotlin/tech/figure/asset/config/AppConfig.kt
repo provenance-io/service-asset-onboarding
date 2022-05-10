@@ -1,8 +1,8 @@
 package tech.figure.asset.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.figure.classification.asset.client.client.base.ACClient
-import com.figure.classification.asset.client.client.base.ContractIdentifier
+import io.provenance.classification.asset.client.client.base.ACClient
+import io.provenance.classification.asset.client.client.base.ContractIdentifier
 import io.provenance.client.grpc.GasEstimationMethod
 import io.provenance.client.grpc.PbClient
 import org.slf4j.LoggerFactory
@@ -15,12 +15,10 @@ import org.springframework.context.annotation.Primary
 import org.springframework.http.MediaType
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.ApiInfo
-import springfox.documentation.service.ApiKey
 import springfox.documentation.service.Contact
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import tech.figure.asset.OBJECT_MAPPER
-import springfox.documentation.swagger.web.*
 import tech.figure.asset.extensions.info
 import tech.figure.asset.services.AssetOnboardService
 import java.lang.management.ManagementFactory

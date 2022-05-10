@@ -9,7 +9,6 @@ dependencies {
     api("com.google.protobuf:protobuf-java:${Versions.Protobuf}")
 
     listOf(
-        Dependencies.Figure.Wallet.PbClient,
         Dependencies.GoogleGuava,
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
@@ -21,8 +20,7 @@ dependencies {
         Dependencies.Protobuf.Java,
         Dependencies.Protobuf.JavaUtil,
         Dependencies.Provenance.AssetModel,
-        Dependencies.Provenance.PbcProto,
-        Dependencies.Provenance.Protobuf.PbProtoJava
+        Dependencies.Provenance.Protobuf.PbProtoKotlin
     ).forEach { dep ->
         dep.implementation(this)
     }
@@ -69,7 +67,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
-            artifactId = project.name.toString()
+            artifactId = project.name
             version = project.version.toString()
 
             from(components["java"])

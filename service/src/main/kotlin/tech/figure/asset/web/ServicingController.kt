@@ -2,10 +2,10 @@ package tech.figure.asset.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.figure.extensions.uuid.toUUID
 import com.google.common.io.BaseEncoding
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.provenance.scope.encryption.util.getAddress
+import io.provenance.scope.util.toUuid
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -65,7 +65,7 @@ class ServicingController(
         response.addHeader("x-asset-hash", hash)
 
         // create the metadata TX message
-        return createScopeTx(loanState.loanId.value.toUUID(), hash, xAddress, permissionAssetManager)
+        return createScopeTx(loanState.loanId.value.toUuid(), hash, xAddress, permissionAssetManager)
     }
 
     private fun storeAsset(

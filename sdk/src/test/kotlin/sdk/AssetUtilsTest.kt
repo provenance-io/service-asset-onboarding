@@ -1,10 +1,12 @@
 package tech.figure.asset.sdk
 
+import io.provenance.metadata.v1.InputSpecification
 import io.provenance.metadata.v1.MsgWriteRecordRequest
 import io.provenance.metadata.v1.MsgWriteScopeRequest
 import io.provenance.metadata.v1.MsgWriteSessionRequest
 import io.provenance.metadata.v1.PartyType
 import io.provenance.metadata.v1.RecordInputStatus
+import io.provenance.metadata.v1.RecordSpecification
 import io.provenance.metadata.v1.ResultStatus
 import io.provenance.scope.encryption.dime.ProvenanceDIME
 import io.provenance.scope.encryption.ecies.ECUtils
@@ -308,7 +310,13 @@ class AssetUtilsTest {
                 owner = testKeyPair.public.getAddress(mainNet = false),
                 scopeSpecAddress = specAddress,
                 contractSpecAddress = contractSpecAddress,
-                recordName = recordName,
+                recordSpec = RecordSpecification.newBuilder().also { recordSpec ->
+                    recordSpec.name = recordName
+                    recordSpec.addInputs(InputSpecification.newBuilder().also { inputSpec ->
+                        inputSpec.name = recordName
+                        inputSpec.typeName = String::class.qualifiedName
+                    })
+                }.build(),
             )
             // Sanity check: All three messages should be generated (MsgWriteScopeRequest, MsgWriteSessionRequest, MsgWriteRecordRequest)
             Assertions.assertEquals(3, result.messagesCount)

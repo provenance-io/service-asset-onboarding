@@ -9,7 +9,6 @@ dependencies {
     implementation(project(":sdk"))
 
     listOf(
-        Dependencies.Figure.Wallet.PbClient,
         Dependencies.Kotlin.StdlbJdk8,
         Dependencies.Kotlin.CoroutinesCoreJvm,
         Dependencies.Kotlin.CoroutinesJdk8,
@@ -24,9 +23,8 @@ dependencies {
         Dependencies.Protobuf.JavaUtil,
         Dependencies.Provenance.HdWallet.HdWallet,
         Dependencies.Provenance.HdWallet.HdWalletBip39,
-        Dependencies.Provenance.PbcProto,
         Dependencies.Provenance.AssetModel,
-        Dependencies.Provenance.Protobuf.PbProtoJava,
+        Dependencies.Provenance.Protobuf.PbProtoKotlin,
         Dependencies.Provenance.Client.GrpcClientKotlin,
         Dependencies.OkHttp.Core,
         Dependencies.OkHttp.LoggingInterceptor,
