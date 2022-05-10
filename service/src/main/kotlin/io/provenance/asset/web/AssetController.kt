@@ -56,7 +56,7 @@ class AssetController(
         @RequestBody asset: Asset,
         @ApiParam(value = "Asset type being onboarded", example = "heloc")
         @RequestParam(required = false) type: String?,
-        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @ApiParam(value = "Allow Provenance Blockchain Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,
@@ -93,7 +93,7 @@ class AssetController(
     )
     fun onboardFileNFT(
         @RequestParam file: MultipartFile,
-        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @ApiParam(value = "Allow Provenance Blockchain Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,

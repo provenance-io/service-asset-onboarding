@@ -96,10 +96,10 @@ class AppConfig(
     @Bean
     fun api(docketProperties: DocketProperties): Docket {
 
-        val contact = Contact("Figure Technologies", "https://figure.tech", null)
+        val contact = Contact(docketProperties.contactName, docketProperties.contactUrl, null)
 
         val apiInfo = ApiInfo(
-            "Figure Tech Asset Onboarding API",
+            docketProperties.apiTitle,
             "",
             "1.0",
             "",
@@ -121,7 +121,7 @@ class AppConfig(
                     // ApiKey("Token Access", "apikey", "header")
             ))
             .select()
-            .apis(RequestHandlerSelectors.basePackage("tech.figure.asset.web"))
+            .apis(RequestHandlerSelectors.basePackage("io.provenance.asset.web"))
             .build()
     }
 

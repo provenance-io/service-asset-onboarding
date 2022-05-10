@@ -49,7 +49,7 @@ class ServicingController(
     )
     fun onboard(
         @RequestBody loanState: LoanState,
-        @ApiParam(value = "Allow Figure Tech Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @ApiParam(value = "Allow Provenance Blockchain Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
         @RequestHeader(name = "x-address", required = false) xAddress: String,

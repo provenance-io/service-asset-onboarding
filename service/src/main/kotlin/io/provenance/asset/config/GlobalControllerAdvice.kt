@@ -11,7 +11,7 @@ import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import io.provenance.asset.exceptions.MissingPublicKeyException
 
-@ControllerAdvice(basePackages = ["tech.figure.asset.web"])
+@ControllerAdvice(basePackages = ["io.provenance.asset.web"])
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class GlobalControllerAdvice : ResponseEntityExceptionHandler() {
 

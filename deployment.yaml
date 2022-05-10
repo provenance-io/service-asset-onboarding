@@ -74,6 +74,9 @@ spec:
           common:
             JMX_DOMAIN: "tech.figure"
             DOCKET_HOST: "test.figure.tech/service-asset-onboarding"
+            DOCKET_CONTACT_NAME: "Figure Technologies"
+            DOCKET_CONTACT_URL: "https://figure.tech"
+            DOCKET_API_NAME: "Figure Tech Asset Onboarding API"
         readinessProbe:
           path: /service-asset-onboarding/manage/health
           periodSeconds: 3

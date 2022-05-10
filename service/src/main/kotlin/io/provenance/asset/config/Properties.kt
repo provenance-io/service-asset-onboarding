@@ -52,6 +52,15 @@ class DocketProperties : LoggableProperties() {
     @NotNull
     lateinit var protocols: Set<String>
 
+    @NotNull
+    lateinit var contactName: String
+
+    @NotNull
+    lateinit var contactUrl: String
+
+    @NotNull
+    lateinit var apiTitle: String
+
 }
 
 @ConfigurationProperties(prefix = "service-keys")
