@@ -52,8 +52,8 @@ tasks {
         }
         manifest {
             attributes(mapOf(
-                "Class-Path" to "tech.figure.asset.cli lib/bcprov-jdk15on-1.68.jar",
-                "Main-Class" to "tech.figure.asset.cli.ApplicationKt"
+                "Class-Path" to "io.provenance.asset.cli lib/bcprov-jdk15on-1.68.jar",
+                "Main-Class" to "io.provenance.asset.cli.ApplicationKt"
             ))
         }
         transform(IncludeResourceTransformer::class.java) {

@@ -1,5 +1,9 @@
-package tech.figure.asset.sdk
+package io.provenance.asset.sdk
 
+import io.provenance.asset.sdk.AssetUtils
+import io.provenance.asset.sdk.AssetUtilsConfig
+import io.provenance.asset.sdk.ObjectStoreConfig
+import io.provenance.asset.sdk.SpecificationConfig
 import io.provenance.metadata.v1.InputSpecification
 import io.provenance.metadata.v1.MsgWriteRecordRequest
 import io.provenance.metadata.v1.MsgWriteScopeRequest
@@ -49,7 +53,8 @@ class AssetUtilsTest {
 
     val testKeyPair: KeyPair = ProvenanceKeyGenerator.generateKeyPair()
 
-    val assetUtils = AssetUtils(AssetUtilsConfig(
+    val assetUtils = AssetUtils(
+        AssetUtilsConfig(
         osConfig = ObjectStoreConfig(
             url = OS_CONFIG_URL,
             timeoutMs = OS_CONFIG_TIMEOUT_MS,
@@ -58,7 +63,8 @@ class AssetUtilsTest {
             contractSpecId = testContractSpecId,
             scopeSpecId = testScopeSpecId,
         )
-    ))
+    )
+    )
 
     @Test
     fun `Generate Keypair`() {

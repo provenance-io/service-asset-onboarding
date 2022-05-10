@@ -10,6 +10,6 @@ pluginManagement {
 
 include(
     "sdk",
-    //"cli",
+    // "cli",
     "service"
 )

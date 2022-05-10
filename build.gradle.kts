@@ -6,6 +6,7 @@ plugins {
 
 allprojects {
     val project = this
+    // TODO: Change this to io.provenance.asset before migrating to public
     group = "tech.figure.asset"
     version = deriveArtifactVersion()
 

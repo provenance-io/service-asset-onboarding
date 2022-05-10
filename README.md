@@ -18,6 +18,7 @@ Figure Technologies
 
 ### Api Key
 
+TODO: Remove Api Key note before going public
 https://github.com/FigureTechnologies/cloud/pull/1570/files
 
 ## Toolchain

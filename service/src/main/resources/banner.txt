@@ -9,4 +9,4 @@ ${AnsiColor.CYAN}
                                                                                                |___/ 
 
 
-                ${AnsiStyle.UNDERLINE}${AnsiColor.WHITE}${AnsiBackground.BLACK}  Figure Technologies  ${AnsiStyle.NORMAL}
+                ${AnsiStyle.UNDERLINE}${AnsiColor.WHITE}${AnsiBackground.BLACK}  Provenance Blockchain Foundation  ${AnsiStyle.NORMAL}
