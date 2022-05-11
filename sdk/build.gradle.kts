@@ -1,5 +1,7 @@
 plugins {
     `java-library`
+    `maven-publish`
+    signing
 }
 
 dependencies {
@@ -57,4 +59,69 @@ tasks.register<Exec>("testComposeUp") {
 tasks.register<Exec>("testComposeDown") {
     workingDir("../")
     commandLine("./dc.sh", "down")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+configure<PublishingExtension> {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = name
+            version = project.version.toString()
+
+            from(components["java"])
+
+            pom {
+                name.set("Asset Onboarding SDK")
+                description.set("Tooling for creating Asset scopes and storing in Object Store")
+                url.set("https://provenance.io")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("vwagner")
+                        name.set("Valerie Wagner")
+                        email.set("vwagner@figure.com")
+                    }
+                    developer {
+                        id.set("kherzinger-figure")
+                        name.set("Kory Herzinger")
+                        email.set("kherzinger@figure.com")
+                    }
+                    developer {
+                        id.set("jazzy-figure")
+                        name.set("Jahanzeb Baber")
+                        email.set("jbaber@figure.com")
+                    }
+                    developer {
+                        id.set("afremuth-figure")
+                        name.set("Anthony Fremuth")
+                        email.set("afremuth@figure.com")
+                    }
+                    developer {
+                        id.set("johnlouiefigure")
+                        name.set("John Louie")
+                        email.set("jlouie@figure.com")
+                    }
+                }
+                scm {
+                    developerConnection.set("git@github.com:provenance.io/service-asset-onboarding.git")
+                    connection.set("https://github.com/provenance-io/service-asset-onboarding.git")
+                    url.set("https://github.com/provenance-io/service-asset-onboarding")
+                }
+            }
+        }
+    }
+
+    configure<SigningExtension> {
+        sign(publications["maven"])
+    }
 }

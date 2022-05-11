@@ -1,5 +1,7 @@
 FROM openjdk:11-jre
 
+LABEL org.opencontainers.image.source=https://github.com/provenance-io/service-asset-onboarding
+
 ADD service/build/libs/service*.jar /service-asset-onboarding.jar
 ADD service/docker/configure /configure
 
