@@ -61,7 +61,7 @@ jobs:
         with:
           name: service
           path: service/build/libs/*.jar
-        
+
   docker_build:
     name: Build and Publish Docker Image
     needs: java_build
