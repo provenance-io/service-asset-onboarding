@@ -71,6 +71,12 @@ spec:
             LOAN_STATE_CONTRACT_SPEC_ID: "23089739-4fd7-4c70-8e32-a6f0500ef4c1"
             LOAN_STATE_SCOPE_SPEC_ID: "2148d958-2b92-440b-b7ff-ed0263583090"
             ASSET_MANAGER_PUBLIC_KEY: "BOWm7T9YcvJNqwi60haIQHoAj8YlyLguirg83cdo3tx3hUqSBMcwZdrLn6gCCYCcF2CtEZBTvFgYc2CmMCU5NQg="
+          common:
+            JMX_DOMAIN: "tech.figure"
+            DOCKET_HOST: "test.figure.tech/service-asset-onboarding"
+            DOCKET_CONTACT_NAME: "Figure Technologies"
+            DOCKET_CONTACT_URL: "https://figure.tech"
+            DOCKET_API_NAME: "Figure Tech Asset Onboarding API"
         readinessProbe:
           path: /service-asset-onboarding/manage/health
           periodSeconds: 3

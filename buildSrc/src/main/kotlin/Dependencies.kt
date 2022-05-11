@@ -3,29 +3,14 @@ import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.ScriptHandlerScope
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.plugin.use.PluginDependenciesSpec
-import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaAnnotation
-
-object RepositoryLocations {
-    const val FigureNexusMirror = "https://nexus.figure.com/repository/mirror"
-    const val FigureNexusFigure = "https://nexus.figure.com/repository/figure"
-}
 
 object Versions {
-    // Branch targets for internal deps
-    const val Main = "main-+"
-    const val Master = "master-+"
-    const val Develop = "develop-+"
-
-    const val ProvenanceCore = Master
-    const val ProvenancePbc = Master
-    const val ProvenanceProtobuf = Master
+    const val ProvenanceProtobuf = "1.8.0"
     const val ProvenanceClient = "1.0.5"
     const val ProvenanceHdWallet = "0.1.15"
+    const val ProvenanceAssetClassification = "1.0.2"
     const val AssetModel = "0.1.2"
     const val P8eScope = "0.1.0"
-    const val StreamData = Master
-    const val FigureUtil = Master
-    const val WalletPbClient = Develop
     // const val Detekt = "1.17.0"
     const val Kotlin = "1.5.0"
     const val KotlinCoroutines = "1.5.0"
@@ -169,25 +154,10 @@ object Dependencies {
         val Annotations = DependencySpec("io.swagger:swagger-annotations", Versions.Swagger)
     }
 
-    object Figure {
-        val Util = DependencySpec("com.figure:figure-util", Versions.FigureUtil)
-        val StreamData = DependencySpec("com.figure:stream-data", Versions.StreamData, isChanging = true)
-        object Wallet {
-            val PbClient = DependencySpec("com.figure.wallet:pb-client", Versions.WalletPbClient)
-        }
-    }
-
     object Provenance {
-        val CoreLocking = DependencySpec("io.provenance:core-locking", Versions.ProvenanceCore)
-        val CoreLogging = DependencySpec("io.provenance:core-logging", Versions.ProvenanceCore)
-        val CoreCoroutinesSupport = DependencySpec(
-            "io.provenance:core-coroutines-support",
-            Versions.ProvenanceCore
-        )
         val AssetModel = DependencySpec("io.provenance.model:metadata-asset-model", Versions.AssetModel)
-        val PbcProto = DependencySpec("io.provenance.pbc:pbc-proto", Versions.ProvenancePbc)
         object Protobuf {
-            val PbProtoJava = DependencySpec("io.provenance.protobuf:pb-proto-java", Versions.ProvenanceProtobuf)
+            val PbProtoKotlin = DependencySpec("io.provenance:proto-kotlin", Versions.ProvenanceProtobuf)
         }
         object Client {
             val GrpcClientKotlin = DependencySpec("io.provenance.client:pb-grpc-client-kotlin", Versions.ProvenanceClient)
@@ -233,7 +203,7 @@ object Dependencies {
     val Hamkrest = DependencySpec("com.natpryce:hamkrest", "1.8.0.1")
     val SpringMockk = DependencySpec("com.ninja-squad:springmockk", "3.0.1")
     val KotlinFaker = DependencySpec("io.github.serpro69:kotlin-faker:1.7.1")
-    val Fuel = DependencySpec(     "com.github.kittinunf.fuel:fuel:2.0.1" )
+    val Fuel = DependencySpec("com.github.kittinunf.fuel:fuel:2.3.1")
 
     object Jupiter {
         val JupiterApi = DependencySpec("org.junit.jupiter:junit-jupiter-api", Versions.JunitJupiter)
@@ -241,7 +211,7 @@ object Dependencies {
     }
 
     object AssetClassification {
-        val Client = DependencySpec("com.figure.classification.asset:client", Versions.Main)
+        val Client = DependencySpec("io.provenance.classification.asset:ac-client", Versions.ProvenanceAssetClassification)
     }
 }
 

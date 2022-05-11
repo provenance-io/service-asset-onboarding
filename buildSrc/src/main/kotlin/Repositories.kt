@@ -18,8 +18,6 @@ fun RepositoryHandler.mavenRepository(project: Project, repoUrl: String): MavenA
     }
 }
 
-fun RepositoryHandler.figureNexusMirrorRepository(project: Project): MavenArtifactRepository =
-    mavenRepository(project, RepositoryLocations.FigureNexusMirror)
-
+// TODO: Remove before transferring to public repository - kept for figure nexus publishing
 fun RepositoryHandler.figureNexusFigureRepository(project: Project): MavenArtifactRepository =
-    mavenRepository(project, RepositoryLocations.FigureNexusFigure)
+    mavenRepository(project, "https://nexus.figure.com/repository/figure")

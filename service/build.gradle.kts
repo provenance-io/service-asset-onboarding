@@ -42,11 +42,9 @@ dependencies {
         Dependencies.Arrow.Core,
         Dependencies.P8eScope.Encryption,
         Dependencies.Provenance.AssetModel,
-        Dependencies.Provenance.PbcProto,
-        Dependencies.Provenance.Protobuf.PbProtoJava,
+        Dependencies.Provenance.Protobuf.PbProtoKotlin,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Jackson.Hubspot,
-        Dependencies.Figure.Util,
         Dependencies.AssetClassification.Client,
     ).forEach { dep ->
         dep.implementation(this)
