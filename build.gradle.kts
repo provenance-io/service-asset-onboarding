@@ -1,13 +1,12 @@
 plugins {
     kotlin("jvm") version Versions.Kotlin apply false
     id("java")
-    `maven-publish`
 }
 
 allprojects {
     val project = this
     // TODO: Change this to io.provenance.asset before migrating to public
-    group = "tech.figure.asset"
+    group = "io.provenance.asset"
     version = deriveArtifactVersion()
 
     println("Project version is: $version")
@@ -22,7 +21,6 @@ subprojects {
         Plugins.Kotlin.addTo(this)
         Plugins.Idea.addTo(this)
         plugin("java")
-        plugin("maven-publish")
     }
 
     repositories {
@@ -50,10 +48,4 @@ subprojects {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-publishing {
-    repositories {
-        figureNexusFigureRepository(project)
-    }
 }

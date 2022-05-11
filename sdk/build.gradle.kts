@@ -1,6 +1,5 @@
 plugins {
     `java-library`
-    `maven-publish`
 }
 
 dependencies {
@@ -58,19 +57,4 @@ tasks.register<Exec>("testComposeUp") {
 tasks.register<Exec>("testComposeDown") {
     workingDir("../")
     commandLine("./dc.sh", "down")
-}
-
-publishing {
-    repositories {
-        figureNexusFigureRepository(project)
-    }
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-
-            from(components["java"])
-        }
-    }
 }

@@ -11,7 +11,7 @@ fun <S : WebTestClient.RequestHeadersSpec<S>> WebTestClient.RequestHeadersSpec<S
 
 fun WebTestClient.RequestBodySpec.contentTypeJson() = contentType(MediaType.APPLICATION_JSON)
 
-fun <S : WebTestClient.RequestHeadersSpec<S>> WebTestClient.RequestHeadersSpec<S>.applyFigureHeaders(
+fun <S : WebTestClient.RequestHeadersSpec<S>> WebTestClient.RequestHeadersSpec<S>.applyProvenanceHeaders(
     uuid: UUID = UUID.randomUUID(),
 ): S = headers {
     it["x-uuid"] = "$uuid"
