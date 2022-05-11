@@ -16,11 +16,6 @@ Service
 Provenance Blockchain Foundation
 ```
 
-### Api Key
-
-TODO: Remove Api Key note before going public
-https://github.com/FigureTechnologies/cloud/pull/1570/files
-
 ## Toolchain
 
 These tools are known to work. You can use others if you wish, but YMMV.
