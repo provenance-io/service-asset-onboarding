@@ -66,11 +66,14 @@ java {
     withJavadocJar()
 }
 
+// Pre-declare artifact name because the create context will swap the name to "maven"
+val artifactName = name
+
 configure<PublishingExtension> {
     publications {
         create<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = name
+            artifactId = artifactName
             version = project.version.toString()
 
             from(components["java"])
