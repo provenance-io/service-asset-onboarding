@@ -56,6 +56,12 @@ jobs:
           -Psigning.keyId=B7D30ABE -Psigning.password="${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}" -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/release.gpg \
           --info
 
+      - name: Upload Service Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: service
+          path: service/build/libs/*.jar
+        
   docker_build:
     name: Build and Publish Docker Image
     needs: java_build
