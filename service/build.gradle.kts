@@ -114,5 +114,5 @@ tasks.register<JavaExec>("ktlintFormat") {
 }
 
 tasks.bootRun {
-    args("--spring.profiles.active=development, local")
+    args("--spring-profiles-active=${System.getenv("SPRING_PROFILES_ACTIVE") ?: "development"}")
 }
