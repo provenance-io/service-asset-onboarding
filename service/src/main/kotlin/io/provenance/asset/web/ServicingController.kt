@@ -108,7 +108,7 @@ class ServicingController(
             additionalAudiences.add(
                 ECUtils.convertBytesToPublicKey(
                     BaseEncoding.base64().decode(serviceKeysProperties.assetManager)
-                ).getAddress(provenanceProperties.isMainnet.toBoolean())
+                ).getAddress(provenanceProperties.mainnet)
             )
         }
 

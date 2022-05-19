@@ -19,7 +19,7 @@ class ObjectStoreProperties : LoggableProperties() {
 class ProvenanceProperties : LoggableProperties() {
 
     @NotNull
-    lateinit var isMainnet: String
+    var mainnet: Boolean = false
 
     @NotNull
     lateinit var chainId: String
