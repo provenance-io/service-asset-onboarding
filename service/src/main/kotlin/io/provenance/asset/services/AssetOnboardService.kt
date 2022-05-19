@@ -92,6 +92,7 @@ class AssetOnboardService(
         assetType: String? = null,
         additionalAudiences: Set<String> = emptySet(),
     ): TxOuterClass.TxBody {
+        logger.info("Building scope [$scopeId] for owner [$owner] with additional audiences $additionalAudiences${assetType?.let { type -> " and asset type [$type]" } ?: ""}")
         val (scopeSpecAddress, contractSpecAddress, recordSpec) = assetType?.let { type ->
             acClient
                 // All entries into the classification smart contract are lowercase. Coerce the provided value to ensure
