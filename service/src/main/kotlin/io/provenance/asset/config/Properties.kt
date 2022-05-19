@@ -19,7 +19,7 @@ class ObjectStoreProperties : LoggableProperties() {
 class ProvenanceProperties : LoggableProperties() {
 
     @NotNull
-    var isMainnet: Boolean = false
+    lateinit var isMainnet: String
 
     @NotNull
     lateinit var chainId: String
@@ -29,7 +29,6 @@ class ProvenanceProperties : LoggableProperties() {
 
     @NotNull
     lateinit var assetClassificationContractName: String
-
 }
 
 @ConfigurationProperties(prefix = "asset-spec")
