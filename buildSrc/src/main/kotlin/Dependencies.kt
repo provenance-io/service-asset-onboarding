@@ -8,7 +8,7 @@ object Versions {
     const val ProvenanceProtobuf = "1.8.0"
     const val ProvenanceClient = "1.0.5"
     const val ProvenanceHdWallet = "0.1.15"
-    const val ProvenanceAssetClassification = "1.0.2"
+    const val ProvenanceAssetClassification = "1.1.3"
     const val AssetModel = "0.1.2"
     const val P8eScope = "0.1.0"
     // const val Detekt = "1.17.0"
