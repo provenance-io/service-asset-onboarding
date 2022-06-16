@@ -1,0 +1,1 @@
+host.docker.internal:5432:postgres:password1:postgres

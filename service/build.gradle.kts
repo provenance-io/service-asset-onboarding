@@ -45,6 +45,7 @@ dependencies {
         Dependencies.Provenance.Protobuf.PbProtoKotlin,
         Dependencies.Jackson.KotlinModule,
         Dependencies.Jackson.Hubspot,
+        Dependencies.Jackson.Dataformat.Csv,
         Dependencies.AssetClassification.Client,
     ).forEach { dep ->
         dep.implementation(this)
