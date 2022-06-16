@@ -1,8 +1,18 @@
 package io.provenance.asset.web
 
+import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.google.common.io.BaseEncoding
+import cosmos.tx.v1beta1.TxOuterClass
+import io.provenance.asset.config.ProvenanceProperties
+import io.provenance.asset.config.ServiceKeysProperties
+import io.provenance.asset.sdk.extensions.toBase64String
+import io.provenance.asset.sdk.extensions.toJson
+import io.provenance.asset.services.AssetOnboardService
+import io.provenance.client.protobuf.extensions.toTxBody
 import io.provenance.scope.encryption.ecies.ECUtils
 import io.provenance.scope.encryption.util.getAddress
 import io.provenance.scope.util.toUuid
@@ -16,22 +26,17 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import tech.figure.asset.v1beta1.Asset
 import tech.figure.asset.v1beta1.AssetOuterClassBuilders.Asset
-import io.provenance.asset.config.ProvenanceProperties
-import io.provenance.asset.config.ServiceKeysProperties
-import io.provenance.asset.sdk.extensions.toBase64String
-import io.provenance.asset.sdk.extensions.toJson
-import io.provenance.asset.services.AssetOnboardService
 import tech.figure.proto.util.FileNFT
 import tech.figure.proto.util.toProtoAny
 import java.security.PublicKey
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 
+
 data class TxBody(
     val json: ObjectNode,
     val base64: List<String>
 )
-
 
 @RestController
 @RequestMapping("/api/v1/asset")
@@ -125,6 +130,71 @@ class AssetController(
         return createScopeTx(assetId, hash, xAddress, permissionAssetManager)
     }
 
+    @ExperimentalStdlibApi
+    @CrossOrigin(exposedHeaders = [ "x-asset-ids", "x-asset-hashes" ])
+    @PostMapping(value=["/mx"],
+        consumes = [MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE])
+    @ApiOperation(value = "Create one or more Asset(s)/NFT(s) from a CSV file")
+    @ApiResponse(
+        message = "Returns JSON encoded TX messages for writing scope(s) to Provenance.",
+        code = 200
+    )
+    fun onboardMX(
+        @RequestParam file: MultipartFile,
+        @ApiParam(value = "Asset type being onboarded", example = "heloc")
+        @RequestParam(required = false) type: String?,
+        @ApiParam(value = "Allow Provenance Blockchain Asset Manager to read this asset", defaultValue = "true", example = "true")
+        @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
+        @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
+        @RequestHeader(name = "x-address", required = false) xAddress: String,
+        response: HttpServletResponse
+    ): TxBody {
+
+        val schema = CsvSchema.emptySchema().withHeader()
+        val csvMapper = CsvMapper()
+
+        val assetEntriesIterator: MappingIterator<Map<String, Any>> = csvMapper.reader().forType(Map::class.java)
+            .with(schema)
+            .readValues(file.inputStream)
+
+        val assetEntries: List<Map<String, Any>> = assetEntriesIterator.readAll()
+
+        logger.info("REST request to onboard ${assetEntries.size} Asset(s)/NFT(s) from a CSV file.")
+
+        val onboardedAssetMetadata: MutableList<Pair<UUID, String>> = mutableListOf()
+
+        val objectMapper = ObjectMapper()
+        assetEntries.forEach { assetDataMap ->
+            val assetId = UUID.randomUUID()
+            val assetJSON = objectMapper.writeValueAsString(assetDataMap)
+
+            val asset = Asset {
+                idBuilder.value = assetId.toString()
+                this.type = FileNFT.ASSET_TYPE
+                description = "Asset $assetId"
+                putKv(FileNFT.KEY_FILENAME, "$assetId.json".toProtoAny())
+                putKv(FileNFT.KEY_SIZE, assetJSON.length.toLong().toProtoAny())
+                putKv(FileNFT.KEY_BYTES, assetJSON.toByteArray().toProtoAny())
+                putKv(FileNFT.KEY_CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE.toProtoAny())
+            }
+
+            // store in EOS
+            val assetHash = storeAsset(asset, xPublicKey, xAddress, permissionAssetManager)
+            onboardedAssetMetadata.add(Pair(assetId, assetHash))
+        }
+
+        // set the response headers
+        response.addHeader("x-asset-ids", onboardedAssetMetadata.joinToString { it.first.toString() })
+        response.addHeader("x-asset-hashes", onboardedAssetMetadata.joinToString { it.second })
+
+        // create the metadata TX message
+        return createScopesTx(
+            scopeIdAndHashes = onboardedAssetMetadata,
+            xAddress = xAddress,
+            permissionAssetManager = permissionAssetManager,
+            assetsType = type,
+        )
+    }
 
     @CrossOrigin
     @GetMapping("/{scopeId}")
@@ -212,6 +282,46 @@ class AssetController(
         return TxBody(
             json = ObjectMapper().readValue(txBody.toJson(), ObjectNode::class.java),
             base64 = txBody.messagesList.map { it.toByteArray().toBase64String() }
+        )
+    }
+
+    @ExperimentalStdlibApi
+    private fun createScopesTx(
+        scopeIdAndHashes: List<Pair<UUID, String>>,
+        xAddress: String,
+        permissionAssetManager: Boolean,
+        assetsType: String? = null
+    ): TxBody {
+        // assemble the list of additional audiences (allow Asset Manager to read data)
+        val additionalAudiences: MutableSet<String> = mutableSetOf()
+        if (permissionAssetManager) {
+            additionalAudiences.add(
+                ECUtils.convertBytesToPublicKey(
+                    BaseEncoding.base64().decode(serviceKeysProperties.assetManager)
+                ).getAddress(provenanceProperties.mainnet)
+            )
+        }
+
+        val txBodies = scopeIdAndHashes.map {
+            assetOnboardService.buildNewScopeMetadataTransaction(
+                scopeId = it.first,
+                hash = it.second,
+                owner = xAddress,
+                assetType = assetsType,
+                additionalAudiences = additionalAudiences,
+            )
+        }
+
+        return TxBody(
+            json = ObjectMapper().readValue(
+                txBodies.flatMap { txBody ->
+                    txBody.messagesList.map { it }
+                }.toTxBody().toJson(), ObjectNode::class.java),
+            base64 = txBodies.flatMap { txBody ->
+                txBody.messagesList.map {
+                    it.toByteArray().toBase64String()
+                }
+            }
         )
     }
 

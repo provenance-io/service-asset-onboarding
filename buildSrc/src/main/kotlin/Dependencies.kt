@@ -23,6 +23,7 @@ object Versions {
     const val KotlinLogging = "2.0.6"
     const val Retrofit = "2.9.0"
     const val OkHttp = "4.2.1"
+    const val Jackson = "2.12.+"
     const val Arrow = "0.13.2"
     const val Reactor = "3.4.6"
     const val JunitJupiter = "5.2.0"
@@ -130,17 +131,23 @@ object Dependencies {
     }
 
     object Jackson {
+        object Dataformat {
+            val Csv = DependencySpec(
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-csv",
+                Versions.Jackson
+            )
+        }
         val Databind = DependencySpec(
             "com.fasterxml.jackson.core:jackson-databind",
-            "2.12.+"
+            Versions.Jackson
         )
         val Datatype = DependencySpec(
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
-            "2.12.+"
+            Versions.Jackson
         )
         val KotlinModule = DependencySpec(
             "com.fasterxml.jackson.module:jackson-module-kotlin",
-            "2.12.+"
+            Versions.Jackson
         )
         val Hubspot = DependencySpec(
             "com.hubspot.jackson:jackson-datatype-protobuf",
