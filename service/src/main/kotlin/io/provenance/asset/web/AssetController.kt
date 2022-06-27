@@ -153,11 +153,11 @@ class AssetController(
         val schema = CsvSchema.emptySchema().withHeader()
         val csvMapper = CsvMapper()
 
-        val assetEntriesIterator: MappingIterator<Map<String, Any>> = csvMapper.reader().forType(Map::class.java)
+        val assetEntriesIterator: MappingIterator<Map<String, String>> = csvMapper.reader().forType(Map::class.java)
             .with(schema)
             .readValues(file.inputStream)
 
-        val assetEntries: List<Map<String, Any>> = assetEntriesIterator.readAll()
+        val assetEntries: List<Map<String, String>> = assetEntriesIterator.readAll()
 
         logger.info("REST request to onboard ${assetEntries.size} Asset(s)/NFT(s) from a CSV file.")
 
@@ -176,6 +176,9 @@ class AssetController(
                 putKv(FileNFT.KEY_SIZE, assetJSON.length.toLong().toProtoAny())
                 putKv(FileNFT.KEY_BYTES, assetJSON.toByteArray().toProtoAny())
                 putKv(FileNFT.KEY_CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE.toProtoAny())
+                assetDataMap.forEach { key, value ->
+                    putKv(key, value.toProtoAny())
+                }
             }
 
             // store in EOS
