@@ -142,7 +142,7 @@ class AssetController(
     fun onboardMX(
         @RequestParam file: MultipartFile,
         @ApiParam(value = "Asset type being onboarded", example = "heloc")
-        @RequestParam(required = false) type: String?,
+        @RequestParam(required = true) type: String,
         @ApiParam(value = "Allow Provenance Blockchain Asset Manager to read this asset", defaultValue = "true", example = "true")
         @RequestParam(defaultValue = "true", required = true) permissionAssetManager: Boolean = true,
         @RequestHeader(name = "x-public-key", required = false) xPublicKey: String,
@@ -159,23 +159,17 @@ class AssetController(
 
         val assetEntries: List<Map<String, String>> = assetEntriesIterator.readAll()
 
-        logger.info("REST request to onboard ${assetEntries.size} Asset(s)/NFT(s) from a CSV file.")
+        logger.info("REST request to onboard ${assetEntries.size} Asset(s)/NFT(s) from a CSV file for asset type $type.")
 
         val onboardedAssetMetadata: MutableList<Pair<UUID, String>> = mutableListOf()
 
-        val objectMapper = ObjectMapper()
         assetEntries.forEach { assetDataMap ->
             val assetId = UUID.randomUUID()
-            val assetJSON = objectMapper.writeValueAsString(assetDataMap)
 
             val asset = Asset {
                 idBuilder.value = assetId.toString()
-                this.type = FileNFT.ASSET_TYPE
+                this.type = type
                 description = "Asset $assetId"
-                putKv(FileNFT.KEY_FILENAME, "$assetId.json".toProtoAny())
-                putKv(FileNFT.KEY_SIZE, assetJSON.length.toLong().toProtoAny())
-                putKv(FileNFT.KEY_BYTES, assetJSON.toByteArray().toProtoAny())
-                putKv(FileNFT.KEY_CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE.toProtoAny())
                 assetDataMap.forEach { key, value ->
                     putKv(key, value.toProtoAny())
                 }
@@ -195,7 +189,7 @@ class AssetController(
             scopeIdAndHashes = onboardedAssetMetadata,
             xAddress = xAddress,
             permissionAssetManager = permissionAssetManager,
-            assetsType = type,
+            assetsType = null/*type*/,
         )
     }
 
