@@ -69,3 +69,12 @@ class ServiceKeysProperties : LoggableProperties() {
     lateinit var assetManager: String
 
 }
+
+@ConfigurationProperties(prefix = "cors")
+class CorsProperties : LoggableProperties() {
+
+    var allowedOrigins: List<String> = emptyList()
+    var allowedHeaders: List<String> = emptyList()
+    var allowedMethods: List<String> = emptyList()
+
+}
