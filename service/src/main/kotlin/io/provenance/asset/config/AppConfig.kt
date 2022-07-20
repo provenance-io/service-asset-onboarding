@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.http.MediaType
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.ApiInfo
 import springfox.documentation.service.Contact
@@ -31,7 +34,8 @@ import java.lang.management.ManagementFactory
         ProvenanceProperties::class,
         AssetSpecificationProperties::class,
         DocketProperties::class,
-        ServiceKeysProperties::class
+        ServiceKeysProperties::class,
+        CorsProperties::class
     ]
 )
 @Import(BuildProperties::class)
@@ -41,7 +45,8 @@ class AppConfig(
     provenanceProperties: ProvenanceProperties,
     assetSpecificationProperties: AssetSpecificationProperties,
     docketProperties: DocketProperties,
-    serviceKeysProperties: ServiceKeysProperties
+    serviceKeysProperties: ServiceKeysProperties,
+    corsProperties: CorsProperties
 ) {
 
     private var logger = LoggerFactory.getLogger(AppConfig::class.java)
@@ -56,6 +61,7 @@ class AppConfig(
         logger.info(assetSpecificationProperties.toLogMessages())
         logger.info(docketProperties.toLogMessages())
         logger.info(serviceKeysProperties.toLogMessages())
+        logger.info(corsProperties.toLogMessages())
 
         ManagementFactory.getRuntimeMXBean().inputArguments.map {
             logger.info("JVM arg: $it")
@@ -124,5 +130,23 @@ class AppConfig(
             .apis(RequestHandlerSelectors.basePackage("io.provenance.asset.web"))
             .build()
     }
+
+    @Bean
+    fun corsFilter(props: CorsProperties): CorsFilter = CorsFilter(UrlBasedCorsConfigurationSource().also {
+        val apiConfig = CorsConfiguration().also {
+            it.setAllowCredentials(false)
+            props.allowedOrigins.forEach { origin ->
+                it.addAllowedOrigin(origin)
+            }
+            props.allowedHeaders.forEach { header ->
+                it.addAllowedHeader(header)
+            }
+            props.allowedMethods.forEach { method ->
+                it.addAllowedMethod(method)
+            }
+        }
+
+        it.registerCorsConfiguration("/api/**", apiConfig)
+    })
 
 }
